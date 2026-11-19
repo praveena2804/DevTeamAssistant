@@ -1,0 +1,45 @@
+# Local gates (roadmap §8). Install with:  uv run pre-commit install
+# All hooks are local and use the project's locked toolchain, so no hook code is downloaded at commit time.
+repos:
+  - repo: local
+    hooks:
+      - id: ruff
+        name: ruff (lint)
+        entry: uv run ruff check --force-exclude
+        language: system
+        types_or: [python, pyi]
+      - id: ruff-format
+        name: ruff (format check)
+        entry: uv run ruff format --check --force-exclude
+        language: system
+        types_or: [python, pyi]
+      - id: mypy
+        name: mypy (strict, platform packages)
+        entry: uv run mypy packages apps scripts
+        language: system
+        pass_filenames: false
+        types: [python]
+      - id: import-linter
+        name: import-linter (dependency direction)
+        entry: uv run lint-imports
+        language: system
+        pass_filenames: false
+        types: [python]
+      - id: agent-count
+        name: ten-agent check (L3)
+        entry: uv run python scripts/check_agent_count.py
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: eslint
+        name: eslint (apps/web)
+        entry: npm --prefix apps/web run lint
+        language: system
+        pass_filenames: false
+        files: ^apps/web/
+      - id: gitleaks
+        name: gitleaks (staged changes)
+        entry: gitleaks git --pre-commit --staged --redact --no-banner
+        language: system
+        pass_filenames: false
+        always_run: true

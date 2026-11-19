@@ -1,0 +1,20 @@
+# Gitleaks configuration: the default ruleset plus a narrow allowlist.
+# Only generated, gitignored directories are excluded (they are never committed). Synthetic test fixtures
+# are marked inline with `gitleaks:allow`, never by disabling a rule.
+title = "DevTeam AI gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Generated, gitignored local directories"
+paths = [
+  '''(^|/)\.venv/''',
+  '''(^|/)node_modules/''',
+  '''(^|/)__pycache__/''',
+  '''(^|/)\.pytest_cache/''',
+  '''(^|/)\.mypy_cache/''',
+  '''(^|/)\.ruff_cache/''',
+  '''(^|/)\.hypothesis/''',
+  '''^apps/web/dist/''',
+]

@@ -1,0 +1,6 @@
+# Automated tests: no log files, fast lock timeouts.
+database:
+  busy_timeout_ms: 1000
+logging:
+  level: DEBUG
+  file_enabled: false

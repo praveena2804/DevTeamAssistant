@@ -1,0 +1,35 @@
+# DevTeam AI — platform defaults (lowest precedence).
+# Precedence: defaults.yaml < profiles/<profile>.yaml < .env < process environment (DEVTEAM_<SECTION>__<KEY>).
+# Validated at startup by devteam_core.config.Settings (unknown keys are rejected).
+profile: low_memory
+
+api:
+  host: 127.0.0.1
+  port: 8000
+
+paths:
+  data_dir: data
+  workspaces_dir: workspaces
+
+database:
+  state_db: state.db
+  checkpoints_db: checkpoints.db
+  busy_timeout_ms: 5000
+  auto_migrate: true          # back up, then upgrade data/state.db on API start (Working Plan §11)
+
+logging:
+  level: INFO
+  console_format: json        # json | console
+  file_enabled: true
+  file_name: devteam.log      # written under <data_dir>/logs/
+  file_max_bytes: 10485760
+  file_backup_count: 5
+
+ollama:
+  base_url: http://127.0.0.1:11434   # loopback only (Spec §9.1, roadmap P7)
+  request_timeout_s: 600
+
+resources:
+  max_parallel_deterministic: 1      # D-27 (recommended default; LLM and sandbox work always sequential)
+  llm_context_tokens: 4096           # Spec §9.3 initial range 4096–8192
+  min_free_ram_mb: 3072              # doctor warns below this

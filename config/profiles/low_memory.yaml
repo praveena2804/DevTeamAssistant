@@ -1,0 +1,5 @@
+# 16 GB CPU-only laptop profile (Spec §9.3). Default profile.
+resources:
+  max_parallel_deterministic: 1
+  llm_context_tokens: 4096
+  min_free_ram_mb: 3072

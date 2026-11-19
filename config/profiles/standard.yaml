@@ -1,0 +1,5 @@
+# Machines with more free memory. LLM calls and sandbox runs remain strictly sequential (Spec §7.2).
+resources:
+  max_parallel_deterministic: 2
+  llm_context_tokens: 8192
+  min_free_ram_mb: 2048

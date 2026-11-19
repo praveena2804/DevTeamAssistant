@@ -1,0 +1,431 @@
+{
+  "meta": {
+    "date": "2026-11-19",
+    "started_utc": "2026-11-19T05:07:55+00:00",
+    "ollama_version": "0.40.16",
+    "ollama_endpoint": "http://127.0.0.1:11434",
+    "cpu": "Intel64 Family 6 Model 186 Stepping 3, GenuineIntel",
+    "cores_threads": "10/12",
+    "ram_total_gb": 15.7,
+    "ram_available_at_start_mb": 2171,
+    "num_ctx": 4096,
+    "runs_per_model": 3,
+    "os": "Windows-11-10.0.26200-SP0",
+    "finished_utc": "2026-11-19T05:14:59+00:00",
+    "models": [
+      {
+        "model": "qwen2.5:3b",
+        "digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+        "parameter_size": "3.1B",
+        "quantization": "Q4_K_M",
+        "family": "qwen2"
+      },
+      {
+        "model": "llama3.2:3b",
+        "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+        "parameter_size": "3.2B",
+        "quantization": "Q4_K_M",
+        "family": "llama"
+      },
+      {
+        "model": "qwen2.5-coder:3b",
+        "digest": "f72c60cabf6237b07f6e632b2c48d533cef25eda2efbd34bed21c5e9c01e6225",
+        "parameter_size": "3.1B",
+        "quantization": "Q4_K_M",
+        "family": "qwen2"
+      },
+      {
+        "model": "qwen2.5:1.5b",
+        "digest": "65ec06548149b04c096a120e4a6da9d4017ea809c91734ea5631e89f96ddc57b",
+        "parameter_size": "1.5B",
+        "quantization": "Q4_K_M",
+        "family": "qwen2"
+      }
+    ]
+  },
+  "summary": [
+    {
+      "model": "qwen2.5:3b",
+      "slot": "instruct",
+      "error": null,
+      "runs": 3,
+      "structured_pass": 0,
+      "code_pass": 3,
+      "median_load_s": 5.76,
+      "median_tokens_per_s": 11.95,
+      "median_structured_wall_s": 24.97,
+      "median_code_wall_s": 8.47,
+      "median_peak_ollama_rss_mb": 2143.8,
+      "min_available_mb": 448.7
+    },
+    {
+      "model": "llama3.2:3b",
+      "slot": "instruct",
+      "error": null,
+      "runs": 3,
+      "structured_pass": 0,
+      "code_pass": 3,
+      "median_load_s": 5.57,
+      "median_tokens_per_s": 12.08,
+      "median_structured_wall_s": 24.98,
+      "median_code_wall_s": 6.23,
+      "median_peak_ollama_rss_mb": 2556.0,
+      "min_available_mb": 639.4
+    },
+    {
+      "model": "qwen2.5-coder:3b",
+      "slot": "coder",
+      "error": null,
+      "runs": 3,
+      "structured_pass": 0,
+      "code_pass": 3,
+      "median_load_s": 5.51,
+      "median_tokens_per_s": 11.43,
+      "median_structured_wall_s": 32.49,
+      "median_code_wall_s": 8.18,
+      "median_peak_ollama_rss_mb": 2145.7,
+      "min_available_mb": 939.2
+    },
+    {
+      "model": "qwen2.5:1.5b",
+      "slot": "fallback",
+      "error": null,
+      "runs": 3,
+      "structured_pass": 3,
+      "code_pass": 3,
+      "median_load_s": 2.94,
+      "median_tokens_per_s": 19.72,
+      "median_structured_wall_s": 23.99,
+      "median_code_wall_s": 7.61,
+      "median_peak_ollama_rss_mb": 1207.1,
+      "min_available_mb": 1715.4
+    }
+  ],
+  "recommendation": {
+    "instruct": "no candidate passed every run; see table (owner decision required)",
+    "coder": "qwen2.5-coder:3b (passed 3/3, 11.43 tok/s)",
+    "fallback": "qwen2.5:1.5b (passed 3/3, 19.72 tok/s)"
+  },
+  "raw": [
+    {
+      "model": "qwen2.5:3b",
+      "slot": "instruct",
+      "digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+      "parameter_size": "3.1B",
+      "quantization": "Q4_K_M",
+      "family": "qwen2",
+      "runs": [
+        {
+          "run": 1,
+          "structured": {
+            "ok": false,
+            "detail": "1 validation error(s): Value error, requirement ids must look like FR-001",
+            "load_s": 5.0368481,
+            "tokens_per_s": 11.982274013527924,
+            "prompt_tokens": 147,
+            "output_tokens": 191,
+            "wall_s": 24.041710599994985
+          },
+          "code": {
+            "ok": true,
+            "detail": "parses; signature and imports OK (static only, not executed)",
+            "load_s": 0.0622632,
+            "tokens_per_s": 11.748929857304626,
+            "prompt_tokens": 93,
+            "output_tokens": 89,
+            "wall_s": 9.25372820001212
+          },
+          "peak_ollama_rss_mb": 2144.4,
+          "min_available_mb": 448.7
+        },
+        {
+          "run": 2,
+          "structured": {
+            "ok": false,
+            "detail": "1 validation error(s): Value error, requirement ids must look like FR-001",
+            "load_s": 6.2923518,
+            "tokens_per_s": 11.737607805472319,
+            "prompt_tokens": 147,
+            "output_tokens": 191,
+            "wall_s": 25.745778399999836
+          },
+          "code": {
+            "ok": true,
+            "detail": "parses; signature and imports OK (static only, not executed)",
+            "load_s": 0.0606389,
+            "tokens_per_s": 12.921273439407793,
+            "prompt_tokens": 93,
+            "output_tokens": 89,
+            "wall_s": 8.47319800000696
+          },
+          "peak_ollama_rss_mb": 2143.8,
+          "min_available_mb": 798.0
+        },
+        {
+          "run": 3,
+          "structured": {
+            "ok": false,
+            "detail": "1 validation error(s): Value error, requirement ids must look like FR-001",
+            "load_s": 5.7639371,
+            "tokens_per_s": 11.918899811912274,
+            "prompt_tokens": 147,
+            "output_tokens": 191,
+            "wall_s": 24.96509350000997
+          },
+          "code": {
+            "ok": true,
+            "detail": "parses; signature and imports OK (static only, not executed)",
+            "load_s": 0.0344942,
+            "tokens_per_s": 13.111736152975363,
+            "prompt_tokens": 93,
+            "output_tokens": 89,
+            "wall_s": 8.414636100002099
+          },
+          "peak_ollama_rss_mb": 2143.4,
+          "min_available_mb": 1051.8
+        }
+      ],
+      "error": null
+    },
+    {
+      "model": "llama3.2:3b",
+      "slot": "instruct",
+      "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+      "parameter_size": "3.2B",
+      "quantization": "Q4_K_M",
+      "family": "llama",
+      "runs": [
+        {
+          "run": 1,
+          "structured": {
+            "ok": false,
+            "detail": "1 validation error(s): Value error, requirement ids must look like FR-001",
+            "load_s": 5.7900875,
+            "tokens_per_s": 10.904872246330045,
+            "prompt_tokens": 134,
+            "output_tokens": 194,
+            "wall_s": 26.75133719999576
+          },
+          "code": {
+            "ok": true,
+            "detail": "parses; signature and imports OK (static only, not executed)",
+            "load_s": 0.0684955,
+            "tokens_per_s": 12.768056141359262,
+            "prompt_tokens": 89,
+            "output_tokens": 59,
+            "wall_s": 6.2291876999952365
+          },
+          "peak_ollama_rss_mb": 2555.6,
+          "min_available_mb": 639.4
+        },
+        {
+          "run": 2,
+          "structured": {
+            "ok": false,
+            "detail": "1 validation error(s): Value error, requirement ids must look like FR-001",
+            "load_s": 5.5745141,
+            "tokens_per_s": 12.049697673706484,
+            "prompt_tokens": 134,
+            "output_tokens": 194,
+            "wall_s": 24.552630299993325
+          },
+          "code": {
+            "ok": true,
+            "detail": "parses; signature and imports OK (static only, not executed)",
+            "load_s": 0.0639803,
+            "tokens_per_s": 12.779453065400908,
+            "prompt_tokens": 89,
+            "output_tokens": 59,
+            "wall_s": 6.187920399999712
+          },
+          "peak_ollama_rss_mb": 2556.3,
+          "min_available_mb": 854.9
+        },
+        {
+          "run": 3,
+          "structured": {
+            "ok": false,
+            "detail": "1 validation error(s): Value error, requirement ids must look like FR-001",
+            "load_s": 5.5660148,
+            "tokens_per_s": 11.792656408919722,
+            "prompt_tokens": 134,
+            "output_tokens": 194,
+            "wall_s": 24.980949999997392
+          },
+          "code": {
+            "ok": true,
+            "detail": "parses; signature and imports OK (static only, not executed)",
+            "load_s": 0.0622079,
+            "tokens_per_s": 12.114171342428818,
+            "prompt_tokens": 89,
+            "output_tokens": 59,
+            "wall_s": 6.529309999998077
+          },
+          "peak_ollama_rss_mb": 2556.0,
+          "min_available_mb": 980.2
+        }
+      ],
+      "error": null
+    },
+    {
+      "model": "qwen2.5-coder:3b",
+      "slot": "coder",
+      "digest": "f72c60cabf6237b07f6e632b2c48d533cef25eda2efbd34bed21c5e9c01e6225",
+      "parameter_size": "3.1B",
+      "quantization": "Q4_K_M",
+      "family": "qwen2",
+      "runs": [
+        {
+          "run": 1,
+          "structured": {
+            "ok": false,
+            "detail": "1 validation error(s): Value error, requirement ids must look like FR-001",
+            "load_s": 4.9840284,
+            "tokens_per_s": 10.850309013087658,
+            "prompt_tokens": 147,
+            "output_tokens": 263,
+            "wall_s": 32.49149660000694
+          },
+          "code": {
+            "ok": true,
+            "detail": "parses; signature and imports OK (static only, not executed)",
+            "load_s": 0.0564802,
+            "tokens_per_s": 10.923350847105858,
+            "prompt_tokens": 93,
+            "output_tokens": 83,
+            "wall_s": 9.247369699995033
+          },
+          "peak_ollama_rss_mb": 2144.9,
+          "min_available_mb": 1054.3
+        },
+        {
+          "run": 2,
+          "structured": {
+            "ok": false,
+            "detail": "1 validation error(s): Value error, requirement ids must look like FR-001",
+            "load_s": 5.9962202,
+            "tokens_per_s": 10.889277167297388,
+            "prompt_tokens": 147,
+            "output_tokens": 263,
+            "wall_s": 33.552691799995955
+          },
+          "code": {
+            "ok": true,
+            "detail": "parses; signature and imports OK (static only, not executed)",
+            "load_s": 0.061623,
+            "tokens_per_s": 12.8241259199379,
+            "prompt_tokens": 93,
+            "output_tokens": 83,
+            "wall_s": 8.182746299993596
+          },
+          "peak_ollama_rss_mb": 2146.9,
+          "min_available_mb": 939.2
+        },
+        {
+          "run": 3,
+          "structured": {
+            "ok": false,
+            "detail": "1 validation error(s): Value error, requirement ids must look like FR-001",
+            "load_s": 5.505225,
+            "tokens_per_s": 11.931522497203238,
+            "prompt_tokens": 147,
+            "output_tokens": 263,
+            "wall_s": 30.814163799994276
+          },
+          "code": {
+            "ok": true,
+            "detail": "parses; signature and imports OK (static only, not executed)",
+            "load_s": 0.0327736,
+            "tokens_per_s": 13.203649106820862,
+            "prompt_tokens": 93,
+            "output_tokens": 83,
+            "wall_s": 7.871611299997312
+          },
+          "peak_ollama_rss_mb": 2145.7,
+          "min_available_mb": 1213.1
+        }
+      ],
+      "error": null
+    },
+    {
+      "model": "qwen2.5:1.5b",
+      "slot": "fallback",
+      "digest": "65ec06548149b04c096a120e4a6da9d4017ea809c91734ea5631e89f96ddc57b",
+      "parameter_size": "1.5B",
+      "quantization": "Q4_K_M",
+      "family": "qwen2",
+      "runs": [
+        {
+          "run": 1,
+          "structured": {
+            "ok": true,
+            "detail": "valid",
+            "load_s": 2.9491033,
+            "tokens_per_s": 17.755588238800687,
+            "prompt_tokens": 147,
+            "output_tokens": 347,
+            "wall_s": 23.9894243000017
+          },
+          "code": {
+            "ok": true,
+            "detail": "parses; signature and imports OK (static only, not executed)",
+            "load_s": 0.0642416,
+            "tokens_per_s": 19.424167608199234,
+            "prompt_tokens": 93,
+            "output_tokens": 132,
+            "wall_s": 7.622926399999415
+          },
+          "peak_ollama_rss_mb": 1206.8,
+          "min_available_mb": 1967.9
+        },
+        {
+          "run": 2,
+          "structured": {
+            "ok": true,
+            "detail": "valid",
+            "load_s": 2.1965752,
+            "tokens_per_s": 15.207679045220713,
+            "prompt_tokens": 147,
+            "output_tokens": 347,
+            "wall_s": 26.757309599997825
+          },
+          "code": {
+            "ok": true,
+            "detail": "parses; signature and imports OK (static only, not executed)",
+            "load_s": 0.0558454,
+            "tokens_per_s": 20.00871591791879,
+            "prompt_tokens": 93,
+            "output_tokens": 132,
+            "wall_s": 7.610773799999151
+          },
+          "peak_ollama_rss_mb": 1207.8,
+          "min_available_mb": 1938.6
+        },
+        {
+          "run": 3,
+          "structured": {
+            "ok": true,
+            "detail": "valid",
+            "load_s": 2.9395814,
+            "tokens_per_s": 20.138858298524156,
+            "prompt_tokens": 147,
+            "output_tokens": 347,
+            "wall_s": 21.68669509999745
+          },
+          "code": {
+            "ok": true,
+            "detail": "parses; signature and imports OK (static only, not executed)",
+            "load_s": 0.04819,
+            "tokens_per_s": 22.1091491846665,
+            "prompt_tokens": 93,
+            "output_tokens": 132,
+            "wall_s": 6.941135300003225
+          },
+          "peak_ollama_rss_mb": 1207.1,
+          "min_available_mb": 1715.4
+        }
+      ],
+      "error": null
+    }
+  ]
+}

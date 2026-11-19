@@ -1,0 +1,15 @@
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.pdf binary
+*.docx binary
+*.xlsx binary
+*.png binary
+*.jpg binary
+*.ico binary
+*.zip binary
+*.gguf binary
+uv.lock linguist-generated=true -diff
+apps/web/package-lock.json linguist-generated=true -diff
+apps/web/src/api/schema.d.ts linguist-generated=true

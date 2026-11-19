@@ -1,0 +1,455 @@
+{
+  "meta": {
+    "date": "2026-11-19",
+    "started_utc": "2026-11-19T05:21:05+00:00",
+    "ollama_version": "0.40.16",
+    "ollama_endpoint": "http://127.0.0.1:11434",
+    "cpu": "Intel64 Family 6 Model 186 Stepping 3, GenuineIntel",
+    "cores_threads": "10/12",
+    "ram_total_gb": 15.7,
+    "ram_available_at_start_mb": 3016,
+    "num_ctx": 4096,
+    "runs_per_model": 3,
+    "os": "Windows-11-10.0.26200-SP0",
+    "finished_utc": "2026-11-19T05:28:11+00:00",
+    "models": [
+      {
+        "model": "qwen2.5:3b",
+        "digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+        "parameter_size": "3.1B",
+        "quantization": "Q4_K_M",
+        "family": "qwen2"
+      },
+      {
+        "model": "llama3.2:3b",
+        "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+        "parameter_size": "3.2B",
+        "quantization": "Q4_K_M",
+        "family": "llama"
+      },
+      {
+        "model": "qwen2.5-coder:3b",
+        "digest": "f72c60cabf6237b07f6e632b2c48d533cef25eda2efbd34bed21c5e9c01e6225",
+        "parameter_size": "3.1B",
+        "quantization": "Q4_K_M",
+        "family": "qwen2"
+      },
+      {
+        "model": "qwen2.5:1.5b",
+        "digest": "65ec06548149b04c096a120e4a6da9d4017ea809c91734ea5631e89f96ddc57b",
+        "parameter_size": "1.5B",
+        "quantization": "Q4_K_M",
+        "family": "qwen2"
+      }
+    ]
+  },
+  "summary": [
+    {
+      "model": "qwen2.5:3b",
+      "slot": "instruct",
+      "error": null,
+      "runs": 3,
+      "structured_pass": 3,
+      "code_pass": 3,
+      "median_load_s": 4.46,
+      "median_tokens_per_s": 13.17,
+      "median_structured_wall_s": 23.64,
+      "median_code_wall_s": 7.8,
+      "median_peak_ollama_rss_mb": 2144.4,
+      "min_available_mb": 1161.6
+    },
+    {
+      "model": "llama3.2:3b",
+      "slot": "instruct",
+      "error": null,
+      "runs": 3,
+      "structured_pass": 3,
+      "code_pass": 3,
+      "median_load_s": 6.32,
+      "median_tokens_per_s": 10.94,
+      "median_structured_wall_s": 30.69,
+      "median_code_wall_s": 6.33,
+      "median_peak_ollama_rss_mb": 2560.8,
+      "min_available_mb": 459.6
+    },
+    {
+      "model": "qwen2.5-coder:3b",
+      "slot": "coder",
+      "error": null,
+      "runs": 3,
+      "structured_pass": 3,
+      "code_pass": 3,
+      "median_load_s": 3.48,
+      "median_tokens_per_s": 12.47,
+      "median_structured_wall_s": 28.63,
+      "median_code_wall_s": 8.18,
+      "median_peak_ollama_rss_mb": 2148.4,
+      "min_available_mb": 1559.2
+    },
+    {
+      "model": "qwen2.5:1.5b",
+      "slot": "fallback",
+      "error": null,
+      "runs": 3,
+      "structured_pass": 3,
+      "code_pass": 3,
+      "median_load_s": 2.22,
+      "median_tokens_per_s": 23.34,
+      "median_structured_wall_s": 18.69,
+      "median_code_wall_s": 6.47,
+      "median_peak_ollama_rss_mb": 1208.2,
+      "min_available_mb": 2740.3
+    }
+  ],
+  "recommendation": {
+    "instruct": "qwen2.5:3b (passed 3/3, 13.17 tok/s)",
+    "coder": "qwen2.5-coder:3b (passed 3/3, 12.47 tok/s)",
+    "fallback": "qwen2.5:1.5b (passed 3/3, 23.34 tok/s)"
+  },
+  "raw": [
+    {
+      "model": "qwen2.5:3b",
+      "slot": "instruct",
+      "digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+      "parameter_size": "3.1B",
+      "quantization": "Q4_K_M",
+      "family": "qwen2",
+      "runs": [
+        {
+          "run": 1,
+          "structured": {
+            "ok": true,
+            "detail": "valid",
+            "load_s": 4.5273544,
+            "tokens_per_s": 13.121896255700785,
+            "prompt_tokens": 147,
+            "output_tokens": 213,
+            "wall_s": 23.65688149999187,
+            "excerpt": "{ \"requirements\": [\n    { \"id\": \"FR-001\", \"text\": \"Members can search the catalogue and view their current loans.\" },\n    { \"id\": \"FR-002\", \"text\": \"Members may borrow at most 3 books at a time.\" },\n    { \"id\": \"FR-003\", \"text\": \"Loans are due 14 days after checkout.\" },\n    { \"id\": \"FR-004\", \"text\""
+          },
+          "code": {
+            "ok": true,
+            "detail": "parses; signature and imports OK (static only, not executed)",
+            "load_s": 0.0137596,
+            "tokens_per_s": 14.400914668431884,
+            "prompt_tokens": 93,
+            "output_tokens": 89,
+            "wall_s": 7.589887399997679,
+            "excerpt": "```python\nimport re\n\ndef slugify(text: str) -> str:\n    # Lowercase the text\n    text = text.lower()\n    # Replace every run of characters that are not letters or digits with a single hyphen\n    text = re.sub(r'[^a-z0-9]+', '-', text)\n    # Strip leading and trailing hyphens\n    text = text.strip('-"
+          },
+          "peak_ollama_rss_mb": 2144.5,
+          "min_available_mb": 1161.6
+        },
+        {
+          "run": 2,
+          "structured": {
+            "ok": true,
+            "detail": "valid",
+            "load_s": 4.4608792,
+            "tokens_per_s": 13.210736868232946,
+            "prompt_tokens": 147,
+            "output_tokens": 213,
+            "wall_s": 23.636704999997164,
+            "excerpt": "{ \"requirements\": [\n    { \"id\": \"FR-001\", \"text\": \"Members can search the catalogue and view their current loans.\" },\n    { \"id\": \"FR-002\", \"text\": \"Members may borrow at most 3 books at a time.\" },\n    { \"id\": \"FR-003\", \"text\": \"Loans are due 14 days after checkout.\" },\n    { \"id\": \"FR-004\", \"text\""
+          },
+          "code": {
+            "ok": true,
+            "detail": "parses; signature and imports OK (static only, not executed)",
+            "load_s": 0.0222162,
+            "tokens_per_s": 13.952095714511904,
+            "prompt_tokens": 93,
+            "output_tokens": 89,
+            "wall_s": 7.801845800000592,
+            "excerpt": "```python\nimport re\n\ndef slugify(text: str) -> str:\n    # Lowercase the text\n    text = text.lower()\n    # Replace every run of characters that are not letters or digits with a single hyphen\n    text = re.sub(r'[^a-z0-9]+', '-', text)\n    # Strip leading and trailing hyphens\n    text = text.strip('-"
+          },
+          "peak_ollama_rss_mb": 2144.4,
+          "min_available_mb": 1639.4
+        },
+        {
+          "run": 3,
+          "structured": {
+            "ok": true,
+            "detail": "valid",
+            "load_s": 3.4635836,
+            "tokens_per_s": 12.687983949045057,
+            "prompt_tokens": 147,
+            "output_tokens": 213,
+            "wall_s": 23.294223899996723,
+            "excerpt": "{ \"requirements\": [\n    { \"id\": \"FR-001\", \"text\": \"Members can search the catalogue and view their current loans.\" },\n    { \"id\": \"FR-002\", \"text\": \"Members may borrow at most 3 books at a time.\" },\n    { \"id\": \"FR-003\", \"text\": \"Loans are due 14 days after checkout.\" },\n    { \"id\": \"FR-004\", \"text\""
+          },
+          "code": {
+            "ok": true,
+            "detail": "parses; signature and imports OK (static only, not executed)",
+            "load_s": 0.067184,
+            "tokens_per_s": 8.959675019499876,
+            "prompt_tokens": 93,
+            "output_tokens": 89,
+            "wall_s": 11.590667700002086,
+            "excerpt": "```python\nimport re\n\ndef slugify(text: str) -> str:\n    # Lowercase the text\n    text = text.lower()\n    # Replace every run of characters that are not letters or digits with a single hyphen\n    text = re.sub(r'[^a-z0-9]+', '-', text)\n    # Strip leading and trailing hyphens\n    text = text.strip('-"
+          },
+          "peak_ollama_rss_mb": 2144.0,
+          "min_available_mb": 1262.4
+        }
+      ],
+      "error": null
+    },
+    {
+      "model": "llama3.2:3b",
+      "slot": "instruct",
+      "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+      "parameter_size": "3.2B",
+      "quantization": "Q4_K_M",
+      "family": "llama",
+      "runs": [
+        {
+          "run": 1,
+          "structured": {
+            "ok": true,
+            "detail": "valid",
+            "load_s": 6.3201728,
+            "tokens_per_s": 8.107608071544874,
+            "prompt_tokens": 134,
+            "output_tokens": 233,
+            "wall_s": 42.227992600004654,
+            "excerpt": "{ \"requirements\": [\n  { \"id\": \"FR-001\", \"text\": \"Members can search the catalogue\" },\n  { \"id\": \"FR-002\", \"text\": \"Members can view their current loans\" },\n  { \"id\": \"FR-003\", \"text\": \"A member may borrow at most 3 books at a time\" },\n  { \"id\": \"FR-004\", \"text\": \"Loans are due 14 days after checkout"
+          },
+          "code": {
+            "ok": true,
+            "detail": "parses; signature and imports OK (static only, not executed)",
+            "load_s": 0.1023843,
+            "tokens_per_s": 10.206065655101407,
+            "prompt_tokens": 89,
+            "output_tokens": 59,
+            "wall_s": 8.134249900002033,
+            "excerpt": "```python\nimport re\n\ndef slugify(text: str) -> str:\n    text = text.lower()\n    text = re.sub(r'[^\\w\\s-]+', '-', text)\n    text = re.sub(r'^-+|-+$', '', text)\n    return text\n```"
+          },
+          "peak_ollama_rss_mb": 2521.5,
+          "min_available_mb": 459.6
+        },
+        {
+          "run": 2,
+          "structured": {
+            "ok": true,
+            "detail": "valid",
+            "load_s": 7.5811103,
+            "tokens_per_s": 11.529426982035915,
+            "prompt_tokens": 134,
+            "output_tokens": 233,
+            "wall_s": 30.688589000012144,
+            "excerpt": "{ \"requirements\": [\n  { \"id\": \"FR-001\", \"text\": \"Members can search the catalogue\" },\n  { \"id\": \"FR-002\", \"text\": \"Members can view their current loans\" },\n  { \"id\": \"FR-003\", \"text\": \"A member may borrow at most 3 books at a time\" },\n  { \"id\": \"FR-004\", \"text\": \"Loans are due 14 days after checkout"
+          },
+          "code": {
+            "ok": true,
+            "detail": "parses; signature and imports OK (static only, not executed)",
+            "load_s": 0.0303853,
+            "tokens_per_s": 12.56703662034471,
+            "prompt_tokens": 89,
+            "output_tokens": 59,
+            "wall_s": 6.145350600010715,
+            "excerpt": "```python\nimport re\n\ndef slugify(text: str) -> str:\n    text = text.lower()\n    text = re.sub(r'[^\\w\\s-]+', '-', text)\n    text = re.sub(r'^-+|-+$', '', text)\n    return text\n```"
+          },
+          "peak_ollama_rss_mb": 2561.4,
+          "min_available_mb": 977.7
+        },
+        {
+          "run": 3,
+          "structured": {
+            "ok": true,
+            "detail": "valid",
+            "load_s": 4.7496866,
+            "tokens_per_s": 10.343388053555488,
+            "prompt_tokens": 134,
+            "output_tokens": 233,
+            "wall_s": 30.02835480000067,
+            "excerpt": "{ \"requirements\": [\n  { \"id\": \"FR-001\", \"text\": \"Members can search the catalogue\" },\n  { \"id\": \"FR-002\", \"text\": \"Members can view their current loans\" },\n  { \"id\": \"FR-003\", \"text\": \"A member may borrow at most 3 books at a time\" },\n  { \"id\": \"FR-004\", \"text\": \"Loans are due 14 days after checkout"
+          },
+          "code": {
+            "ok": true,
+            "detail": "parses; signature and imports OK (static only, not executed)",
+            "load_s": 0.0282281,
+            "tokens_per_s": 12.868704749598997,
+            "prompt_tokens": 89,
+            "output_tokens": 59,
+            "wall_s": 6.326478500006488,
+            "excerpt": "```python\nimport re\n\ndef slugify(text: str) -> str:\n    text = text.lower()\n    text = re.sub(r'[^\\w\\s-]+', '-', text)\n    text = re.sub(r'^-+|-+$', '', text)\n    return text\n```"
+          },
+          "peak_ollama_rss_mb": 2560.8,
+          "min_available_mb": 1112.3
+        }
+      ],
+      "error": null
+    },
+    {
+      "model": "qwen2.5-coder:3b",
+      "slot": "coder",
+      "digest": "f72c60cabf6237b07f6e632b2c48d533cef25eda2efbd34bed21c5e9c01e6225",
+      "parameter_size": "3.1B",
+      "quantization": "Q4_K_M",
+      "family": "qwen2",
+      "runs": [
+        {
+          "run": 1,
+          "structured": {
+            "ok": true,
+            "detail": "valid",
+            "load_s": 4.7425237,
+            "tokens_per_s": 12.343687729479594,
+            "prompt_tokens": 147,
+            "output_tokens": 269,
+            "wall_s": 29.42995359998895,
+            "excerpt": "{ \"requirements\": [\n    { \"id\": \"FR-001\", \"text\": \"Librarians can register members.\" },\n    { \"id\": \"FR-002\", \"text\": \"Librarians can record book loans.\" },\n    { \"id\": \"FR-003\", \"text\": \"Members can search the catalogue.\" },\n    { \"id\": \"FR-004\", \"text\": \"Members can view their current loans.\" },\n "
+          },
+          "code": {
+            "ok": true,
+            "detail": "parses; signature and imports OK (static only, not executed)",
+            "load_s": 0.0314069,
+            "tokens_per_s": 12.345517416996476,
+            "prompt_tokens": 93,
+            "output_tokens": 83,
+            "wall_s": 8.442037600005278,
+            "excerpt": "```python\nimport re\n\ndef slugify(text: str) -> str:\n    # Convert the text to lowercase\n    text = text.lower()\n    # Replace non-alphanumeric characters with a hyphen\n    text = re.sub(r'[^a-z0-9]+', '-', text)\n    # Strip leading and trailing hyphens\n    text = text.strip('-')\n    return text\n```"
+          },
+          "peak_ollama_rss_mb": 2147.5,
+          "min_available_mb": 1559.2
+        },
+        {
+          "run": 2,
+          "structured": {
+            "ok": true,
+            "detail": "valid",
+            "load_s": 3.4763963,
+            "tokens_per_s": 12.119749068029593,
+            "prompt_tokens": 147,
+            "output_tokens": 269,
+            "wall_s": 28.633058899999014,
+            "excerpt": "{ \"requirements\": [\n    { \"id\": \"FR-001\", \"text\": \"Librarians can register members.\" },\n    { \"id\": \"FR-002\", \"text\": \"Librarians can record book loans.\" },\n    { \"id\": \"FR-003\", \"text\": \"Members can search the catalogue.\" },\n    { \"id\": \"FR-004\", \"text\": \"Members can view their current loans.\" },\n "
+          },
+          "code": {
+            "ok": true,
+            "detail": "parses; signature and imports OK (static only, not executed)",
+            "load_s": 0.0370119,
+            "tokens_per_s": 13.21414072263837,
+            "prompt_tokens": 93,
+            "output_tokens": 83,
+            "wall_s": 8.059806699995534,
+            "excerpt": "```python\nimport re\n\ndef slugify(text: str) -> str:\n    # Convert the text to lowercase\n    text = text.lower()\n    # Replace non-alphanumeric characters with a hyphen\n    text = re.sub(r'[^a-z0-9]+', '-', text)\n    # Strip leading and trailing hyphens\n    text = text.strip('-')\n    return text\n```"
+          },
+          "peak_ollama_rss_mb": 2148.4,
+          "min_available_mb": 1831.2
+        },
+        {
+          "run": 3,
+          "structured": {
+            "ok": true,
+            "detail": "valid",
+            "load_s": 3.2285803,
+            "tokens_per_s": 12.589835968010023,
+            "prompt_tokens": 147,
+            "output_tokens": 269,
+            "wall_s": 27.588776199991116,
+            "excerpt": "{ \"requirements\": [\n    { \"id\": \"FR-001\", \"text\": \"Librarians can register members.\" },\n    { \"id\": \"FR-002\", \"text\": \"Librarians can record book loans.\" },\n    { \"id\": \"FR-003\", \"text\": \"Members can search the catalogue.\" },\n    { \"id\": \"FR-004\", \"text\": \"Members can view their current loans.\" },\n "
+          },
+          "code": {
+            "ok": true,
+            "detail": "parses; signature and imports OK (static only, not executed)",
+            "load_s": 0.032463,
+            "tokens_per_s": 13.020745498861626,
+            "prompt_tokens": 93,
+            "output_tokens": 83,
+            "wall_s": 8.179419299995061,
+            "excerpt": "```python\nimport re\n\ndef slugify(text: str) -> str:\n    # Convert the text to lowercase\n    text = text.lower()\n    # Replace non-alphanumeric characters with a hyphen\n    text = re.sub(r'[^a-z0-9]+', '-', text)\n    # Strip leading and trailing hyphens\n    text = text.strip('-')\n    return text\n```"
+          },
+          "peak_ollama_rss_mb": 2153.4,
+          "min_available_mb": 1929.3
+        }
+      ],
+      "error": null
+    },
+    {
+      "model": "qwen2.5:1.5b",
+      "slot": "fallback",
+      "digest": "65ec06548149b04c096a120e4a6da9d4017ea809c91734ea5631e89f96ddc57b",
+      "parameter_size": "1.5B",
+      "quantization": "Q4_K_M",
+      "family": "qwen2",
+      "runs": [
+        {
+          "run": 1,
+          "structured": {
+            "ok": true,
+            "detail": "valid",
+            "load_s": 2.7038771,
+            "tokens_per_s": 23.848525164592623,
+            "prompt_tokens": 147,
+            "output_tokens": 347,
+            "wall_s": 18.692963099994813,
+            "excerpt": "{\n  \"requirements\": [\n    {\n      \"id\": \"FR-001\",\n      \"text\": \"The Library Lending System lets librarians register members and record book loans.\"\n    },\n    {\n      \"id\": \"FR-002\",\n      \"text\": \"Members can search the catalogue and view their current loans.\"\n    },\n    {\n      \"id\": \"FR-003\",\n  "
+          },
+          "code": {
+            "ok": true,
+            "detail": "parses; signature and imports OK (static only, not executed)",
+            "load_s": 0.0253184,
+            "tokens_per_s": 25.517369499436203,
+            "prompt_tokens": 93,
+            "output_tokens": 132,
+            "wall_s": 5.9254865999973845,
+            "excerpt": "```python\nimport re\n\ndef slugify(text: str) -> str:\n    \"\"\"\n    Lowercases the text, replaces every run of characters that are not letters or digits with a single hyphen,\n    and strips leading and trailing hyphens.\n    \"\"\"\n    # Lowercase the text\n    text = text.lower()\n    \n    # Replace non-lett"
+          },
+          "peak_ollama_rss_mb": 1208.5,
+          "min_available_mb": 2866.4
+        },
+        {
+          "run": 2,
+          "structured": {
+            "ok": true,
+            "detail": "valid",
+            "load_s": 1.9368059,
+            "tokens_per_s": 22.827343447184106,
+            "prompt_tokens": 147,
+            "output_tokens": 347,
+            "wall_s": 18.690549899998587,
+            "excerpt": "{\n  \"requirements\": [\n    {\n      \"id\": \"FR-001\",\n      \"text\": \"The Library Lending System lets librarians register members and record book loans.\"\n    },\n    {\n      \"id\": \"FR-002\",\n      \"text\": \"Members can search the catalogue and view their current loans.\"\n    },\n    {\n      \"id\": \"FR-003\",\n  "
+          },
+          "code": {
+            "ok": true,
+            "detail": "parses; signature and imports OK (static only, not executed)",
+            "load_s": 0.0238918,
+            "tokens_per_s": 23.915131719834957,
+            "prompt_tokens": 93,
+            "output_tokens": 132,
+            "wall_s": 6.465260199998738,
+            "excerpt": "```python\nimport re\n\ndef slugify(text: str) -> str:\n    \"\"\"\n    Lowercases the text, replaces every run of characters that are not letters or digits with a single hyphen,\n    and strips leading and trailing hyphens.\n    \"\"\"\n    # Lowercase the text\n    text = text.lower()\n    \n    # Replace non-lett"
+          },
+          "peak_ollama_rss_mb": 1208.2,
+          "min_available_mb": 2791.8
+        },
+        {
+          "run": 3,
+          "structured": {
+            "ok": true,
+            "detail": "valid",
+            "load_s": 2.218316,
+            "tokens_per_s": 21.534970495849212,
+            "prompt_tokens": 147,
+            "output_tokens": 347,
+            "wall_s": 19.772916799993254,
+            "excerpt": "{\n  \"requirements\": [\n    {\n      \"id\": \"FR-001\",\n      \"text\": \"The Library Lending System lets librarians register members and record book loans.\"\n    },\n    {\n      \"id\": \"FR-002\",\n      \"text\": \"Members can search the catalogue and view their current loans.\"\n    },\n    {\n      \"id\": \"FR-003\",\n  "
+          },
+          "code": {
+            "ok": true,
+            "detail": "parses; signature and imports OK (static only, not executed)",
+            "load_s": 0.0778467,
+            "tokens_per_s": 21.24483464839396,
+            "prompt_tokens": 93,
+            "output_tokens": 132,
+            "wall_s": 7.288064400010626,
+            "excerpt": "```python\nimport re\n\ndef slugify(text: str) -> str:\n    \"\"\"\n    Lowercases the text, replaces every run of characters that are not letters or digits with a single hyphen,\n    and strips leading and trailing hyphens.\n    \"\"\"\n    # Lowercase the text\n    text = text.lower()\n    \n    # Replace non-lett"
+          },
+          "peak_ollama_rss_mb": 1208.0,
+          "min_available_mb": 2740.3
+        }
+      ],
+      "error": null
+    }
+  ]
+}

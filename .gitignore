@@ -1,0 +1,57 @@
+# --- DevTeam AI local state (never committed; roadmap §8) ---
+data/
+workspaces/
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+chroma/
+logs/
+*.log
+traces/
+
+# --- secrets / environment ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# --- model files ---
+*.gguf
+*.safetensors
+*.bin
+Modelfile.local
+
+# --- Python ---
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.import_linter_cache/
+
+# --- Node / web ---
+node_modules/
+apps/web/dist/
+apps/web/coverage/
+*.tsbuildinfo
+
+# --- evaluation scratch ---
+evals/reports/tmp/
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/

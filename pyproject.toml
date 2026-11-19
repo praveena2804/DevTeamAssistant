@@ -1,0 +1,127 @@
+# DevTeam AI — uv workspace root (roadmap §7, §8; decision D-26 option (a), proceeding on recommended default).
+# Agent packages (exactly ten) are added as workspace members in Part C. Adding an eleventh is prohibited (ADR-0002).
+
+[project]
+name = "devteam-ai"
+version = "0.1.0"
+description = "DevTeam AI platform — local-first, BRD-driven software development platform (workspace root)"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "devteam-core",
+    "devteam-state",
+    "devteam-api",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = [
+    "packages/core",
+    "packages/state",
+    "apps/api",
+]
+
+[tool.uv.sources]
+devteam-core = { workspace = true }
+devteam-state = { workspace = true }
+devteam-api = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-cov>=6.0",
+    "hypothesis>=6.120",
+    "httpx>=0.28",
+    "ruff>=0.8",
+    "mypy>=1.13",
+    "import-linter>=2.1",
+    "types-PyYAML>=6.0",
+    "psutil>=6.1",
+    "types-psutil>=6.1",
+    "pre-commit>=4.0",
+]
+
+# ---------------------------------------------------------------- ruff
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+extend-exclude = ["apps/web", "data", "workspaces"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "N", "SIM", "RUF", "TID", "PTH", "C4", "PL"]
+ignore = [
+    "PLR0913",  # explicit argument lists are preferred in factories
+    "PLR2004",  # magic values are acceptable in tests and limits read from config
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["S101", "S105", "S106", "PLR2004", "S603", "S607"]
+"tests/**" = ["S101", "S105", "S106", "PLR2004", "S603", "S607"]
+"scripts/**" = ["S603", "S607", "T201"]
+"**/migrations/versions/*.py" = ["N999"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["devteam_core", "devteam_state", "devteam_api"]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "parents"
+# Banned-API rules for agents/** are introduced in Part C via agents/ruff.toml (roadmap §5.3).
+
+# ---------------------------------------------------------------- mypy
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unreachable = true
+mypy_path = ["packages/core/src", "packages/state/src", "apps/api/src"]
+explicit_package_bases = true
+namespace_packages = true
+plugins = ["pydantic.mypy"]
+exclude = ["^apps/web/", "/migrations/versions/"]
+
+[[tool.mypy.overrides]]
+module = ["alembic.*"]
+ignore_missing_imports = true
+
+# ---------------------------------------------------------------- pytest
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra --strict-markers --import-mode=importlib"
+testpaths = ["packages", "apps/api", "tests"]
+markers = [
+    "integration: cross-module tests using temp SQLite and fakes",
+    "contract: schema/OpenAPI snapshot tests",
+    "security: security suite (permanent CI gate from Part C)",
+    "docker: requires a running Docker engine",
+    "llm: requires local Ollama (never in CI)",
+    "slow: long end-to-end tests",
+    "acceptance: Spec §23 acceptance scenarios (Part R)",
+]
+filterwarnings = ["error::DeprecationWarning:devteam_.*"]
+
+[tool.coverage.run]
+branch = true
+source = ["devteam_core", "devteam_state", "devteam_api"]
+omit = ["*/migrations/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+
+# ---------------------------------------------------------------- import-linter (roadmap §7.1)
+[tool.importlinter]
+root_packages = ["devteam_core", "devteam_state", "devteam_api"]
+include_external_packages = false
+
+[[tool.importlinter.contracts]]
+name = "devteam_core depends on no internal package"
+type = "forbidden"
+source_modules = ["devteam_core"]
+forbidden_modules = ["devteam_state", "devteam_api"]
+
+[[tool.importlinter.contracts]]
+name = "devteam_state may depend only on devteam_core"
+type = "forbidden"
+source_modules = ["devteam_state"]
+forbidden_modules = ["devteam_api"]

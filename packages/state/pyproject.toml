@@ -1,0 +1,20 @@
+[project]
+name = "devteam-state"
+version = "0.1.0"
+description = "DevTeam AI platform state: SQLite engine, models, repositories and Alembic migrations"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "devteam-core",
+    "SQLAlchemy>=2.0.36",
+    "alembic>=1.14",
+]
+
+[tool.uv.sources]
+devteam-core = { workspace = true }
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/devteam_state"]
