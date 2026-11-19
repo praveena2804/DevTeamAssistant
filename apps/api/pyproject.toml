@@ -6,13 +6,18 @@ requires-python = ">=3.12,<3.13"
 dependencies = [
     "devteam-core",
     "devteam-state",
+    "devteam-harness",
+    "devteam-services",
     "fastapi>=0.115",
+    "python-multipart>=0.0.18",
     "uvicorn>=0.32",
 ]
 
 [tool.uv.sources]
 devteam-core = { workspace = true }
 devteam-state = { workspace = true }
+devteam-harness = { workspace = true }
+devteam-services = { workspace = true }
 
 [build-system]
 requires = ["hatchling>=1.25"]

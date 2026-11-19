@@ -184,3 +184,28 @@ def test_doctor_docker_states(isolated_settings: Settings) -> None:
 @pytest.mark.parametrize(("text", "expected"), [("v22.20.0", (22, 20, 0)), ("uv 0.11", (0, 11)), ("x", None)])
 def test_version_parsing(text: str, expected: tuple[int, ...] | None) -> None:
     assert doctor._version(text) == expected
+
+
+def test_doctor_api_token_states_never_print_the_key(isolated_settings: Settings) -> None:
+    from devteam_harness.iam import load_or_create_token  # noqa: PLC0415
+
+    assert doctor.check_api_token(isolated_settings).status == "warn"  # not created yet
+    token = load_or_create_token(isolated_settings.api_token_path)
+    check = doctor.check_api_token(isolated_settings)
+    assert check.status == "ok" and token not in check.detail
+    isolated_settings.api_token_path.write_text("short", encoding="utf-8")
+    assert doctor.check_api_token(isolated_settings).status == "fail"
+
+
+def test_signin_link_puts_the_key_only_in_the_fragment(
+    isolated_settings: Settings, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    from devteam_api import signin_link  # noqa: PLC0415
+
+    monkeypatch.setenv("DEVTEAM_ROOT", str(isolated_settings.root))
+    monkeypatch.setenv("DEVTEAM_PROFILE", "test")
+    assert signin_link.main() == 0
+    link = capsys.readouterr().out.strip()
+    token = isolated_settings.api_token_path.read_text(encoding="utf-8").strip()
+    assert link == f"http://127.0.0.1:5173/signin#token={token}"
+    assert token not in link.split("#", 1)[0]  # never in the part a browser sends to a server

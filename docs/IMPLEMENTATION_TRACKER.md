@@ -5,7 +5,7 @@
 | Document | `docs/IMPLEMENTATION_TRACKER.md`. The permanent record of **what has actually happened** |
 | Scope reference | `docs/IMPLEMENTATION_ROADMAP.md` (what and when) · `docs/DETAILED_WORKING_PLAN.md` (how) |
 | Time zone | All timestamps are local time, IST (UTC+05:30) |
-| Last updated | 2026-11-19 14:35 IST |
+| Last updated | 2026-11-19 15:15 IST |
 
 > **Mandatory rule.** Every time a project file is created, modified or deleted during authorised development, this tracker is updated **in the same session**:
 > - Planned work is never recorded as completed.
@@ -19,15 +19,15 @@
 | Item | Value |
 |---|---|
 | Current milestone | **M0 Foundation** |
-| Current part | **Part B: In progress** (G-A approved 2026-11-19 14:30, AP-005) |
-| Overall status | Part A implemented and locally validated. Completion report: `docs/parts/PART-A-COMPLETION-REPORT.md` |
-| Last completed activity | 2026-11-19 12:50 (AP-004): model-routing audit (`docs/architecture/MODEL_ROUTING.md`), Part B plan drafted (`docs/parts/PART-B-PLAN.md`), simple-language tracker created (`docs/PROJECT_PROGRESS_TRACKER.md`). Documentation only, no code |
-| Code written | Yes, Part A scope only: `devteam_core`, `devteam_state`, `devteam_api`, `apps/web` shell, scripts, tests |
+| Current part | **Part B: Awaiting approval (gate G-B)**. G-A approved 2026-11-19 14:30 (AP-005) |
+| Overall status | Part A approved (v0.1.0, local tags). Part B implemented and locally validated; completion report `docs/parts/PART-B-COMPLETION-REPORT.md` |
+| Last completed activity | Part B final regression TR-0034 (pytest 279 passed, 94% coverage; Vitest 13; all gates clean; gitleaks exit 0); smoke TR-0032 |
+| Code written | Parts A and B: `devteam_core`, `devteam_state`, `devteam_harness` (HC-15/18/20/21 foundations), `devteam_services` (extraction, workspace, intake), `devteam_api`, `apps/web`, scripts, tests |
 | Dependencies installed | Python (uv, `uv.lock`), npm (`package-lock.json`), Gitleaks (winget, user scope), Ollama models `qwen2.5:3b` and `qwen2.5-coder:3b` |
-| Git / GitHub operations | **None.** No commits or pushes (excluded by AP-003). The existing empty `.git` was inspected read-only |
-| Tests executed | TR-0001…TR-0017. Final: pytest 128 passed / 0 failed / 0 skipped (95% coverage); Vitest 5 passed; smoke OK |
-| Blocking items | G-A owner approval. For Part E: D-07. Unverifiable until Git is authorised: AC-A-01 (fresh clone), AC-A-02 (CI) |
-| Next authorised action | **None.** Wait for the owner's decisions on G-A **and** the Part B plan. Part B implementation must not start until both are explicitly approved |
+| Git / GitHub operations | **Local only (AP-005).** Branch `main`: commit `ead86ae` (Part A), tags `v0.1.0`, `part-a-approved`. Branch `part/b-intake`: Part B commit (CH-0041). No push, no GitHub |
+| Tests executed | TR-0001…TR-0034. Final Part B: pytest 279 passed / 0 failed / 0 skipped (94%); Vitest 13 passed; smoke OK |
+| Blocking items | G-B owner approval. For Part E: D-07. AC-A-02 (GitHub CI) still unverifiable without GitHub |
+| Next authorised action | **None.** Wait for the owner's G-B decision. Part C must not start until G-B is approved |
 
 ---
 
@@ -49,7 +49,7 @@
 | Part | Name | Milestone | Status | Gate | Plan confirmed | Approved on | Tag |
 |---|---|---|---|---|---|---|---|
 | A | Foundation, Repository Conventions & Environment Benchmark | M0 | **Approved** | G-A | Retrospectively, at G-A (DV-001) | 2026-11-19 (AP-005) | `part-a-approved`, `v0.1.0` (local) |
-| B | Intake, Extraction, Human IAM & Audit Foundation | M0 | **In progress** | G-B | 2026-11-19 (AP-005) | — | — |
+| B | Intake, Extraction, Human IAM & Audit Foundation | M0 | **Awaiting approval** | G-B | 2026-11-19 (AP-005) | — | — (branch `part/b-intake`, local) |
 | C | Shared Contracts & Harness Core | M1 | Not started | G-C | — | — | — |
 | D | LangGraph Orchestration, Ten Stub Agents & Head Agent Deterministic Core | M1 | Not started | G-D | — | — | — |
 | E | Isolated Execution Sandbox & Target-App Templates | M1 | Not started | G-E | — | — | — |
@@ -82,7 +82,7 @@
 | Debugger & Code Reviewer | — | — (N) |
 | Documentation & Reporting Agent | — | — (O) |
 
-**Harness component status:** HC-01…HC-21 are not built yet. Part A delivered only foundations: HC-10 structured logging (HS-01, implemented and tested), HC-11 trace-context propagation (HS-01, implemented and tested; OpenTelemetry exporter in C), and HC-17 log redaction (HS-01, implemented and tested; SecretsManager in C). The planned part for each component is in roadmap §12.
+**Harness component status:** HC-01…HC-21 are not built yet. Part B added foundations of HC-15 (local human principal, roles, install token, session cookie, origin checks), HC-18 (API token-bucket limits), HC-20 (upload validation) and HC-21 (append-only audit store, no hash chain yet), each implemented and tested in its Part B scope only. Part A delivered only foundations: HC-10 structured logging (HS-01, implemented and tested), HC-11 trace-context propagation (HS-01, implemented and tested; OpenTelemetry exporter in C), and HC-17 log redaction (HS-01, implemented and tested; SecretsManager in C). The planned part for each component is in roadmap §12.
 
 ---
 
@@ -185,6 +185,17 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | CH-0028 | 2026-11-19 12:52 | Cross-part | `CLAUDE.md` §2 | Added the rule to update `docs/PROJECT_PROGRESS_TRACKER.md` at the end of every part and before every approval request | AP-004 (owner: keep it updated throughout A–R) | — | Done |
 | CH-0029 | 2026-11-19 12:52 | Cross-part | `docs/IMPLEMENTATION_TRACKER.md` (§1, §2, §3, §4, §5, §6, §11, §13) | Recorded AP-004, D-37 proposal, D-22 discrepancy, D-31 proposal, Part B "Planning", new changes; tracker rule 10 | Tracker rule | — | Done |
 | CH-0030 | 2026-11-19 13:05 | Cross-part | `docs/PROJECT_PROGRESS_TRACKER.md` (whole file); `CLAUDE.md` §2 (progress-tracker paragraph) | Replaced the detailed simple-language tracker with a one-paragraph-per-run Development Run History (Runs 1–8); CLAUDE.md rule updated to match | Owner instruction 2026-11-19 (simplify tracker) | — | Done |
+| CH-0031 | 2026-11-19 14:33 | B | `docs/IMPLEMENTATION_TRACKER.md`, `CHANGELOG.md` (0.1.0 section + versioning note), `CLAUDE.md` §2 (Git and versioning) | Recorded AP-005, rulings, DV-006; versioning scheme (SemVer pre-1.0, minor bump per approved part; tags `vX.Y.Z` + `part-x-approved`) | AP-005 | — | Done |
+| CH-0032 | 2026-11-19 14:34 | A/B | Local Git repository | `HEAD` set to `main` (repository had zero commits); first commit `ead86ae` with all Part A files (spec .docx excluded pending D-34); annotated tag `v0.1.0` + tag `part-a-approved`; branch `part/b-intake` created. The commit message was amended once (its two lines had run together) before any other work; tags moved with it | AP-005 (local commits) | Gitleaks exit 0 before commit | Done |
+| CH-0033 | 2026-11-19 14:40 | B | `pyproject.toml`, `packages/harness/pyproject.toml`, `packages/services/pyproject.toml`, `apps/api/pyproject.toml`, `uv.lock` | New workspace members `devteam_harness`, `devteam_services`; deps pypdf, pdfplumber, python-docx, charset-normalizer, python-multipart; mypy/coverage/isort/import-linter updated (2 new contracts); `pythonpath=["."]` for shared test fixtures | PART-B-PLAN §5.1, §7 | VR-010, VR-011 | Done |
+| CH-0034 | 2026-11-19 14:45 | B | `packages/core/src/devteam_core/config/{settings,__init__}.py`, `config/defaults.yaml` | `UploadSettings`, `AuthSettings`, `RateLimitSettings`; loopback validator for `api.host` and allowed origins; `api_token_path` | PART-B-PLAN §2, §5.3 | TR-0031 | Done |
+| CH-0035 | 2026-11-19 14:50 | B | `packages/state/src/devteam_state/models/__init__.py`, `migrations/versions/0002_intake_iam_audit.py`, `repositories/{__init__,principals,projects,documents,audit}.py` | Tables principals, principal_roles, projects, source_documents, document_chunks, audit_events (append-only triggers); repositories requiring `project_id` | PART-B-PLAN §4 | TR-0018 | Done |
+| CH-0036 | 2026-11-19 14:55 | B | `packages/harness/src/devteam_harness/{iam,audit,ratelimit,validation}/` | HS-02 upload validation; HS-03 roles + install token + session value; HS-04 token bucket; HS-05 audit recorder | HC-15/18/20/21 | TR-0019, TR-0020 | Done |
+| CH-0037 | 2026-11-19 15:00 | B | `packages/services/src/devteam_services/{extractor,workspace,intake}/` | PDF/DOCX/TXT/MD extractors, deterministic chunker (`CHUNKER_VERSION` 1), workspace manager, intake pipeline. Fix after TR-0021: the DOCX extractor treats any parser error as "damaged file" | FR-001, FR-003; PART-B-PLAN §5.6 | TR-0021…TR-0023 | Done |
+| CH-0038 | 2026-11-19 15:05 | B | `apps/api/src/devteam_api/{main,deps,schemas,signin_link}.py`, `routers/{session,projects,documents,audit}.py`, `middleware/{body_limit,request_context}.py`, `apps/api/openapi.json` | Authenticated `/api` routes, audit dependency, rate limits, CORS, upload size guard, sign-in link; request ID stored in scope state | PART-B-PLAN §5.3–§5.7 | TR-0024…TR-0028 | Done |
+| CH-0039 | 2026-11-19 15:08 | B | `apps/web/src/{App.tsx,styles.css}`, `api/{client.ts,useLoad.ts,schema.d.ts}`, `components/{Layout,ErrorNotice}.tsx`, `pages/{SignIn,Projects,Project,ExtractionReview,Activity}Page.tsx`, `pages/PartB.test.tsx` | Part B screens and typed client (regenerated schema) | PART-B-PLAN §5.8 | TR-0029, TR-0030 | Done |
+| CH-0040 | 2026-11-19 15:12 | B | Tests (`tests/conftest.py`, `tests/fixtures/`, `tests/security/`, `tests/e2e/`, `tests/integration/test_intake_api.py`, `packages/harness/tests/`, `packages/services/tests/`); Part A tests adjusted (`tests/integration/test_migrations.py`, `apps/api/tests/test_system.py`, `tests/scripts/test_scripts.py`); `scripts/dev.ps1`, `scripts/doctor.py`; `README.md`, `CHANGELOG.md`, `docs/parts/PART-B-COMPLETION-REPORT.md`, `docs/PROJECT_PROGRESS_TRACKER.md` (Run 9) | Part B tests, scripts and docs | AC-B-01…05 | TR-0031…TR-0034 | Done |
+| CH-0041 | 2026-11-19 15:16 | B | Local Git: branch `part/b-intake` | Part B committed on the part branch (not merged or tagged until G-B approval) | AP-005 | TR-0034 | Done |
 
 **Activity outside the project (recorded for transparency; not repository changes):**
 - Earlier in the planning session, the specification's text was extracted to a temporary file in the coding agent's session scratchpad (outside the workspace) for reading.
@@ -244,6 +255,17 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | CH-0028 | Modified | `CLAUDE.md` | §2 Tracker-update rule (one new bullet) | Progress-tracker rule | AP-004 |
 | CH-0029 | Modified | `docs/IMPLEMENTATION_TRACKER.md` | §1, §2 (Part B row), §3 (AP-004), §4 (D-06, D-22, D-31, D-37), §5, §6, §11, §13 (rule 10) | Status record | Tracker rule |
 | CH-0030 | Modified | `docs/PROJECT_PROGRESS_TRACKER.md`; `CLAUDE.md` | Whole file; §2 last paragraph | Run-history format | Owner instruction |
+| CH-0031 | Modified | `docs/IMPLEMENTATION_TRACKER.md`; `CHANGELOG.md`; `CLAUDE.md` | §1–§4, §10, §11; header + 0.1.0 heading; §2 Git paragraph | Approvals, versioning | AP-005 |
+| CH-0032 | Repository operation | `.git` (local) | HEAD → `main`; commit `ead86ae`; tags `v0.1.0`, `part-a-approved`; branch `part/b-intake` | First commit | AP-005 |
+| CH-0033 | Created / Modified | `packages/harness/pyproject.toml`, `packages/services/pyproject.toml` (created); `pyproject.toml`, `apps/api/pyproject.toml`, `uv.lock` (modified) | Workspace members, dependencies, tool config | Part B packages | PART-B-PLAN §7 |
+| CH-0034 | Modified | `packages/core/src/devteam_core/config/settings.py`, `config/__init__.py`, `config/defaults.yaml` | `ApiSettings._loopback_host`; `UploadSettings`, `AuthSettings`, `RateLimitSettings`; `Settings.api_token_path`; new YAML sections | Limits and auth config | AP-005 |
+| CH-0035 | Created / Modified | `packages/state/src/devteam_state/models/__init__.py` (modified); `migrations/versions/0002_intake_iam_audit.py`, `repositories/*.py` (created) | Whole files | Schema + repositories | AC-B-03, AC-B-04 |
+| CH-0036 | Created | `packages/harness/src/devteam_harness/**`, `packages/harness/tests/{test_upload_validation,test_iam_ratelimit}.py` | Whole files | Harness foundations | HC-15/18/20/21 |
+| CH-0037 | Created | `packages/services/src/devteam_services/**`, `packages/services/tests/{test_extractors,test_chunker,test_workspace_intake}.py` | Whole files; `extractor/word.py` except clause widened after TR-0021 | Extraction and intake | AC-B-01, AC-B-02 |
+| CH-0038 | Created / Modified | `apps/api/src/devteam_api/{deps,schemas,signin_link}.py`, `routers/{session,projects,documents,audit}.py`, `middleware/body_limit.py` (created); `main.py`, `middleware/request_context.py` (one line), `apps/api/openapi.json` (modified) | Whole files / `create_app` + lifespan / `__call__` | API surface | AC-B-04 |
+| CH-0039 | Created / Modified | `apps/web/src/api/useLoad.ts`, `components/ErrorNotice.tsx`, five `pages/*Page.tsx`, `pages/PartB.test.tsx` (created); `App.tsx`, `components/Layout.tsx`, `api/client.ts`, `api/schema.d.ts`, `styles.css` (modified) | Whole files / routes, nav, appended CSS | UI | AC-B-01 |
+| CH-0040 | Created / Modified | See CH-0040 in §5 | Whole files. Part A tests changed: `test_upgrade_then_downgrade_round_trip`, `test_version_reports_platform_and_schema`, `test_only_health_and_version_live_outside_the_authenticated_api` (renamed from `test_openapi_lists_only_part_a_endpoints`); `scripts/doctor.py` `check_api_token` + `run_checks`; `scripts/dev.ps1` parameters + smoke block | Tests, scripts, docs | AC-B-01…05 |
+| CH-0041 | Repository operation | `.git` (local) | Commit on `part/b-intake` | Part B commit | AP-005 |
 
 | Category | Files |
 |---|---|
@@ -274,6 +296,23 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | TR-0015 | 2026-11-19 10:51 | A | `uv run pytest -m "not llm and not docker and not slow and not acceptance" -q` (after CH-0021) | 128 | 0 | 0 | Console |
 | TR-0016 | 2026-11-19 10:51–10:58 | A | `uv run python scripts/benchmark_models.py --runs 3` (run 2, corrected task; machine otherwise idle) | 4/4 models: structured 3/3, code 3/3 | 0 | 7B not run (insufficient free RAM, Spec §9.3) | `docs/benchmarks/2026-11-19-baseline.{json,md}` |
 | TR-0017 | 2026-11-19 10:59 | A | **Final regression:** `uv sync --locked`; ruff check + format; mypy strict; lint-imports; `check_agent_count.py`; `pytest -m "not llm and not docker and not slow and not acceptance" --cov`; web `check:api`, `lint`, `typecheck`, `test`, `build`; `gitleaks dir . --exit-code 1` | pytest **128**; Vitest **5**; all gates clean; coverage **95%**; gitleaks exit 0 | 0 | 0 | Console |
+| TR-0018 | 2026-11-19 14:52 | B | `uv run pytest tests/integration/test_migrations.py packages/state apps/api -q` | 19 | **2** | 0 | Expected: two Part A tests hard-coded revision `0001_baseline`. Updated to the new head, plus Part B table and append-only checks; rerun 16/16 passed |
+| TR-0019 | 2026-11-19 14:58 | B | `uv run pytest packages/harness -q` | 71 | **1** | 0 | **Test bug**: the test used `redact_text` (explicit values only) instead of the registry path `redact_value` that logs use; product behaviour correct |
+| TR-0020 | 2026-11-19 14:59 | B | `uv run pytest packages/harness -q` | 72 | 0 | 0 | Console |
+| TR-0021 | 2026-11-19 15:00 | B | `uv run pytest packages/services -q` | 24 | **1** | 0 | **Product bug**: python-docx `PackageNotFoundError` on a truncated .docx was not mapped to "damaged file" (fixed in CH-0037) |
+| TR-0022 | 2026-11-19 15:00 | B | `uv run pytest packages/services -q` | 25 | 0 | 0 | Console |
+| TR-0023 | 2026-11-19 15:01 | B | `uv run pytest packages/services -q` (with intake tests) | 39 | 0 | 0 | Console |
+| TR-0024 | 2026-11-19 14:56 | B | `uv run pytest tests/security -q` | 25 | **4** | 0 | **Test bugs**: route listing returned nothing (FastAPI 0.165 wraps included routers lazily); one test expected a user-typed project name to be redacted in the projects table (only the audit copy is redacted, by design); the hostile-filename test did not allow for the multipart parser stripping folder parts itself (stored as `doc_…`, safe). Route inventory now cross-checked against the live OpenAPI |
+| TR-0025 | 2026-11-19 14:58 | B | `uv run pytest tests/security -q` | 30 | 0 | 0 | Console |
+| TR-0026 | 2026-11-19 14:59 | B | `uv run pytest tests/e2e -q` | 0 | **1** | 0 | **Test-harness bug**: server output went to an unread pipe; DEBUG logs filled it and blocked the server (read timeout). Output now goes to a file. The same investigation found duplicate audit naming; the batch event was renamed `document.upload_batch` |
+| TR-0027 | 2026-11-19 15:00 | B | `uv run pytest tests/e2e -q` | 1 | 0 | 0 | Console |
+| TR-0028 | 2026-11-19 15:01 | B | `uv run pytest tests/integration/test_intake_api.py -q` | 6 | 0 | 0 | Console |
+| TR-0029 | 2026-11-19 15:03 | B | `npm test` (apps/web): first from Git Bash, then from PowerShell with the new tests | Bash: suite did not load (KI-012). PowerShell: 12 | **1** | 0 | **Test bug**: exact-text match on a message inside a longer list item; fixed |
+| TR-0030 | 2026-11-19 15:04 | B | `npm test`, `lint`, `typecheck`, `check:api`, `build` (PowerShell) | Vitest 13; all gates clean | 0 | 0 | Console |
+| TR-0031 | 2026-11-19 15:06 | B | `uv run pytest -m "not llm and not docker and not slow and not acceptance" --cov` | 278 | 0 | 0 | Coverage 94% |
+| TR-0032 | 2026-11-19 15:07 | B | `./scripts/dev.ps1 -Smoke` | SMOKE OK (health direct + via proxy; `/api` 401 without key, 200 with key) | 0 | — | Ports 8000/5173 free afterwards. The real `data/state.db` was backed up, then migrated 0001→0002 |
+| TR-0033 | 2026-11-19 15:10 | B | Performance script (session scratchpad): 300-page generated PDF, `extract` + `chunk_blocks` | 300 pages, 600 chunks, 38.8 s, +12 MB peak RSS | — | — | KI-013 |
+| TR-0034 | 2026-11-19 15:11 | B | **Final regression:** `uv sync --locked`; ruff check + format; mypy strict; lint-imports (4/4); agent count; pytest fast suite `--cov`; web check:api/lint/typecheck/test/build; gitleaks | pytest **279**, Vitest **13**, coverage **94%**, gitleaks exit 0 | 0 | 0 | Console |
 
 ---
 
@@ -290,6 +329,9 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | VR-007 | 2026-11-19 10:47 | A | OpenAPI drift gate has teeth | `openapi-typescript <drifted copy> --check` vs clean snapshot | **Pass**: drifted exit 1, clean exit 0 | Console |
 | VR-008 | 2026-11-19 11:00 | A | AC-A-06 CLAUDE.md covers roadmap §8 list | Manual checklist: ten-agent restriction ✔, agent boundaries ✔, LangGraph conventions ✔, gateway-only ✔, harness/security ✔, tool/sandbox restrictions ✔, approvals ✔, coding/testing ✔, uv/npm rules ✔, adding/modifying agents ✔, no bypass of central infrastructure ✔, tracker rule ✔, session protocol ✔ | **Pass** (manual review, not automated) | `CLAUDE.md` §1–§11 |
 | VR-009 | 2026-11-19 05:02 | A | Redaction canary has teeth | `test_negative_control_canary_leaks_without_redaction`: with the redaction processor removed, the canary **is** emitted | **Pass** | TR-0002 |
+| VR-010 | 2026-11-19 15:09 | B | Dependency audits after the Part B dependencies | `uvx pip-audit --strict -r <uv export>`; `npm audit --audit-level=high` | **Pass**: no known vulnerabilities; 0 npm vulnerabilities | Console |
+| VR-011 | 2026-11-19 15:12 | B | Secret scan | `gitleaks dir . --redact --exit-code 1`. First run: 1 finding, a synthetic canary in a security test (marked `gitleaks:allow`). Rescan exit 0. Real key file `data/api_token` confirmed gitignored | **Pass** | Console |
+| VR-012 | 2026-11-19 15:12 | B | AC-B-01…05 | Mapped to tests in `PART-B-COMPLETION-REPORT.md` | **Pass** (automated). Manual UI demo left to the owner (D-15 (b)) | Completion report |
 
 ---
 
@@ -306,6 +348,8 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | KI-009 | 2026-11-19 | TypeScript pinned to `~5.9.3`: TS 7.0.2 is current, but `openapi-typescript@7.13.0` requires `^5.x` and `typescript-eslint@8.73.0` requires `<6.1.0` | Web toolchain one major behind | Revisit when those packages support TS 6/7 | Open (accepted) |
 | KI-010 | 2026-11-19 | Gitleaks is on `PATH` only in shells started after the winget install (`doctor` in an old shell shows it as missing) | Cosmetic | — | Open (documented in README troubleshooting) |
 | KI-011 | 2026-11-19 | Embedding model not benchmarked in Part A (roadmap §9.1: "chosen by benchmark (A/F)") | None until RAG (Part F) | Part F plan | Deferred to F |
+| KI-012 | 2026-11-19 | Vitest fails ("failed to find the current suite") when started from a shell whose path has a lower-case drive letter (`c:`), because it loads Vitest twice | Web tests must run from PowerShell or an upper-case `C:` path | — | Open (documented in README) |
+| KI-013 | 2026-11-19 | Extraction runs inside the upload request: ≈39 s for a 300-page PDF (TR-0033); typical BRDs take seconds | Long wait for very large PDFs | Part D worker (background extraction) | Open |
 | KI-002 | 2026-11-18 | Any earlier AI Agent Harness discussion outside this session was not accessible. The roadmap uses only the 21-item harness list from owner instruction #2 | Possible gap if earlier discussion had additional requirements | Owner to confirm nothing is missing | Open |
 | KI-003 | 2026-11-18 | Repository template files were intentionally not provided. Structure and conventions were derived from the stated conventions only | None expected | — | Accepted by design |
 
@@ -327,7 +371,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 
 **Pending:**
 
-1. Part B implementation (in progress).
+1. **Owner decision on gate G-B.** Review `docs/parts/PART-B-COMPLETION-REPORT.md`.
 2. Owner approval of the model selection (owner: "keep pending; will approve later").
 3. Owner rulings when they become necessary (never assumed): D-07 (before Part E), D-21, D-26/D-33 confirmation, D-31 final ruling, D-34 (commit the spec .docx; until ruled, the .docx is **not** committed).
 4. Optional: Ollama env vars (KI-004); GitHub push/repository creation (not authorised; AC-A-01 fresh-clone can now be checked locally, AC-A-02 CI still needs GitHub).
@@ -341,7 +385,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 
 | Milestone | Parts | Status | Completed on | Report |
 |---|---|---|---|---|
-| M0 Foundation | A, B | In progress (A approved; B in progress) | — | `docs/parts/PART-A-COMPLETION-REPORT.md` |
+| M0 Foundation | A, B | In progress (A approved; B awaiting approval) | — | `docs/parts/PART-A-COMPLETION-REPORT.md` |
 | M1 Harness & Orchestration | C, D, E, F | Not started | — | — |
 | M2 Discovery | G, H, I | Not started | — | — |
 | M3 Build | J, K, L | Not started | — | — |

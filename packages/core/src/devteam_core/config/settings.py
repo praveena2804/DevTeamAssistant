@@ -19,6 +19,14 @@ class ApiSettings(_Section):
     host: str = "127.0.0.1"
     port: int = Field(default=8000, ge=1, le=65535)
 
+    @field_validator("host")
+    @classmethod
+    def _loopback_host(cls, value: str) -> str:
+        # Spec §15 / D-29: the platform API is reachable from this machine only.
+        if not is_loopback_host(value):
+            raise ValueError("api.host must be a loopback address (127.0.0.1, ::1 or localhost)")
+        return value
+
 
 class PathSettings(_Section):
     data_dir: Path = Path("data")
@@ -80,6 +88,63 @@ class ResourceSettings(_Section):
     min_free_ram_mb: int = Field(default=3072, ge=0)
 
 
+class UploadSettings(_Section):
+    """HC-20 upload limits (Part B plan §2, approved AP-005)."""
+
+    allowed_extensions: tuple[str, ...] = (".pdf", ".docx", ".txt", ".md")  # D-22 (b)
+    max_file_mb: int = Field(default=20, ge=1, le=500)
+    max_files_per_upload: int = Field(default=10, ge=1, le=100)
+    max_pdf_pages: int = Field(default=300, ge=1, le=10_000)
+    max_docx_uncompressed_mb: int = Field(default=100, ge=1, le=2000)
+    max_docx_entries: int = Field(default=2000, ge=10, le=100_000)
+    max_docx_compression_ratio: int = Field(default=100, ge=2, le=10_000)
+    max_extracted_chars: int = Field(default=2_000_000, ge=1000)
+    chunk_target_chars: int = Field(default=1200, ge=200, le=20_000)
+    chunk_max_chars: int = Field(default=2000, ge=200, le=40_000)
+
+    @field_validator("allowed_extensions")
+    @classmethod
+    def _normalise_extensions(cls, value: tuple[str, ...]) -> tuple[str, ...]:
+        supported = {".pdf", ".docx", ".txt", ".md"}
+        normalised = tuple(ext.lower() for ext in value)
+        unknown = set(normalised) - supported
+        if unknown:
+            raise ValueError(f"no extractor exists for {sorted(unknown)}")
+        return normalised
+
+    @property
+    def max_file_bytes(self) -> int:
+        return self.max_file_mb * 1024 * 1024
+
+
+class AuthSettings(_Section):
+    """HC-15 local API authentication (D-29 (a))."""
+
+    token_file: str = "api_token"  # noqa: S105 - a file name, not a secret; under data_dir (gitignored)
+    cookie_name: str = "devteam_session"
+    allowed_origins: tuple[str, ...] = ("http://127.0.0.1:5173", "http://localhost:5173")
+
+    @field_validator("allowed_origins")
+    @classmethod
+    def _loopback_origins(cls, value: tuple[str, ...]) -> tuple[str, ...]:
+        for origin in value:
+            parts = urlsplit(origin)
+            if parts.scheme not in {"http", "https"} or not parts.hostname:
+                raise ValueError(f"invalid origin {origin!r}")
+            if not is_loopback_host(parts.hostname) or parts.path not in {"", "/"}:
+                raise ValueError(f"allowed origin must be a loopback origin: {origin!r}")
+        return tuple(origin.rstrip("/") for origin in value)
+
+
+class RateLimitSettings(_Section):
+    """HC-18 API token-bucket limits (requests per minute)."""
+
+    enabled: bool = True
+    upload_per_minute: int = Field(default=10, ge=1)
+    mutation_per_minute: int = Field(default=60, ge=1)
+    session_per_minute: int = Field(default=10, ge=1)
+
+
 class Settings(_Section):
     profile: ProfileName = "low_memory"
     root: Path
@@ -89,6 +154,9 @@ class Settings(_Section):
     logging: LoggingSettings = LoggingSettings()
     ollama: OllamaSettings = OllamaSettings()
     resources: ResourceSettings = ResourceSettings()
+    uploads: UploadSettings = UploadSettings()
+    auth: AuthSettings = AuthSettings()
+    ratelimit: RateLimitSettings = RateLimitSettings()
 
     # -- derived locations (absolute) ---------------------------------------------------------------
     @property
@@ -114,6 +182,10 @@ class Settings(_Section):
     @property
     def backups_dir(self) -> Path:
         return self.data_dir / "backups"
+
+    @property
+    def api_token_path(self) -> Path:
+        return self.data_dir / self.auth.token_file
 
     def _resolve(self, value: Path) -> Path:
         return value if value.is_absolute() else (self.root / value).resolve()

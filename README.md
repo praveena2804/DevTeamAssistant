@@ -7,15 +7,17 @@ DevTeam AI is a local-first, BRD-driven software development platform.
 3. A supervised team of **exactly ten AI agents** then designs, generates, tests, repairs, documents and packages the requested application.
 4. The agents work inside a central security and execution **harness**. Models run locally on Ollama; no paid service is used.
 
-> **Current state: Part A (Foundation) is under development, awaiting gate G-A.**
-> Only the foundation exists so far:
-> - configuration, logging and trace context;
-> - a SQLite state database;
-> - the API with `/health` and `/version`;
-> - the web shell;
-> - environment tooling.
+> **Current state: Part A approved (v0.1.0). Part B (intake) implemented, awaiting gate G-B.**
+> What exists:
+> - configuration, logging, trace context and secret redaction (Part A);
+> - a SQLite state database with migrations and automatic backups (Part A);
+> - projects, BRD upload (PDF, DOCX, TXT, MD) with validation, extraction into referenced text pieces,
+>   and an extraction review screen (Part B);
+> - local sign-in key, rate limits and an append-only activity log (Part B; harness HC-15, HC-18, HC-20, HC-21
+>   foundations).
 >
-> No agents or harness components beyond logging and redaction exist yet. See `docs/IMPLEMENTATION_TRACKER.md` for the authoritative status.
+> **No AI agents and no model calls exist yet.** See `docs/IMPLEMENTATION_TRACKER.md` for the authoritative
+> status and `docs/PROJECT_PROGRESS_TRACKER.md` for a plain-English run history.
 
 ## Documentation
 
@@ -25,6 +27,8 @@ DevTeam AI is a local-first, BRD-driven software development platform.
 | `docs/IMPLEMENTATION_ROADMAP.md` | What is built and when: 18 parts (A–R), 6 milestones, harness components HC-01…HC-21 |
 | `docs/DETAILED_WORKING_PLAN.md` | How each part is executed |
 | `docs/IMPLEMENTATION_TRACKER.md` | What has actually happened (changes, tests, decisions, approvals) |
+| `docs/PROJECT_PROGRESS_TRACKER.md` | Plain-English history: one short paragraph per development run |
+| `docs/architecture/MODEL_ROUTING.md` | Model-routing audit and proposed design (D-06, D-37) |
 | `docs/architecture/HARNESS_ASSESSMENT.md` | Agent and harness architecture assessment |
 | `docs/adr/` | Architecture decision records |
 | `CLAUDE.md` | Engineering rules for coding agents |
@@ -60,10 +64,13 @@ apps/web (React+TS) ──HTTP──► apps/api (FastAPI) ──► apps/worker
 ## Repository structure (current)
 
 ```text
-apps/api/        FastAPI platform API (devteam_api): /health, /version
-apps/web/        React + TypeScript + Vite UI shell (typed client generated from apps/api/openapi.json)
+apps/api/        FastAPI platform API (devteam_api): /health, /version (public); /api/* (sign-in required)
+apps/web/        React + TypeScript + Vite UI: sign-in, projects, upload, extraction review, activity
 packages/core/   devteam_core: config, structured logging + redaction, trace context, IDs, errors, paths
-packages/state/  devteam_state: SQLite engine (WAL), Alembic migrations, online backups
+packages/state/  devteam_state: SQLite engine (WAL), models, repositories, Alembic migrations, backups
+packages/harness/ devteam_harness: HC-15 local IAM + token, HC-18 rate limits, HC-20 upload validation,
+                 HC-21 audit (foundations only)
+packages/services/ devteam_services: workspace manager, document extraction + chunking, intake (not agents)
 config/          defaults.yaml + profiles (low_memory, standard, test)
 scripts/         doctor, benchmark, agent-count check, backup, OpenAPI export, setup/dev PowerShell
 tests/           cross-package integration, contract and script tests
@@ -105,12 +112,18 @@ uv run python scripts/doctor.py
 
 - Variables use the form `DEVTEAM_<SECTION>__<KEY>`, for example `DEVTEAM_LOGGING__LEVEL=DEBUG`.
 - Copy `.env.example` to `.env` for local overrides; it holds placeholders only.
-- Unknown keys and a non-loopback Ollama URL are rejected at startup.
+- Unknown keys, a non-loopback API host, non-loopback allowed origins and a non-loopback Ollama URL are rejected
+  at startup.
+- Upload limits (`uploads:`), sign-in settings (`auth:`) and rate limits (`ratelimit:`) live in
+  `config/defaults.yaml`. Approved defaults: 20 MB per file, 10 files per upload, 300 PDF pages.
 
 ## Development
 
 ```powershell
-./scripts/dev.ps1                                   # API on http://127.0.0.1:8000, UI on http://127.0.0.1:5173
+./scripts/dev.ps1                                   # API on http://127.0.0.1:8000, UI on http://127.0.0.1:5173;
+                                                    # prints and opens the private sign-in link
+uv run python -m devteam_api.signin_link            # print the sign-in link again
+uv run python tests/fixtures/brds.py data/sample_brds  # write sample BRDs (good and broken) for a demo
 uv run python scripts/export_openapi.py             # after API changes, then:
 npm --prefix apps/web run gen:api                   # regenerate the typed client
 uv run python scripts/backup_state.py               # back up data/*.db
@@ -135,4 +148,7 @@ gitleaks dir . --no-banner
 | Ollama not reachable | Start Ollama; the URL must be `127.0.0.1`/`localhost` |
 | Docker engine not running | Needed only from Part E |
 | `gitleaks` not found right after `winget install` | Open a new terminal so `PATH` refreshes |
+| UI says "You are not signed in" | Open the sign-in link printed by `scripts/dev.ps1` (or run `uv run python -m devteam_api.signin_link`). The key is stored in `data/api_token`; never share it |
+| A large PDF takes a long time to upload | Expected for now: reading happens during the upload (≈40 s for 300 pages on this laptop). Background reading arrives with the worker (Part D) |
+| `npm test` fails with "Vitest failed to find the current suite" | Run it from PowerShell or a path that starts with an upper-case `C:`; a lower-case drive letter loads Vitest twice |
 | API reports `degraded` | The state DB schema is behind; restart the API (it backs up, then migrates), or run `uv run alembic -c packages/state/alembic.ini upgrade head` |

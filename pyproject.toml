@@ -10,6 +10,8 @@ requires-python = ">=3.12,<3.13"
 dependencies = [
     "devteam-core",
     "devteam-state",
+    "devteam-harness",
+    "devteam-services",
     "devteam-api",
 ]
 
@@ -20,12 +22,16 @@ package = false
 members = [
     "packages/core",
     "packages/state",
+    "packages/harness",
+    "packages/services",
     "apps/api",
 ]
 
 [tool.uv.sources]
 devteam-core = { workspace = true }
 devteam-state = { workspace = true }
+devteam-harness = { workspace = true }
+devteam-services = { workspace = true }
 devteam-api = { workspace = true }
 
 [dependency-groups]
@@ -63,7 +69,7 @@ ignore = [
 "**/migrations/versions/*.py" = ["N999"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["devteam_core", "devteam_state", "devteam_api"]
+known-first-party = ["devteam_core", "devteam_state", "devteam_harness", "devteam_services", "devteam_api"]
 
 [tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "parents"
@@ -74,14 +80,14 @@ ban-relative-imports = "parents"
 python_version = "3.12"
 strict = true
 warn_unreachable = true
-mypy_path = ["packages/core/src", "packages/state/src", "apps/api/src"]
+mypy_path = ["packages/core/src", "packages/state/src", "packages/harness/src", "packages/services/src", "apps/api/src"]
 explicit_package_bases = true
 namespace_packages = true
 plugins = ["pydantic.mypy"]
 exclude = ["^apps/web/", "/migrations/versions/"]
 
 [[tool.mypy.overrides]]
-module = ["alembic.*"]
+module = ["alembic.*", "pdfplumber.*", "docx.*", "lxml.*"]
 ignore_missing_imports = true
 
 # ---------------------------------------------------------------- pytest
@@ -89,6 +95,7 @@ ignore_missing_imports = true
 minversion = "8.0"
 addopts = "-ra --strict-markers --import-mode=importlib"
 testpaths = ["packages", "apps/api", "tests"]
+pythonpath = ["."]
 markers = [
     "integration: cross-module tests using temp SQLite and fakes",
     "contract: schema/OpenAPI snapshot tests",
@@ -102,7 +109,7 @@ filterwarnings = ["error::DeprecationWarning:devteam_.*"]
 
 [tool.coverage.run]
 branch = true
-source = ["devteam_core", "devteam_state", "devteam_api"]
+source = ["devteam_core", "devteam_state", "devteam_harness", "devteam_services", "devteam_api"]
 omit = ["*/migrations/*"]
 
 [tool.coverage.report]
@@ -111,17 +118,29 @@ skip_covered = false
 
 # ---------------------------------------------------------------- import-linter (roadmap §7.1)
 [tool.importlinter]
-root_packages = ["devteam_core", "devteam_state", "devteam_api"]
+root_packages = ["devteam_core", "devteam_state", "devteam_harness", "devteam_services", "devteam_api"]
 include_external_packages = false
 
 [[tool.importlinter.contracts]]
 name = "devteam_core depends on no internal package"
 type = "forbidden"
 source_modules = ["devteam_core"]
-forbidden_modules = ["devteam_state", "devteam_api"]
+forbidden_modules = ["devteam_state", "devteam_harness", "devteam_services", "devteam_api"]
 
 [[tool.importlinter.contracts]]
 name = "devteam_state may depend only on devteam_core"
 type = "forbidden"
 source_modules = ["devteam_state"]
+forbidden_modules = ["devteam_harness", "devteam_services", "devteam_api"]
+
+[[tool.importlinter.contracts]]
+name = "devteam_harness must not depend on services or apps (roadmap 7.1)"
+type = "forbidden"
+source_modules = ["devteam_harness"]
+forbidden_modules = ["devteam_services", "devteam_api"]
+
+[[tool.importlinter.contracts]]
+name = "devteam_services must not depend on apps (roadmap 7.1)"
+type = "forbidden"
+source_modules = ["devteam_services"]
 forbidden_modules = ["devteam_api"]

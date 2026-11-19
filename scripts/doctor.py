@@ -170,6 +170,17 @@ def check_disk(settings: Settings) -> Check:
     return Check("disk.free", "ok" if free_gb >= 10 else "warn", f"{free_gb:.0f} GB free at {target}")
 
 
+def check_api_token(settings: Settings) -> Check:
+    """HC-15: the per-install key exists (it is created on the API's first start). Never prints it."""
+    path = settings.api_token_path
+    if not path.exists():
+        return Check("api.token", "warn", f"not created yet; it appears at {path} after the API first starts")
+    length = len(path.read_text(encoding="utf-8").strip())
+    if length < 40:
+        return Check("api.token", "fail", f"{path} is too short; delete it and restart the API")
+    return Check("api.token", "ok", f"present at {path} (value not shown)")
+
+
 def run_checks(
     settings: Settings,
     *,
@@ -198,6 +209,7 @@ def run_checks(
     checks += check_docker(runner)
     checks += check_memory(settings)
     checks.append(check_disk(settings))
+    checks.append(check_api_token(settings))
     return checks
 
 

@@ -4,6 +4,20 @@ One section per approved part (roadmap §8). Entries are added at gate approval;
 
 **Versioning:** SemVer, pre-1.0. Each approved part bumps the minor version (Part A = 0.1.0, B = 0.2.0, …, R = 0.18.0); fixes to an approved part bump the patch version. The accepted MVP is `1.0.0-mvp`. Git tags: `vX.Y.Z` plus `part-<letter>-approved` (roadmap §16.2).
 
+## Unreleased — Part B: Project Intake, Document Extraction, Human IAM & Audit Foundation (awaiting gate G-B)
+
+### Added
+
+- Projects (create, list, read, rename); per-project workspaces. No deletion yet (D-31, DV-006).
+- BRD upload of PDF, DOCX, TXT and MD (D-22 (b)): filename, type, size, signature, zip-bomb, encryption and
+  duplicate checks; a clear per-file result, so good files continue when others fail.
+- Extraction (pdfplumber/pypdf, python-docx, charset-normalizer) into deterministic, referenced chunks
+  (file · page · section · paragraph).
+- Local sign-in key with an HttpOnly session cookie, loopback origins only, API rate limits, and an
+  append-only activity log of every change and refused request (HC-15, HC-18, HC-20, HC-21 foundations).
+- UI: sign-in, projects dashboard, project/upload, extraction review, activity.
+- Alembic migration `0002_intake_iam_audit`; new packages `devteam_harness` and `devteam_services`.
+
 ## 0.1.0 — Part A: Foundation, Repository Conventions & Environment Benchmark (G-A approved 2026-11-19)
 
 ### Added
