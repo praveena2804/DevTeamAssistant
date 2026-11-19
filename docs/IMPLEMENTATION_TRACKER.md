@@ -19,15 +19,15 @@
 | Item | Value |
 |---|---|
 | Current milestone | **M0 Foundation** |
-| Current part | **Part B: Awaiting approval (gate G-B)**. G-A approved 2026-11-19 14:30 (AP-005) |
-| Overall status | Part A approved (v0.1.0, local tags). Part B implemented and locally validated; completion report `docs/parts/PART-B-COMPLETION-REPORT.md` |
+| Current part | **Part C: Planning** (plan awaiting owner approval). G-B approved 2026-11-19 (AP-006) |
+| Overall status | Part A approved (v0.1.0) and Part B approved (v0.2.0), both merged to `main` with local tags. M0 Foundation complete |
 | Last completed activity | Part B final regression TR-0034 (pytest 279 passed, 94% coverage; Vitest 13; all gates clean; gitleaks exit 0); smoke TR-0032 |
 | Code written | Parts A and B: `devteam_core`, `devteam_state`, `devteam_harness` (HC-15/18/20/21 foundations), `devteam_services` (extraction, workspace, intake), `devteam_api`, `apps/web`, scripts, tests |
 | Dependencies installed | Python (uv, `uv.lock`), npm (`package-lock.json`), Gitleaks (winget, user scope), Ollama models `qwen2.5:3b` and `qwen2.5-coder:3b` |
-| Git / GitHub operations | **Local only (AP-005).** Branch `main`: commit `ead86ae` (Part A), tags `v0.1.0`, `part-a-approved`. Branch `part/b-intake`: Part B commit (CH-0041). No push, no GitHub |
-| Tests executed | TR-0001…TR-0034. Final Part B: pytest 279 passed / 0 failed / 0 skipped (94%); Vitest 13 passed; smoke OK |
-| Blocking items | G-B owner approval. For Part E: D-07. AC-A-02 (GitHub CI) still unverifiable without GitHub |
-| Next authorised action | **None.** Wait for the owner's G-B decision. Part C must not start until G-B is approved |
+| Git / GitHub operations | **Local only (AP-005).** `main` holds Parts A and B; tags `v0.1.0`, `part-a-approved`, `v0.2.0`, `part-b-approved` (CH-0042). No push, no GitHub |
+| Tests executed | TR-0001…TR-0035. Final Part B: pytest 279 passed / 0 failed / 0 skipped (94%); Vitest 13 passed; smoke OK |
+| Blocking items | Owner approval of the Part C plan. For Part E: D-07. AC-A-02 (GitHub CI) still unverifiable without GitHub |
+| Next authorised action | Write the Part C plan (`docs/parts/PART-C-PLAN.md`) and **wait for the owner's approval** before implementing it |
 
 ---
 
@@ -49,7 +49,7 @@
 | Part | Name | Milestone | Status | Gate | Plan confirmed | Approved on | Tag |
 |---|---|---|---|---|---|---|---|
 | A | Foundation, Repository Conventions & Environment Benchmark | M0 | **Approved** | G-A | Retrospectively, at G-A (DV-001) | 2026-11-19 (AP-005) | `part-a-approved`, `v0.1.0` (local) |
-| B | Intake, Extraction, Human IAM & Audit Foundation | M0 | **Awaiting approval** | G-B | 2026-11-19 (AP-005) | — | — (branch `part/b-intake`, local) |
+| B | Intake, Extraction, Human IAM & Audit Foundation | M0 | **Approved** | G-B | 2026-11-19 (AP-005) | 2026-11-19 (AP-006) | `part-b-approved`, `v0.2.0` (local) |
 | C | Shared Contracts & Harness Core | M1 | Not started | G-C | — | — | — |
 | D | LangGraph Orchestration, Ten Stub Agents & Head Agent Deterministic Core | M1 | Not started | G-D | — | — | — |
 | E | Isolated Execution Sandbox & Target-App Templates | M1 | Not started | G-E | — | — | — |
@@ -97,6 +97,7 @@ Only explicit owner approvals are recorded here.
 | AP-003 | 2026-11-19 04:50 | **Start of development.** Authorises: implementation; source, test and config files; dependency installation; documentation and tracker updates; local tests. Instruction: use roadmap v2.0 as the default and do not wait for routine, reversible decisions | Owner | Session instruction "START DEVELOPMENT" (2026-11-19) | **Excludes:** Git commits and GitHub pushes; external publishing; production deployment; destructive or irreversible infrastructure changes. **Owner directions in the same instruction:** D-35 (no LiteLLM without asking; gateway calls Ollama directly); D-36 (versioned Skills Registry inside prompt/skill management; skills grant no permissions) |
 | AP-004 | 2026-11-19 12:44 | Documentation tasks: simple-language tracker `docs/PROJECT_PROGRESS_TRACKER.md` (permanent, updated every part), model-routing audit, Part B plan | Owner | Instruction "Model Routing Audit, Part B Planning, and Simple-Words Progress Tracker" | **Not** an approval of G-A, of the Part B plan, of the model selection, or of Part B implementation. Git/publishing still excluded |
 | AP-005 | 2026-11-19 14:30 | **Gate G-A approved.** Part B plan confirmed as recommended, with rulings: D-22 (b) MD accepted; D-31 deletion excluded from Part B; upload limits 20 MB/file, 10 files/upload, 300 PDF pages; D-11 (a), D-15 (b), D-29 (a) as in the plan; D-37 to be included in the architecture and implementation plan. **Local Git commits authorised** for completed milestones, with a versioning scheme (short messages, max two lines) | Owner | Owner message 2026-11-19 "I approve G-A and the Part B plan as recommended" | **Still pending:** model selection (owner will approve later); every other open decision must be asked when needed, never assumed. **Not authorised:** push to GitHub, publishing, deployment |
+| AP-006 | 2026-11-19 | **Gate G-B approved.** Part B accepted; merge to `main` and tag `v0.2.0` + `part-b-approved` | Owner | Owner message 2026-11-19 "Approve G-B" | Part C plan must be approved before Part C code. Still pending as in AP-005 |
 
 *Roadmap v2.0: adopted as the working default under AP-003. An explicit formal "roadmap approved" statement has not been given, so it is recorded as adopted, not approved.*
 
@@ -196,6 +197,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | CH-0039 | 2026-11-19 15:08 | B | `apps/web/src/{App.tsx,styles.css}`, `api/{client.ts,useLoad.ts,schema.d.ts}`, `components/{Layout,ErrorNotice}.tsx`, `pages/{SignIn,Projects,Project,ExtractionReview,Activity}Page.tsx`, `pages/PartB.test.tsx` | Part B screens and typed client (regenerated schema) | PART-B-PLAN §5.8 | TR-0029, TR-0030 | Done |
 | CH-0040 | 2026-11-19 15:12 | B | Tests (`tests/conftest.py`, `tests/fixtures/`, `tests/security/`, `tests/e2e/`, `tests/integration/test_intake_api.py`, `packages/harness/tests/`, `packages/services/tests/`); Part A tests adjusted (`tests/integration/test_migrations.py`, `apps/api/tests/test_system.py`, `tests/scripts/test_scripts.py`); `scripts/dev.ps1`, `scripts/doctor.py`; `README.md`, `CHANGELOG.md`, `docs/parts/PART-B-COMPLETION-REPORT.md`, `docs/PROJECT_PROGRESS_TRACKER.md` (Run 9) | Part B tests, scripts and docs | AC-B-01…05 | TR-0031…TR-0034 | Done |
 | CH-0041 | 2026-11-19 15:16 | B | Local Git: branch `part/b-intake` | Part B committed on the part branch (not merged or tagged until G-B approval) | AP-005 | TR-0034 | Done |
+| CH-0042 | 2026-11-19 | B | Version 0.1.0 → 0.2.0 in all `pyproject.toml` files, `apps/web/package.json`, lock files; `CHANGELOG.md` (0.2.0 section); `README.md`; this tracker; `docs/PROJECT_PROGRESS_TRACKER.md` (Run 10); local Git: release commit on `part/b-intake`, merged into `main` (`--no-ff`), tags `v0.2.0` + `part-b-approved` | Part B release after G-B | AP-006 | TR-0035 | Done |
 
 **Activity outside the project (recorded for transparency; not repository changes):**
 - Earlier in the planning session, the specification's text was extracted to a temporary file in the coding agent's session scratchpad (outside the workspace) for reading.
@@ -266,6 +268,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | CH-0039 | Created / Modified | `apps/web/src/api/useLoad.ts`, `components/ErrorNotice.tsx`, five `pages/*Page.tsx`, `pages/PartB.test.tsx` (created); `App.tsx`, `components/Layout.tsx`, `api/client.ts`, `api/schema.d.ts`, `styles.css` (modified) | Whole files / routes, nav, appended CSS | UI | AC-B-01 |
 | CH-0040 | Created / Modified | See CH-0040 in §5 | Whole files. Part A tests changed: `test_upgrade_then_downgrade_round_trip`, `test_version_reports_platform_and_schema`, `test_only_health_and_version_live_outside_the_authenticated_api` (renamed from `test_openapi_lists_only_part_a_endpoints`); `scripts/doctor.py` `check_api_token` + `run_checks`; `scripts/dev.ps1` parameters + smoke block | Tests, scripts, docs | AC-B-01…05 |
 | CH-0041 | Repository operation | `.git` (local) | Commit on `part/b-intake` | Part B commit | AP-005 |
+| CH-0042 | Modified / Repository operation | Six `pyproject.toml`, `apps/web/package.json`, `apps/web/package-lock.json`, `uv.lock`, `CHANGELOG.md`, `README.md`, trackers; `.git` (local) | `version` fields; changelog heading; status lines; merge + tags | Release 0.2.0 | AP-006 |
 
 | Category | Files |
 |---|---|
@@ -313,6 +316,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | TR-0032 | 2026-11-19 15:07 | B | `./scripts/dev.ps1 -Smoke` | SMOKE OK (health direct + via proxy; `/api` 401 without key, 200 with key) | 0 | — | Ports 8000/5173 free afterwards. The real `data/state.db` was backed up, then migrated 0001→0002 |
 | TR-0033 | 2026-11-19 15:10 | B | Performance script (session scratchpad): 300-page generated PDF, `extract` + `chunk_blocks` | 300 pages, 600 chunks, 38.8 s, +12 MB peak RSS | — | — | KI-013 |
 | TR-0034 | 2026-11-19 15:11 | B | **Final regression:** `uv sync --locked`; ruff check + format; mypy strict; lint-imports (4/4); agent count; pytest fast suite `--cov`; web check:api/lint/typecheck/test/build; gitleaks | pytest **279**, Vitest **13**, coverage **94%**, gitleaks exit 0 | 0 | 0 | Console |
+| TR-0035 | 2026-11-19 16:42 | B | **Release 0.2.0 regression** (after version bump): `uv sync --locked`; ruff check + format; `mypy packages apps scripts`; lint-imports (4/4); agent count; pytest fast suite; web check:api/lint/typecheck/test/build; gitleaks | pytest **279**, Vitest **13**, gitleaks exit 0 | 0 | 0 | Console. One pre-existing library deprecation warning (Starlette test client) |
 
 ---
 
@@ -371,13 +375,13 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 
 **Pending:**
 
-1. **Owner decision on gate G-B.** Review `docs/parts/PART-B-COMPLETION-REPORT.md`.
+1. **Owner approval of the Part C plan** (`docs/parts/PART-C-PLAN.md`).
 2. Owner approval of the model selection (owner: "keep pending; will approve later").
 3. Owner rulings when they become necessary (never assumed): D-07 (before Part E), D-21, D-26/D-33 confirmation, D-31 final ruling, D-34 (commit the spec .docx; until ruled, the .docx is **not** committed).
 4. Optional: Ollama env vars (KI-004); GitHub push/repository creation (not authorised; AC-A-01 fresh-clone can now be checked locally, AC-A-02 CI still needs GitHub).
 5. Roadmap v2.1 amendment for D-35/D-36/D-37 (DV-003), on owner approval.
 
-**Next authorised action:** Implement Part B per `docs/parts/PART-B-PLAN.md` (AP-005). Then completion report and **stop for G-B**.
+**Next authorised action:** Plan Part C and **stop for owner approval of the plan** (same pattern as Part B, AP-005). No Part C code before that approval.
 
 ---
 
@@ -385,7 +389,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 
 | Milestone | Parts | Status | Completed on | Report |
 |---|---|---|---|---|
-| M0 Foundation | A, B | In progress (A approved; B awaiting approval) | — | `docs/parts/PART-A-COMPLETION-REPORT.md` |
+| M0 Foundation | A, B | **Complete** (A and B approved) | 2026-11-19 | `docs/parts/PART-A-COMPLETION-REPORT.md`, `docs/parts/PART-B-COMPLETION-REPORT.md` |
 | M1 Harness & Orchestration | C, D, E, F | Not started | — | — |
 | M2 Discovery | G, H, I | Not started | — | — |
 | M3 Build | J, K, L | Not started | — | — |

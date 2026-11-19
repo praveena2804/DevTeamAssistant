@@ -35,3 +35,7 @@ No development changes were made. I simplified this progress page.
 **Run 9 — Part B**
 
 I saved Part A as the first version in your local Git history, then built the project "front door". You can now create projects, upload BRDs (PDF, Word, text or Markdown), and read the extracted text, where every piece shows the page, section and paragraph it came from. Damaged, locked, disguised or oversized files are refused with a plain explanation while the good files go through. Only someone with the local key on this computer can use it, each project's files are kept apart, and every action, including refused ones, is written to a log that cannot be changed. All tests passed. Very large PDFs (300 pages) take about 40 seconds to read. You haven't reviewed it yet, and there is still no AI involved.
+
+**Run 10 — Part B release**
+
+No new features were built. You approved Part B, so I re-ran all the tests (all passed), marked it as version 0.2.0, and saved it into the main line of your local Git history. Part C is next; I am writing its plan for you to approve first.
