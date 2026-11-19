@@ -3,7 +3,8 @@
 from pathlib import Path
 
 import pytest
-from sqlalchemy import inspect
+from sqlalchemy import inspect, text
+from sqlalchemy.exc import DatabaseError
 
 from devteam_core.config import Settings
 from devteam_state import (
@@ -18,6 +19,15 @@ from devteam_state import (
 
 pytestmark = pytest.mark.integration
 
+PART_B_TABLES = {
+    "principals",
+    "principal_roles",
+    "projects",
+    "source_documents",
+    "document_chunks",
+    "audit_events",
+}
+
 
 def _revision(db: Path) -> str | None:
     engine = create_sqlite_engine(db)
@@ -31,11 +41,17 @@ def test_upgrade_then_downgrade_round_trip(tmp_path: Path) -> None:
     db = tmp_path / "state.db"
     assert needs_upgrade(db)
     upgrade(db)
-    assert _revision(db) == head_revision() == "0001_baseline"
+    assert _revision(db) == head_revision() == "0002_intake_iam_audit"
     assert not needs_upgrade(db)
     engine = create_sqlite_engine(db)
     try:
-        assert "alembic_version" in inspect(engine).get_table_names()
+        assert set(inspect(engine).get_table_names()) >= {"alembic_version", *PART_B_TABLES}
+    finally:
+        engine.dispose()
+    downgrade(db, "0001_baseline")
+    engine = create_sqlite_engine(db)
+    try:
+        assert not set(inspect(engine).get_table_names()) & PART_B_TABLES
     finally:
         engine.dispose()
     downgrade(db, "base")
@@ -62,3 +78,25 @@ def test_ensure_schema_backs_up_existing_db_before_migrating(isolated_settings: 
     assert [p.name for p in result.backups] == ["state.db"]
     assert result.backups[0].is_relative_to(isolated_settings.backups_dir)
     assert _revision(db) == head_revision()
+
+
+@pytest.mark.security
+def test_audit_events_are_append_only_at_database_level(tmp_path: Path) -> None:
+    db = tmp_path / "state.db"
+    upgrade(db)
+    engine = create_sqlite_engine(db)
+    try:
+        with engine.begin() as conn:
+            conn.execute(
+                text(
+                    "INSERT INTO audit_events (id, ts, action, outcome, details) "
+                    "VALUES ('aud_1', '2026-11-19T00:00:00+00:00', 'x', 'success', '{}')"
+                )
+            )
+        for statement in ("UPDATE audit_events SET action = 'y'", "DELETE FROM audit_events"):
+            with pytest.raises(DatabaseError, match="append-only"), engine.begin() as conn:
+                conn.execute(text(statement))
+        with engine.connect() as conn:
+            assert conn.execute(text("SELECT action FROM audit_events")).scalar_one() == "x"
+    finally:
+        engine.dispose()

@@ -1,0 +1,20 @@
+[project]
+name = "devteam-harness"
+version = "0.2.0"
+description = "DevTeam AI shared agent harness (HC-01...HC-21). Part B: human IAM, audit store, API rate limits, upload validation"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "devteam-core",
+    "devteam-state",
+]
+
+[tool.uv.sources]
+devteam-core = { workspace = true }
+devteam-state = { workspace = true }
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/devteam_harness"]

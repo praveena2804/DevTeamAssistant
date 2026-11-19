@@ -42,6 +42,7 @@ class RequestContextMiddleware:
 
         supplied = _header(scope, REQUEST_ID_HEADER.encode())
         request_id = supplied if supplied and _SAFE_REQUEST_ID.fullmatch(supplied) else new_id("req")
+        scope.setdefault("state", {})["request_id"] = request_id  # read by auth/audit dependencies
         parent = tracing.parse_traceparent(_header(scope, b"traceparent"))
         ctx = tracing.child_of(parent) if parent else tracing.new_root()
         status: dict[str, Any] = {"code": 500}

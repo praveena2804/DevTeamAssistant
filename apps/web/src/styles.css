@@ -66,3 +66,119 @@ dt {
 dd {
   margin: 0;
 }
+
+/* ---- Part B screens ---- */
+.app-header nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.link-button {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: #0969da;
+  cursor: pointer;
+  font: inherit;
+}
+
+form.stack,
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-width: 28rem;
+}
+
+input,
+textarea,
+button {
+  font: inherit;
+}
+
+button {
+  align-self: flex-start;
+  padding: 0.3rem 0.9rem;
+}
+
+.notice {
+  border: 1px solid #d4a72c;
+  background: #fff8c5;
+  padding: 0.5rem 1rem;
+  margin: 1rem 0;
+}
+
+.notice-error {
+  border-color: #cf222e;
+  background: #ffebe9;
+}
+
+.dropzone {
+  border: 2px dashed #d0d7de;
+  padding: 1rem;
+  margin: 0.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.results li.ok::marker {
+  content: "✔ ";
+  color: #1a7f37;
+}
+
+.results li.bad::marker {
+  content: "✖ ";
+  color: #cf222e;
+}
+
+tr.bad td {
+  background: #fff5f5;
+}
+
+.muted {
+  color: #656d76;
+}
+
+.review {
+  display: grid;
+  grid-template-columns: minmax(12rem, 1fr) 3fr;
+  gap: 1.5rem;
+}
+
+.outline ul {
+  list-style: none;
+  padding: 0;
+}
+
+.chunk {
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  margin: 0.75rem 0;
+}
+
+.chunk header {
+  background: #f6f8fa;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.85rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.chunk pre {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  white-space: pre-wrap;
+  font-family: inherit;
+}
+
+.badge {
+  background: #ddf4ff;
+  border-radius: 1rem;
+  padding: 0 0.5rem;
+}
+
+.pager {
+  display: flex;
+  gap: 0.5rem;
+}

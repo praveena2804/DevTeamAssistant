@@ -38,7 +38,7 @@ def test_version_reports_platform_and_schema(client: TestClient) -> None:
     assert body["name"] == "DevTeam AI"
     assert body["api_version"] == "v1"
     assert body["profile"] == "test"
-    assert body["schema_revision"] == body["schema_head"] == "0001_baseline"
+    assert body["schema_revision"] == body["schema_head"] == "0002_intake_iam_audit"
     assert re.fullmatch(r"3\.12\.\d+", body["python_version"])
 
 
@@ -78,5 +78,6 @@ def test_new_trace_when_no_traceparent(client: TestClient) -> None:
     assert parse_traceparent(client.get("/version").headers["traceparent"]) is not None
 
 
-def test_openapi_lists_only_part_a_endpoints(client: TestClient) -> None:
-    assert set(client.get("/openapi.json").json()["paths"]) == {"/health", "/version"}
+def test_only_health_and_version_live_outside_the_authenticated_api(client: TestClient) -> None:
+    paths = set(client.get("/openapi.json").json()["paths"])
+    assert {p for p in paths if not p.startswith("/api/")} == {"/health", "/version"}

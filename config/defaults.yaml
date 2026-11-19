@@ -33,3 +33,26 @@ resources:
   max_parallel_deterministic: 1      # D-27 (recommended default; LLM and sandbox work always sequential)
   llm_context_tokens: 4096           # Spec §9.3 initial range 4096–8192
   min_free_ram_mb: 3072              # doctor warns below this
+
+uploads:                             # HC-20 limits (Part B plan, approved AP-005)
+  allowed_extensions: [".pdf", ".docx", ".txt", ".md"]   # D-22 (b)
+  max_file_mb: 20
+  max_files_per_upload: 10
+  max_pdf_pages: 300
+  max_docx_uncompressed_mb: 100      # zip-bomb protection (DOCX is a ZIP archive)
+  max_docx_entries: 2000
+  max_docx_compression_ratio: 100
+  max_extracted_chars: 2000000
+  chunk_target_chars: 1200
+  chunk_max_chars: 2000
+
+auth:                                # HC-15 local API token (D-29 (a))
+  token_file: api_token              # under data_dir (gitignored); never logged
+  cookie_name: devteam_session
+  allowed_origins: ["http://127.0.0.1:5173", "http://localhost:5173"]
+
+ratelimit:                           # HC-18 API limits, requests per minute
+  enabled: true
+  upload_per_minute: 10
+  mutation_per_minute: 60
+  session_per_minute: 10
