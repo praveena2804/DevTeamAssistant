@@ -28,7 +28,9 @@ def test_project_lifecycle(client: TestClient, isolated_settings: Settings) -> N
     assert client.get(f"/api/projects/{project_id}", headers=bearer(client)).json()["name"] == "Library"
     assert client.delete(f"/api/projects/{project_id}", headers=bearer(client)).status_code == 405  # DV-006
 
-    actions = [(r.action, r.outcome) for r in audit_rows(isolated_settings)]
+    actions = [
+        (r.action, r.outcome) for r in audit_rows(isolated_settings) if r.action != "audit.chain_anchor"
+    ]
     assert actions == [
         ("project.create", "success"),
         ("project.update", "success"),

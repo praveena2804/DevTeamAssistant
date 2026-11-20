@@ -88,6 +88,15 @@ class ResourceSettings(_Section):
     min_free_ram_mb: int = Field(default=3072, ge=0)
 
 
+class FileToolSettings(_Section):
+    """HC-06 Controlled File Service limits (approved F-9i / F-9j, AP-008)."""
+
+    max_write_bytes: int = Field(default=1_048_576, ge=65_536, le=10_485_760)  # F-9i
+    max_task_write_bytes: int = Field(default=10_485_760, ge=1_048_576, le=104_857_600)  # F-9j
+    max_read_bytes: int = Field(default=1_048_576, ge=65_536, le=10_485_760)
+    max_list_entries: int = Field(default=2_000, ge=10, le=20_000)
+
+
 class UploadSettings(_Section):
     """HC-20 upload limits (Part B plan §2, approved AP-005)."""
 
@@ -167,6 +176,7 @@ class Settings(_Section):
     uploads: UploadSettings = UploadSettings()
     auth: AuthSettings = AuthSettings()
     secrets: SecretsSettings = SecretsSettings()
+    files: FileToolSettings = FileToolSettings()
     ratelimit: RateLimitSettings = RateLimitSettings()
 
     @model_validator(mode="after")

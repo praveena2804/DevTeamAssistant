@@ -168,6 +168,16 @@ class AuditEventOut(BaseModel):
     details: dict[str, Any]
 
 
+class AuditIntegrity(BaseModel):
+    """Result of recomputing the audit hash chain (HC-21)."""
+
+    ok: bool
+    checked: int
+    pre_chain_rows: int
+    broken_at: int | None
+    reason: str | None
+
+
 class AuditPage(BaseModel):
     items: list[AuditEventOut]
     total: int

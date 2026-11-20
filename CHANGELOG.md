@@ -27,6 +27,15 @@ One section per approved part (roadmap §8). Entries are added at gate approval;
 - The API refuses to start if the credential store is unavailable or a plaintext key file still exists.
 - Logs are redacted at the source as well as in the platform's own formatters.
 
+### Added (checkpoint C.3)
+
+- Controlled tool layer with five typed tools (no shell): registry, identity binding, policy, approval and
+  budget checks, time limits, and an audit record for every call; Controlled File Service with Windows-aware
+  path safety (junctions, symlinks, short names, hard links) and atomic writes with checksums and diffs.
+- Tamper-evident audit log (hash chain, migration `0003_harness_core`); Part B entries covered without being
+  changed. "Log intact" check on the Activity page, `GET /api/audit/verify`, `scripts/verify_audit.py`.
+- Run and task state machines with an attempt ledger; illegal status changes are refused and recorded.
+
 ## 0.2.0 — Part B: Project Intake, Document Extraction, Human IAM & Audit Foundation (G-B approved 2026-11-19)
 
 ### Added

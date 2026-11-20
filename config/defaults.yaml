@@ -55,6 +55,12 @@ secrets:                             # HC-17 (D-18): Windows Credential Manager 
   backend: keyring
   service_name: devteam-ai
 
+files:                               # HC-06 Controlled File Service (F-9i, F-9j approved AP-008)
+  max_write_bytes: 1048576           # 1 MB per file write
+  max_task_write_bytes: 10485760     # 10 MB written per task
+  max_read_bytes: 1048576
+  max_list_entries: 2000
+
 ratelimit:                           # HC-18 API limits, requests per minute
   enabled: true
   upload_per_minute: 10

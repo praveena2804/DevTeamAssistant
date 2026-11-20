@@ -17,8 +17,10 @@ from devteam_core.contracts._base import AuditEventId, Contract, TaskId, ToolCal
 from devteam_core.contracts.errors import ErrorCategory, ErrorRef
 from devteam_core.contracts.statuses import AgentRole
 
-MAX_TOOL_ARGS_BYTES = 64 * 1024
-MAX_TOOL_VALUE_BYTES = 1024 * 1024
+# Structural ceilings at the top of the approved F-9i range (10 MB per file write) plus envelope overhead.
+# The configured limits (default 1 MB) are enforced by the Controlled File Service (C.3).
+MAX_TOOL_ARGS_BYTES = 10 * 1024 * 1024 + 64 * 1024
+MAX_TOOL_VALUE_BYTES = 10 * 1024 * 1024 + 64 * 1024
 
 ToolName = Annotated[str, StringConstraints(pattern=r"^[a-z][a-z0-9_]{2,63}$")]
 PolicyRuleId = Annotated[str, StringConstraints(pattern=r"^[a-z][a-z0-9_.-]{1,80}$")]

@@ -6,7 +6,7 @@ approval/transition event types (HS-11).
 
 from typing import Any
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, sessionmaker
 
 from devteam_core import tracing
 from devteam_core.logging import get_logger
@@ -46,4 +46,38 @@ def record(
     return event.id
 
 
-__all__ = ["Outcome", "record"]
+class DatabaseAuditSink:
+    """Audit sink for harness components (policy, tool layer): each record in its own short transaction.
+
+    Callers must not hold an open write transaction on the same database while calling it (SQLite has a
+    single writer); the tool layer and executor never do.
+    """
+
+    def __init__(self, sessions: sessionmaker[Session]) -> None:
+        self._sessions = sessions
+
+    def record(
+        self,
+        *,
+        action: str,
+        outcome: Outcome,
+        principal_id: str | None,
+        project_id: str | None,
+        details: dict[str, Any],
+        target_type: str | None = None,
+        target_id: str | None = None,
+    ) -> str:
+        with self._sessions.begin() as session:
+            return record(
+                session,
+                action=action,
+                outcome=outcome,
+                principal_id=principal_id,
+                project_id=project_id,
+                target_type=target_type,
+                target_id=target_id,
+                details=details,
+            )
+
+
+__all__ = ["DatabaseAuditSink", "Outcome", "record"]

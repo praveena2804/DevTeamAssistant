@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, Query
 
 from devteam_api.deps import DbSession, ProjectUser, limit_rate
 from devteam_api.routers.projects import NOT_FOUND, load_project
-from devteam_api.schemas import ERROR_RESPONSES, AuditEventOut, AuditPage
+from devteam_api.schemas import ERROR_RESPONSES, AuditEventOut, AuditIntegrity, AuditPage
 from devteam_state.models import AuditEvent
 from devteam_state.repositories import audit as audit_repo
 
@@ -47,6 +47,19 @@ def list_audit(
 ) -> AuditPage:
     items, total = audit_repo.list_events(db, project_id=None, offset=offset, limit=limit)
     return _page(items, total, offset, limit)
+
+
+@router.get("/audit/verify", response_model=AuditIntegrity, name="audit.verify")
+def verify_audit(db: DbSession, _: ProjectUser) -> AuditIntegrity:
+    """Recompute the whole hash chain and report the first broken entry, if any."""
+    report = audit_repo.verify_chain(db)
+    return AuditIntegrity(
+        ok=report.ok,
+        checked=report.checked,
+        pre_chain_rows=report.pre_chain_rows,
+        broken_at=report.broken_at,
+        reason=report.reason,
+    )
 
 
 @router.get(

@@ -41,7 +41,7 @@ def test_upgrade_then_downgrade_round_trip(tmp_path: Path) -> None:
     db = tmp_path / "state.db"
     assert needs_upgrade(db)
     upgrade(db)
-    assert _revision(db) == head_revision() == "0002_intake_iam_audit"
+    assert _revision(db) == head_revision() == "0003_harness_core"
     assert not needs_upgrade(db)
     engine = create_sqlite_engine(db)
     try:
@@ -97,6 +97,8 @@ def test_audit_events_are_append_only_at_database_level(tmp_path: Path) -> None:
             with pytest.raises(DatabaseError, match="append-only"), engine.begin() as conn:
                 conn.execute(text(statement))
         with engine.connect() as conn:
-            assert conn.execute(text("SELECT action FROM audit_events")).scalar_one() == "x"
+            assert (
+                conn.execute(text("SELECT action FROM audit_events WHERE id = 'aud_1'")).scalar_one() == "x"
+            )
     finally:
         engine.dispose()
