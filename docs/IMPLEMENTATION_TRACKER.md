@@ -19,15 +19,15 @@
 | Item | Value |
 |---|---|
 | Current milestone | **M0 Foundation** |
-| Current part | **Part C: Planning** (plan awaiting owner approval). G-B approved 2026-11-19 (AP-006) |
+| Current part | **Part C: In progress.** Checkpoint **C.1 Contracts complete** (CH-0046…CH-0050); C.2 not started |
 | Overall status | Part A approved (v0.1.0) and Part B approved (v0.2.0), both merged to `main` with local tags. M0 Foundation complete |
-| Last completed activity | Part B final regression TR-0034 (pytest 279 passed, 94% coverage; Vitest 13; all gates clean; gitleaks exit 0); smoke TR-0032 |
+| Last completed activity | C.1 final regression TR-0045: pytest 752 passed / 0 failed / 0 skipped, coverage 95% (contracts 96%); security marker 353 passed; Vitest 13; gitleaks exit 0. Mutation negative controls TR-0041: 8/8 protections detected |
 | Code written | Parts A and B: `devteam_core`, `devteam_state`, `devteam_harness` (HC-15/18/20/21 foundations), `devteam_services` (extraction, workspace, intake), `devteam_api`, `apps/web`, scripts, tests |
 | Dependencies installed | Python (uv, `uv.lock`), npm (`package-lock.json`), Gitleaks (winget, user scope), Ollama models `qwen2.5:3b` and `qwen2.5-coder:3b` |
 | Git / GitHub operations | **Local only (AP-005).** `main` holds Parts A and B; tags `v0.1.0`, `part-a-approved`, `v0.2.0`, `part-b-approved` (CH-0042). No push, no GitHub |
-| Tests executed | TR-0001…TR-0035. Final Part B: pytest 279 passed / 0 failed / 0 skipped (94%); Vitest 13 passed; smoke OK |
-| Blocking items | Owner approval of the Part C plan. For Part E: D-07. AC-A-02 (GitHub CI) still unverifiable without GitHub |
-| Next authorised action | Write the Part C plan (`docs/parts/PART-C-PLAN.md`) and **wait for the owner's approval** before implementing it |
+| Tests executed | TR-0001…TR-0045 |
+| Blocking items | Owner review of the C.1 checkpoint report before C.2 (owner: "Do not begin checkpoint C.2 until C.1 is … reported to me"). For Part E: D-07. AC-A-02 (GitHub CI) still unverifiable without GitHub |
+| Next authorised action | **None.** C.1 reported; wait for the owner before starting C.2 (identity, policy, guardrails, secrets, D-18a key migration) |
 
 ---
 
@@ -50,7 +50,7 @@
 |---|---|---|---|---|---|---|---|
 | A | Foundation, Repository Conventions & Environment Benchmark | M0 | **Approved** | G-A | Retrospectively, at G-A (DV-001) | 2026-11-19 (AP-005) | `part-a-approved`, `v0.1.0` (local) |
 | B | Intake, Extraction, Human IAM & Audit Foundation | M0 | **Approved** | G-B | 2026-11-19 (AP-005) | 2026-11-19 (AP-006) | `part-b-approved`, `v0.2.0` (local) |
-| C | Shared Contracts & Harness Core | M1 | Not started | G-C | — | — | — |
+| C | Shared Contracts & Harness Core | M1 | **In progress** (C.1 done; C.2–C.4 pending) | G-C | 2026-11-20 (AP-007, AP-008) | — | — (branch `part/c-harness-core`, local) |
 | D | LangGraph Orchestration, Ten Stub Agents & Head Agent Deterministic Core | M1 | Not started | G-D | — | — | — |
 | E | Isolated Execution Sandbox & Target-App Templates | M1 | Not started | G-E | — | — | — |
 | F | LLM Gateway, Model Routing, Context & Memory, and RAG | M1 | Not started | G-F | — | — | — |
@@ -98,6 +98,8 @@ Only explicit owner approvals are recorded here.
 | AP-004 | 2026-11-19 12:44 | Documentation tasks: simple-language tracker `docs/PROJECT_PROGRESS_TRACKER.md` (permanent, updated every part), model-routing audit, Part B plan | Owner | Instruction "Model Routing Audit, Part B Planning, and Simple-Words Progress Tracker" | **Not** an approval of G-A, of the Part B plan, of the model selection, or of Part B implementation. Git/publishing still excluded |
 | AP-005 | 2026-11-19 14:30 | **Gate G-A approved.** Part B plan confirmed as recommended, with rulings: D-22 (b) MD accepted; D-31 deletion excluded from Part B; upload limits 20 MB/file, 10 files/upload, 300 PDF pages; D-11 (a), D-15 (b), D-29 (a) as in the plan; D-37 to be included in the architecture and implementation plan. **Local Git commits authorised** for completed milestones, with a versioning scheme (short messages, max two lines) | Owner | Owner message 2026-11-19 "I approve G-A and the Part B plan as recommended" | **Still pending:** model selection (owner will approve later); every other open decision must be asked when needed, never assumed. **Not authorised:** push to GitHub, publishing, deployment |
 | AP-006 | 2026-11-19 | **Gate G-B approved.** Part B accepted; merge to `main` and tag `v0.2.0` + `part-b-approved` | Owner | Owner message 2026-11-19 "Approve G-B" | Part C plan must be approved before Part C code. Still pending as in AP-005 |
+| AP-007 | 2026-11-20 | **Part C decisions ruled:** D-32 (a) approved; D-18 keyring approved, no plaintext fallback, secrets redacted from logs/errors/traces; D-18a approved **with conditions** (store OK, read-back match, API authenticates with stored key, existing sign-in link works; only then delete the file; on any failure stop and keep the file; record the result without the secret); D-30 approved, local storage only, no sensitive trace attributes; D-26 (a) approved. **F-1…F-11 not approved**: provisional, owner requested the full table for review | Owner | Owner message 2026-11-20 "I approve the following Part C decisions" | Part C implementation **not** authorised until F-1…F-11 are approved. Part D not before G-C. No LiteLLM (D-35 reaffirmed) |
+| AP-008 | 2026-11-20 | **F-1…F-11 approved** as proposed, with **F-9d = 180 s** (was 300 s). Part C implementation authorised, starting with C.1; C.2 only after C.1 is implemented, tested, documented and reported. Conditions restated: real enforcement (no placeholders), adversarial tests, no LiteLLM, Credential Manager migration conditions exactly as AP-007, local commit per checkpoint; push only if previously authorised (it is not), never force-push | Owner | Owner message 2026-11-20 "Proceed with Part C implementation" | Push not authorised (AP-005 unchanged) |
 
 *Roadmap v2.0: adopted as the working default under AP-003. An explicit formal "roadmap approved" statement has not been given, so it is recorded as adopted, not approved.*
 
@@ -126,7 +128,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | D-15 | Platform-UI E2E automation | **Ruled (AP-005)** | (b) API E2E + manual UI demo until R | 2026-11-19 | Roadmap §15 |
 | D-16 | PostgreSQL Docker validation | Open | — | — | Roadmap §13 E/K |
 | D-17 | Two-stage Completion Gate | Open | — | — | Roadmap §13 N/O |
-| D-18 | Secret store / GitHub auth | Open | — | — | Roadmap §13 C/P |
+| D-18 | Secret store / GitHub auth | **Ruled (AP-007)** for platform secrets | Windows Credential Manager via `keyring`; no plaintext fallback; D-18a key migration with four checks. GitHub PAT half still open (Part P) | 2026-11-20 | Roadmap §13 C/P; PART-C-PLAN §2.0 |
 | D-19 | Pages eligibility | Open | — | — | Roadmap §13 P |
 | D-20 | Platform repo visibility | **Open — deferred** (no GitHub use authorised; not exercised in A) | — | — | Roadmap §18.1 |
 | D-21 | Platform licence | **Open — owner ruling required** (no `LICENSE` file created; does not block A) | — | — | Roadmap §8 |
@@ -134,13 +136,13 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | D-23 | DB test ownership | Open | — | — | Roadmap §13 K |
 | D-24 | Integration/Build Service classification | Open | — | — | Roadmap §4.2 |
 | D-25 | BRD_ANALYSIS.md ownership | Open | — | — | Roadmap §13 H/O |
-| D-26 | uv workspace with per-agent packages | **Proceeding on recommended default (a); owner confirmation pending** (G-A approval covered the implementation, not the explicit ruling) | (a) uv workspace — implemented in Part A (reversible until Part C adds agent packages) | 2026-11-19 | Roadmap §7, §8; ADR-0005 |
+| D-26 | uv workspace with per-agent packages | **Ruled (AP-007)** | (a) uv workspace; agents in `agents/<agent_name>/` | 2026-11-20 | Roadmap §7, §8; ADR-0005 |
 | D-27 | Parallel execution policy | Open | — | — | Roadmap §6.6 |
 | D-28 | LLM response cache | Open | — | — | Roadmap §13 F |
 | D-29 | Local API authentication | **Ruled (AP-005)** | (a) per-install token, HttpOnly cookie for UI, loopback, CORS (PART-B-PLAN §5.3) | 2026-11-19 | Roadmap §13 B |
-| D-30 | Tracing implementation | Open | — | — | Roadmap §5.1 HC-11 |
+| D-30 | Tracing implementation | **Ruled (AP-007)** | (a) OpenTelemetry API + SDK, local SQLite exporter only; attribute allowlist | 2026-11-20 | Roadmap §5.1 HC-11; PART-C-PLAN §2.0 |
 | D-31 | Project deletion/retention | **Partially ruled (AP-005)**: deletion **excluded from Part B**; final ruling on (a)/(b) still open, to be asked when deletion is planned | — | 2026-11-19 | Roadmap §13 B ("projects CRUD" without delete, DV-006) |
-| D-32 | Part C internal staging vs split | Open | — | — | Roadmap §13 C |
+| D-32 | Part C internal staging vs split | **Ruled (AP-007)** | (a) C.1–C.4 checkpoints under one gate G-C | 2026-11-20 | Roadmap §13 C; PART-C-PLAN §10 |
 | D-33 | Pre-existing `.git` in workspace | **Proceeding on recommended default (a); owner approval pending** | Inspected read-only 2026-11-19: branch `master`, **zero commits**, no remotes → workspace root used as the repository root. No commits made (not authorised) | 2026-11-19 | Roadmap §18.1; Plan §16.1 |
 | D-34 | Commit specification .docx | **Open — deferred** (no commits authorised) | — | — | Roadmap §18.1 |
 | D-35 | LiteLLM in the LLM Gateway (new) | **Ruled by owner direction (AP-003)** | Keep roadmap design: our gateway calls Ollama's HTTP API directly; LiteLLM not introduced without a documented impact assessment and owner approval | 2026-11-19 | ADR-0003; `docs/architecture/HARNESS_ASSESSMENT.md` §6; roadmap §20 row **to be added** on next roadmap revision (pending approval) |
@@ -197,6 +199,14 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | CH-0039 | 2026-11-19 15:08 | B | `apps/web/src/{App.tsx,styles.css}`, `api/{client.ts,useLoad.ts,schema.d.ts}`, `components/{Layout,ErrorNotice}.tsx`, `pages/{SignIn,Projects,Project,ExtractionReview,Activity}Page.tsx`, `pages/PartB.test.tsx` | Part B screens and typed client (regenerated schema) | PART-B-PLAN §5.8 | TR-0029, TR-0030 | Done |
 | CH-0040 | 2026-11-19 15:12 | B | Tests (`tests/conftest.py`, `tests/fixtures/`, `tests/security/`, `tests/e2e/`, `tests/integration/test_intake_api.py`, `packages/harness/tests/`, `packages/services/tests/`); Part A tests adjusted (`tests/integration/test_migrations.py`, `apps/api/tests/test_system.py`, `tests/scripts/test_scripts.py`); `scripts/dev.ps1`, `scripts/doctor.py`; `README.md`, `CHANGELOG.md`, `docs/parts/PART-B-COMPLETION-REPORT.md`, `docs/PROJECT_PROGRESS_TRACKER.md` (Run 9) | Part B tests, scripts and docs | AC-B-01…05 | TR-0031…TR-0034 | Done |
 | CH-0041 | 2026-11-19 15:16 | B | Local Git: branch `part/b-intake` | Part B committed on the part branch (not merged or tagged until G-B approval) | AP-005 | TR-0034 | Done |
+| CH-0045 | 2026-11-20 | C | `docs/parts/PART-C-PLAN.md` (status table, §2.1 heading/intro, F-9d row, confirmation line) | Record AP-008: F-1…F-11 approved, F-9d = 180 s | AP-008 | — | Done |
+| CH-0046 | 2026-11-20 | C | `packages/core/src/devteam_core/contracts/` created: `__init__.py`, `_base.py`, `statuses.py`, `errors.py`, `base.py`, `records.py`, `tasks.py`, `agents.py`, `tools.py`, `llm.py`, `events.py`, `state.py` | C.1 shared contracts v1 (HS-06): 71 registered models incl. 22 domain records, AgentTask/TaskPlan, 20 agent I/O models, tool/model/event/state contracts; enforced rules listed in `docs/architecture/contracts.md` | Roadmap §13 C.1; Spec §6, §11, §12, §18, §20.2; AP-008 | TR-0037…TR-0045 | Done |
+| CH-0047 | 2026-11-20 | C | `scripts/export_contract_schemas.py` (created); `packages/core/src/devteam_core/contracts/schemas/*.v1.json` (71 generated files) | JSON Schema export + committed snapshot (`--check` mode) | Roadmap §13 C.1 | TR-0038, TR-0045 | Done |
+| CH-0048 | 2026-11-20 | C | `tests/fixtures/contract_samples.py`, `packages/core/tests/test_contracts.py`, `tests/security/test_contract_security.py` (created) | Registry, snapshot, round-trip, immutability tests; adversarial suite (paths incl. hypothesis fuzz, handoffs, plans, provenance, fake verification, identities, prompt-injection containment, payload bounds, output/input cross-checks) with valid baselines and a negative control | AC-C-03; CLAUDE.md §9 | TR-0037…TR-0045 | Done |
+| CH-0049 | 2026-11-20 | C | `docs/architecture/contracts.md` (created); this tracker; `docs/PROJECT_PROGRESS_TRACKER.md` (Run 12); `CHANGELOG.md` (Unreleased Part C) | C.1 checkpoint documentation | Plan §10 | — | Done |
+| CH-0050 | 2026-11-20 | C | Local Git: commit on `part/c-harness-core` | C.1 checkpoint commit (includes PART-C-PLAN.md and the CH-0043…CH-0045 doc changes). Not pushed (push not authorised) | AP-005, AP-008 | TR-0045 | Done |
+| CH-0044 | 2026-11-20 | C | `docs/parts/PART-C-PLAN.md` (status table; §2 rewritten as §2.0 rulings + §2.1 full F-1…F-11 table with values, defaults, min/max, rationale, dependents; new §10 checkpoint breakdown; confirmation line); `CLAUDE.md` §11 (stale "Git not authorised" sentence aligned with AP-005); this tracker (§1, §3 AP-007, §4 D-18/D-26/D-30/D-32, §11) | Record AP-007; owner asked for the full F table. First-draft error corrected: context 8,000 tokens exceeded the benchmarked 4,096 window | AP-007 | — | Done (plan awaiting F approval) |
+| CH-0043 | 2026-11-19 | C | `docs/parts/PART-C-PLAN.md` (created, on branch `part/c-harness-core`, uncommitted until approval) | Part C plan: scope C.1–C.4, decisions D-18/D-18a/D-26/D-30/D-32, flagged field values F-1…F-11, design, tests, demo, risks | Roadmap §13 C; Plan §20 C | — | Awaiting owner approval |
 | CH-0042 | 2026-11-19 | B | Version 0.1.0 → 0.2.0 in all `pyproject.toml` files, `apps/web/package.json`, lock files; `CHANGELOG.md` (0.2.0 section); `README.md`; this tracker; `docs/PROJECT_PROGRESS_TRACKER.md` (Run 10); local Git: release commit on `part/b-intake`, merged into `main` (`--no-ff`), tags `v0.2.0` + `part-b-approved` | Part B release after G-B | AP-006 | TR-0035 | Done |
 
 **Activity outside the project (recorded for transparency; not repository changes):**
@@ -269,6 +279,14 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | CH-0040 | Created / Modified | See CH-0040 in §5 | Whole files. Part A tests changed: `test_upgrade_then_downgrade_round_trip`, `test_version_reports_platform_and_schema`, `test_only_health_and_version_live_outside_the_authenticated_api` (renamed from `test_openapi_lists_only_part_a_endpoints`); `scripts/doctor.py` `check_api_token` + `run_checks`; `scripts/dev.ps1` parameters + smoke block | Tests, scripts, docs | AC-B-01…05 |
 | CH-0041 | Repository operation | `.git` (local) | Commit on `part/b-intake` | Part B commit | AP-005 |
 | CH-0042 | Modified / Repository operation | Six `pyproject.toml`, `apps/web/package.json`, `apps/web/package-lock.json`, `uv.lock`, `CHANGELOG.md`, `README.md`, trackers; `.git` (local) | `version` fields; changelog heading; status lines; merge + tags | Release 0.2.0 | AP-006 |
+| CH-0043 | Created | `docs/parts/PART-C-PLAN.md` | Whole file | Part C plan | Roadmap §13 C |
+| CH-0044 | Modified | `docs/parts/PART-C-PLAN.md`; `CLAUDE.md`; `docs/IMPLEMENTATION_TRACKER.md` | Plan §2, §10, header; CLAUDE.md §11 Git bullet; tracker §1/§3/§4/§11 | AP-007 rulings, F table | AP-007 |
+| CH-0045 | Modified | `docs/parts/PART-C-PLAN.md` | Header status/preconditions; §2.1 heading + intro; F-9d row; confirmation line | AP-008 | AP-008 |
+| CH-0046 | Created | `packages/core/src/devteam_core/contracts/*.py` (12 modules) | Whole files | C.1 contracts | Roadmap §13 C.1 |
+| CH-0047 | Created | `scripts/export_contract_schemas.py`; `packages/core/src/devteam_core/contracts/schemas/` (71 JSON files) | Whole files | Schema export/snapshot | Roadmap §13 C.1 |
+| CH-0048 | Created | `tests/fixtures/contract_samples.py`; `packages/core/tests/test_contracts.py`; `tests/security/test_contract_security.py` | Whole files | C.1 tests | AC-C-03 |
+| CH-0049 | Created / Modified | `docs/architecture/contracts.md` (created); `docs/IMPLEMENTATION_TRACKER.md` §1/§2/§3/§5/§6/§7/§8/§11; `docs/PROJECT_PROGRESS_TRACKER.md` (Run 12 appended); `CHANGELOG.md` (Unreleased section added) | As listed | Checkpoint docs | Plan §10 |
+| CH-0050 | Repository operation | `.git` (local) | Commit on `part/c-harness-core` | C.1 commit | AP-005 |
 
 | Category | Files |
 |---|---|
@@ -317,6 +335,16 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | TR-0033 | 2026-11-19 15:10 | B | Performance script (session scratchpad): 300-page generated PDF, `extract` + `chunk_blocks` | 300 pages, 600 chunks, 38.8 s, +12 MB peak RSS | — | — | KI-013 |
 | TR-0034 | 2026-11-19 15:11 | B | **Final regression:** `uv sync --locked`; ruff check + format; mypy strict; lint-imports (4/4); agent count; pytest fast suite `--cov`; web check:api/lint/typecheck/test/build; gitleaks | pytest **279**, Vitest **13**, coverage **94%**, gitleaks exit 0 | 0 | 0 | Console |
 | TR-0035 | 2026-11-19 16:42 | B | **Release 0.2.0 regression** (after version bump): `uv sync --locked`; ruff check + format; `mypy packages apps scripts`; lint-imports (4/4); agent count; pytest fast suite; web check:api/lint/typecheck/test/build; gitleaks | pytest **279**, Vitest **13**, gitleaks exit 0 | 0 | 0 | Console. One pre-existing library deprecation warning (Starlette test client) |
+| TR-0036 | 2026-11-20 09:50 | C | Session baseline: `uv run pytest -m "not llm and not docker and not slow and not acceptance" -q` | 279 | 0 | 0 | Green baseline before C.1 |
+| TR-0037 | 2026-11-20 10:20 | C.1 | `uv run pytest packages/core/tests/test_contracts.py -q` (first run) | 219 | **1** | 0 | **Product gap caught by the registry test**: `OutputValidation` was a contract but not registered (no schema export). Registered + sample added (CH-0046) |
+| TR-0038 | 2026-11-20 10:22 | C.1 | Same, after the fix (71 schemas exported) | 223 | 0 | 0 | Console |
+| TR-0039 | 2026-11-20 10:25 | C.1 | `uv run pytest tests/security/test_contract_security.py -q` (first run) | 243 | 0 | 0 | All passed first time, so mutation checks were run (TR-0040/41) |
+| TR-0040 | 2026-11-20 10:28 | C.1 | Mutation negative controls, attempts 1–3 (session scratchpad script `mutate.py`) | — | — | — | **Invalid runs (test-harness errors, kept for the record):** (1) summary-line parsing wrong; (2) two mutants showed no failures: the "extra=forbid" mutant edited the module docstring instead of `ConfigDict`, and stale bytecode could mask same-size edits; the "trust rules" mutant disabled only one of two overlapping rules. Script fixed: cache cleared, `PYTHONDONTWRITEBYTECODE`, whole-function mutant, exact `ConfigDict(` target |
+| TR-0041 | 2026-11-20 10:36 | C.1 | Mutation negative controls, final (contract + security tests, 466 at the time) | — | — | — | **8/8 protections detected** when disabled: path check 28 failures; never-assume 4; agent-principal binding 1; trust rules 3; plan role check 3; Debugger test-edit 1; evidence proof 1; extra=forbid 197. Source restored after each (466 passed); CRLF introduced by the script's rewrite normalised back to LF |
+| TR-0042 | 2026-11-20 10:40 | C.1 | `uv run mypy packages apps scripts` | — | **3 errors** | — | Errors in existing `tests/scripts/test_scripts.py` (Part B) surfaced because the new contract test imported it. Fixed by loading the script directly in the new test; Part B file unchanged. Rerun: no issues (87 files) |
+| TR-0043 | 2026-11-20 10:42 | C.1 | Fast suite with `--cov` | 745 | 0 | 0 | Coverage 95%; contracts `base.py` 89%, `tools.py` 88%, so edge tests were added |
+| TR-0044 | 2026-11-20 10:42 | C.1 | `npm test`, `npm run check:api` (PowerShell) | Vitest 13 | 0 | 0 | Web untouched in C.1; regression only |
+| TR-0045 | 2026-11-20 10:46 | C.1 | **C.1 final:** `uv sync --locked`; ruff check + format; `mypy packages apps scripts`; lint-imports (4/4); agent count; `export_contract_schemas.py --check`; fast suite `--cov`; `pytest -m security`; gitleaks | pytest **752**, security marker **353**, coverage **95%** (contracts 96%, each module ≥ 90%), 71 schemas current, gitleaks exit 0 | 0 | 0 | One pre-existing library deprecation warning (Starlette test client) |
 
 ---
 
@@ -336,6 +364,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | VR-010 | 2026-11-19 15:09 | B | Dependency audits after the Part B dependencies | `uvx pip-audit --strict -r <uv export>`; `npm audit --audit-level=high` | **Pass**: no known vulnerabilities; 0 npm vulnerabilities | Console |
 | VR-011 | 2026-11-19 15:12 | B | Secret scan | `gitleaks dir . --redact --exit-code 1`. First run: 1 finding, a synthetic canary in a security test (marked `gitleaks:allow`). Rescan exit 0. Real key file `data/api_token` confirmed gitignored | **Pass** | Console |
 | VR-012 | 2026-11-19 15:12 | B | AC-B-01…05 | Mapped to tests in `PART-B-COMPLETION-REPORT.md` | **Pass** (automated). Manual UI demo left to the owner (D-15 (b)) | Completion report |
+| VR-013 | 2026-11-20 10:46 | C.1 | C.1 exit criteria (PART-C-PLAN §10) | Round-trip for every model; snapshot; extra fields rejected; TaskPlan cycles/unknown agents/missing deps rejected; brd_fact without source rejected; `len(AgentRole)==10` | **Pass** (TR-0045); negative controls TR-0041 | Tests |
 
 ---
 
@@ -375,13 +404,13 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 
 **Pending:**
 
-1. **Owner approval of the Part C plan** (`docs/parts/PART-C-PLAN.md`).
+1. **Owner review of the C.1 checkpoint report**, then C.2, C.3, C.4 and G-C (PART-C-PLAN §10). F-1…F-11 approved (AP-008).
 2. Owner approval of the model selection (owner: "keep pending; will approve later").
 3. Owner rulings when they become necessary (never assumed): D-07 (before Part E), D-21, D-26/D-33 confirmation, D-31 final ruling, D-34 (commit the spec .docx; until ruled, the .docx is **not** committed).
 4. Optional: Ollama env vars (KI-004); GitHub push/repository creation (not authorised; AC-A-01 fresh-clone can now be checked locally, AC-A-02 CI still needs GitHub).
 5. Roadmap v2.1 amendment for D-35/D-36/D-37 (DV-003), on owner approval.
 
-**Next authorised action:** Plan Part C and **stop for owner approval of the plan** (same pattern as Part B, AP-005). No Part C code before that approval.
+**Next authorised action:** **None.** Checkpoint C.1 complete and reported; wait for the owner before starting C.2.
 
 ---
 

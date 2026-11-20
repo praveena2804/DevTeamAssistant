@@ -1,0 +1,67 @@
+{
+  "$defs": {
+    "ErrorCategory": {
+      "enum": [
+        "retryable",
+        "invalid_output",
+        "budget_exhausted",
+        "policy_denied",
+        "resource_unavailable",
+        "fatal"
+      ],
+      "title": "ErrorCategory",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A short, already-redacted description of an error. Never contains secrets or document text.",
+  "properties": {
+    "category": {
+      "$ref": "#/$defs/ErrorCategory"
+    },
+    "code": {
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9_]*(\\.[a-z0-9_]+)*$",
+      "title": "Code",
+      "type": "string"
+    },
+    "message": {
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Message",
+      "type": "string"
+    },
+    "occurred_at": {
+      "format": "date-time",
+      "title": "Occurred At",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "task_id": {
+      "anyOf": [
+        {
+          "pattern": "^tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Task Id"
+    }
+  },
+  "required": [
+    "category",
+    "code",
+    "message",
+    "occurred_at"
+  ],
+  "title": "ErrorRef",
+  "type": "object"
+}

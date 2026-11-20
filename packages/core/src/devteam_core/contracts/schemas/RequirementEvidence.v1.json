@@ -1,0 +1,87 @@
+{
+  "$defs": {
+    "EvidenceStatus": {
+      "description": "F-7. Default ``not_run``: nothing looks green until the harness ran it.",
+      "enum": [
+        "passing",
+        "failing",
+        "not_run",
+        "manual",
+        "blocked"
+      ],
+      "title": "EvidenceStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "approval_id": {
+      "anyOf": [
+        {
+          "pattern": "^apr_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Approval Id"
+    },
+    "artifact_refs": {
+      "default": [],
+      "items": {
+        "pattern": "^art_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+        "type": "string"
+      },
+      "maxItems": 500,
+      "title": "Artifact Refs",
+      "type": "array"
+    },
+    "evidence_id": {
+      "pattern": "^evd_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Evidence Id",
+      "type": "string"
+    },
+    "project_id": {
+      "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Project Id",
+      "type": "string"
+    },
+    "requirement_id": {
+      "pattern": "^(FR|NFR|BR)-[0-9]{3,4}$",
+      "title": "Requirement Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "status": {
+      "$ref": "#/$defs/EvidenceStatus",
+      "default": "not_run"
+    },
+    "test_run_id": {
+      "anyOf": [
+        {
+          "pattern": "^trn_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Test Run Id"
+    }
+  },
+  "required": [
+    "evidence_id",
+    "project_id",
+    "requirement_id"
+  ],
+  "title": "RequirementEvidence",
+  "type": "object"
+}

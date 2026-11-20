@@ -229,6 +229,6 @@ npm --prefix apps/web run lint ; npm --prefix apps/web run typecheck ; npm --pre
 
 - Branches: `part/<letter>-<slug>`, `fix/<slug>`.
 - Commits follow Conventional Commits; PRs are one per part; tags are `part-<x>-approved`.
-- **Commits and pushes only when the owner has explicitly authorised Git/GitHub use.** As of 2026-11-19 this is **not** authorised.
+- **Commits and pushes only when the owner has explicitly authorised Git/GitHub use.** Local commits are authorised (AP-005, see §2). Pushing, publishing and deploying are **not** authorised.
 - Never force-push `main`. Never commit `.env`, `data/`, `workspaces/`, databases, logs or model files.
 - Tokens are never pasted into chat or written to files.

@@ -1,0 +1,32 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "description": {
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Description",
+      "type": "string"
+    },
+    "requirement_ids": {
+      "default": [],
+      "items": {
+        "pattern": "^(FR|NFR|BR)-[0-9]{3,4}$",
+        "type": "string"
+      },
+      "maxItems": 500,
+      "title": "Requirement Ids",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "description"
+  ],
+  "title": "Blocker",
+  "type": "object"
+}

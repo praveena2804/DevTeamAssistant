@@ -1,0 +1,62 @@
+{
+  "$defs": {
+    "ChatRole": {
+      "enum": [
+        "system",
+        "user",
+        "assistant"
+      ],
+      "title": "ChatRole",
+      "type": "string"
+    },
+    "Trust": {
+      "enum": [
+        "trusted",
+        "untrusted"
+      ],
+      "title": "Trust",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "content": {
+      "maxLength": 60000,
+      "minLength": 1,
+      "title": "Content",
+      "type": "string"
+    },
+    "label": {
+      "anyOf": [
+        {
+          "pattern": "^[a-z][a-z0-9_]{1,40}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Label"
+    },
+    "role": {
+      "$ref": "#/$defs/ChatRole"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "trust": {
+      "$ref": "#/$defs/Trust"
+    }
+  },
+  "required": [
+    "role",
+    "content",
+    "trust"
+  ],
+  "title": "ChatMessage",
+  "type": "object"
+}

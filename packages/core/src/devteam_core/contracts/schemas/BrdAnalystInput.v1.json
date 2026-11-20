@@ -1,0 +1,49 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "chunk_ids": {
+      "items": {
+        "pattern": "^chk_[0-9a-f]{26}$",
+        "type": "string"
+      },
+      "maxItems": 500,
+      "minItems": 1,
+      "title": "Chunk Ids",
+      "type": "array"
+    },
+    "document_ids": {
+      "items": {
+        "pattern": "^doc_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+        "type": "string"
+      },
+      "maxItems": 50,
+      "minItems": 1,
+      "title": "Document Ids",
+      "type": "array"
+    },
+    "project_id": {
+      "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Project Id",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^run_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "project_id",
+    "run_id",
+    "document_ids",
+    "chunk_ids"
+  ],
+  "title": "BrdAnalystInput",
+  "type": "object"
+}

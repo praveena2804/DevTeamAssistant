@@ -4,6 +4,16 @@ One section per approved part (roadmap §8). Entries are added at gate approval;
 
 **Versioning:** SemVer, pre-1.0. Each approved part bumps the minor version (Part A = 0.1.0, B = 0.2.0, …, R = 0.18.0); fixes to an approved part bump the patch version. The accepted MVP is `1.0.0-mvp`. Git tags: `vX.Y.Z` plus `part-<letter>-approved` (roadmap §16.2).
 
+## Unreleased — Part C: Shared Contracts & Harness Core (in progress)
+
+### Added (checkpoint C.1)
+
+- Shared contracts v1 (`devteam_core.contracts`): 22 domain records, `AgentTask`/`TaskPlan`, input/output
+  contracts for all ten agents, tool, model-call, event and run-state contracts; 71 exported JSON Schemas
+  with a snapshot check (`scripts/export_contract_schemas.py --check`).
+- Contract-level enforcement: safe workspace paths, never-assume provenance, bound handoffs, no agent
+  field for test results, verification or approval, human-only approvals, trust-labelled model messages.
+
 ## 0.2.0 — Part B: Project Intake, Document Extraction, Human IAM & Audit Foundation (G-B approved 2026-11-19)
 
 ### Added

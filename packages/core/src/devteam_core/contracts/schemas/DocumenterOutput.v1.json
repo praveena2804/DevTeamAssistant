@@ -1,0 +1,83 @@
+{
+  "$defs": {
+    "FileOutput": {
+      "additionalProperties": false,
+      "description": "A file the agent asks the harness to write (the harness computes the authoritative checksum).",
+      "properties": {
+        "path": {
+          "maxLength": 240,
+          "title": "Path",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "title": "FileOutput",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "documents": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/FileOutput"
+      },
+      "maxItems": 100,
+      "title": "Documents",
+      "type": "array"
+    },
+    "not_generated": {
+      "default": [],
+      "items": {
+        "maxLength": 200,
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 100,
+      "title": "Not Generated",
+      "type": "array"
+    },
+    "project_id": {
+      "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Project Id",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^run_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "task_id": {
+      "pattern": "^tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Task Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "project_id",
+    "run_id",
+    "task_id"
+  ],
+  "title": "DocumenterOutput",
+  "type": "object"
+}

@@ -1,0 +1,52 @@
+{
+  "$defs": {
+    "RelationshipKind": {
+      "enum": [
+        "one_to_one",
+        "one_to_many",
+        "many_to_one",
+        "many_to_many"
+      ],
+      "title": "RelationshipKind",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "description": {
+      "anyOf": [
+        {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Description"
+    },
+    "kind": {
+      "$ref": "#/$defs/RelationshipKind"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "target_entity": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Target Entity",
+      "type": "string"
+    }
+  },
+  "required": [
+    "target_entity",
+    "kind"
+  ],
+  "title": "EntityRelationship",
+  "type": "object"
+}

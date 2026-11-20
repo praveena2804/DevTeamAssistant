@@ -1,0 +1,155 @@
+{
+  "$defs": {
+    "Provider": {
+      "enum": [
+        "fake",
+        "ollama"
+      ],
+      "title": "Provider",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "actor": {
+      "pattern": "(^agent:(brd_analyst|requirements_finalizer|head|architect|database_developer|backend_developer|frontend_developer|tester|debugger_reviewer|documenter):tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$)|(^service:[a-z][a-z0-9_]{1,40}$)|(^prn_[0-7][0-9A-HJKMNP-TV-Z]{25}$)",
+      "title": "Actor",
+      "type": "string"
+    },
+    "attempt": {
+      "maximum": 4,
+      "minimum": 1,
+      "title": "Attempt",
+      "type": "integer"
+    },
+    "duration_ms": {
+      "minimum": 0,
+      "title": "Duration Ms",
+      "type": "integer"
+    },
+    "event_id": {
+      "pattern": "^evt_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Event Id",
+      "type": "string"
+    },
+    "input_tokens": {
+      "minimum": 0,
+      "title": "Input Tokens",
+      "type": "integer"
+    },
+    "kind": {
+      "const": "model.called",
+      "default": "model.called",
+      "title": "Kind",
+      "type": "string"
+    },
+    "model_id": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Model Id",
+      "type": "string"
+    },
+    "operation_id": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Operation Id",
+      "type": "string"
+    },
+    "output_tokens": {
+      "minimum": 0,
+      "title": "Output Tokens",
+      "type": "integer"
+    },
+    "output_valid": {
+      "title": "Output Valid",
+      "type": "boolean"
+    },
+    "project_id": {
+      "anyOf": [
+        {
+          "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Project Id"
+    },
+    "prompt_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Prompt Hash",
+      "type": "string"
+    },
+    "prompt_id": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Prompt Id",
+      "type": "string"
+    },
+    "prompt_version": {
+      "minimum": 1,
+      "title": "Prompt Version",
+      "type": "integer"
+    },
+    "provider": {
+      "$ref": "#/$defs/Provider"
+    },
+    "run_id": {
+      "anyOf": [
+        {
+          "pattern": "^run_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Run Id"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "task_id": {
+      "anyOf": [
+        {
+          "pattern": "^tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Task Id"
+    },
+    "ts": {
+      "format": "date-time",
+      "title": "Ts",
+      "type": "string"
+    }
+  },
+  "required": [
+    "event_id",
+    "ts",
+    "actor",
+    "provider",
+    "model_id",
+    "operation_id",
+    "prompt_id",
+    "prompt_version",
+    "prompt_hash",
+    "input_tokens",
+    "output_tokens",
+    "duration_ms",
+    "output_valid",
+    "attempt"
+  ],
+  "title": "ModelCallRecorded",
+  "type": "object"
+}

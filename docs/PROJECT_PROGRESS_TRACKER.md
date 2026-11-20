@@ -38,4 +38,12 @@ I saved Part A as the first version in your local Git history, then built the pr
 
 **Run 10 — Part B release**
 
-No new features were built. You approved Part B, so I re-ran all the tests (all passed), marked it as version 0.2.0, and saved it into the main line of your local Git history. Part C is next; I am writing its plan for you to approve first.
+No new features were built. You approved Part B, so I re-ran all the tests (all passed), marked it as version 0.2.0, and saved it into the main line of your local Git history. I then wrote the plan for Part C, the safety system all agents will go through, and listed the decisions I need from you before building it.
+
+**Run 11 — Part C planning**
+
+No development changes were made. I recorded your Part C decisions, wrote out the full table of proposed values and limits for you to review, corrected one limit I had set too high for this laptop, and broke Part C into its four checkpoints.
+
+**Run 12 — Part C, checkpoint C.1**
+
+I recorded your approval of the values and limits (with 3 minutes per AI call), then built the first of Part C's four checkpoints: the fixed "forms" that every agent and part of the system must use to pass work around. These forms now refuse, on their own, paths that try to leave the project folder, an agent borrowing another agent's job, an agent claiming tests passed or approving anything, requirements the AI invented without a source, and BRD text dressed up as system instructions. I wrote attack tests for all of these, and proved each protection matters by switching it off and watching the tests catch it. All tests passed, including everything from Parts A and B. Nothing is enforced while the system runs yet; that starts in the next checkpoint, which I have not begun.

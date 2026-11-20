@@ -1,0 +1,220 @@
+{
+  "$defs": {
+    "Criticality": {
+      "description": "Spec §5.4.2. Decided by code rules (Requirements Policy Engine), never by model opinion.",
+      "enum": [
+        "critical",
+        "minor"
+      ],
+      "title": "Criticality",
+      "type": "string"
+    },
+    "GapCategory": {
+      "description": "The 13 mandatory completeness-checklist categories (Spec §6.2).",
+      "enum": [
+        "goal",
+        "actors",
+        "features",
+        "workflows",
+        "data",
+        "rules",
+        "permissions",
+        "login",
+        "technology",
+        "integrations",
+        "deployment",
+        "acceptance_criteria",
+        "non_functional"
+      ],
+      "title": "GapCategory",
+      "type": "string"
+    },
+    "GapKind": {
+      "description": "Spec §6.2: conflicting, ambiguous, duplicate and missing statements.",
+      "enum": [
+        "missing",
+        "unclear",
+        "conflicting",
+        "duplicate"
+      ],
+      "title": "GapKind",
+      "type": "string"
+    },
+    "GapStatus": {
+      "description": "Spec §5.4: a gap is resolved or explicitly excluded; never silently decided.",
+      "enum": [
+        "open",
+        "resolved",
+        "excluded"
+      ],
+      "title": "GapStatus",
+      "type": "string"
+    },
+    "SourceRef": {
+      "additionalProperties": false,
+      "description": "Points at one extracted chunk (Part B). Page/section/paragraph are filled in by code.",
+      "properties": {
+        "chunk_id": {
+          "pattern": "^chk_[0-9a-f]{26}$",
+          "title": "Chunk Id",
+          "type": "string"
+        },
+        "document_id": {
+          "pattern": "^doc_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "title": "Document Id",
+          "type": "string"
+        },
+        "page_end": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Page End"
+        },
+        "page_start": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Page Start"
+        },
+        "paragraph_end": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Paragraph End"
+        },
+        "paragraph_start": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Paragraph Start"
+        },
+        "quote": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quote"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "section": {
+          "anyOf": [
+            {
+              "maxLength": 2000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Section"
+        }
+      },
+      "required": [
+        "document_id",
+        "chunk_id"
+      ],
+      "title": "SourceRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A missing/unclear/conflicting/duplicate item. Criticality is assigned by code rules only.",
+  "properties": {
+    "category": {
+      "$ref": "#/$defs/GapCategory"
+    },
+    "criticality": {
+      "$ref": "#/$defs/Criticality"
+    },
+    "description": {
+      "maxLength": 20000,
+      "minLength": 1,
+      "title": "Description",
+      "type": "string"
+    },
+    "gap_id": {
+      "pattern": "^gap_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Gap Id",
+      "type": "string"
+    },
+    "kind": {
+      "$ref": "#/$defs/GapKind"
+    },
+    "project_id": {
+      "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Project Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "source_refs": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/SourceRef"
+      },
+      "maxItems": 50,
+      "title": "Source Refs",
+      "type": "array"
+    },
+    "status": {
+      "$ref": "#/$defs/GapStatus",
+      "default": "open"
+    }
+  },
+  "required": [
+    "gap_id",
+    "project_id",
+    "category",
+    "kind",
+    "criticality",
+    "description"
+  ],
+  "title": "Gap",
+  "type": "object"
+}

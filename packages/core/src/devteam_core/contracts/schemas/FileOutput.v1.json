@@ -1,0 +1,28 @@
+{
+  "additionalProperties": false,
+  "description": "A file the agent asks the harness to write (the harness computes the authoritative checksum).",
+  "properties": {
+    "path": {
+      "maxLength": 240,
+      "title": "Path",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Sha256",
+      "type": "string"
+    }
+  },
+  "required": [
+    "path",
+    "sha256"
+  ],
+  "title": "FileOutput",
+  "type": "object"
+}

@@ -1,0 +1,69 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "failed_task_ids": {
+      "default": [],
+      "items": {
+        "pattern": "^tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+        "type": "string"
+      },
+      "maxItems": 500,
+      "title": "Failed Task Ids",
+      "type": "array"
+    },
+    "feasibility_item_ids": {
+      "default": [],
+      "items": {
+        "pattern": "^fea_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+        "type": "string"
+      },
+      "maxItems": 500,
+      "title": "Feasibility Item Ids",
+      "type": "array"
+    },
+    "in_scope_keys": {
+      "default": [],
+      "items": {
+        "pattern": "^(FR|NFR|BR)-[0-9]{3,4}$",
+        "type": "string"
+      },
+      "maxItems": 500,
+      "title": "In Scope Keys",
+      "type": "array"
+    },
+    "project_id": {
+      "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Project Id",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^run_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "spec_checksum": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Spec Checksum",
+      "type": "string"
+    },
+    "spec_version_id": {
+      "pattern": "^spv_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Spec Version Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "project_id",
+    "run_id",
+    "spec_version_id",
+    "spec_checksum"
+  ],
+  "title": "HeadInput",
+  "type": "object"
+}

@@ -1,0 +1,245 @@
+{
+  "$defs": {
+    "AgentRole": {
+      "description": "The ten agents, exactly (roadmap §4.1, ADR-0002). Adding an eleventh is prohibited.",
+      "enum": [
+        "brd_analyst",
+        "requirements_finalizer",
+        "head",
+        "architect",
+        "database_developer",
+        "backend_developer",
+        "frontend_developer",
+        "tester",
+        "debugger_reviewer",
+        "documenter"
+      ],
+      "title": "AgentRole",
+      "type": "string"
+    },
+    "ChatMessage": {
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "maxLength": 60000,
+          "minLength": 1,
+          "title": "Content",
+          "type": "string"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z][a-z0-9_]{1,40}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Label"
+        },
+        "role": {
+          "$ref": "#/$defs/ChatRole"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "trust": {
+          "$ref": "#/$defs/Trust"
+        }
+      },
+      "required": [
+        "role",
+        "content",
+        "trust"
+      ],
+      "title": "ChatMessage",
+      "type": "object"
+    },
+    "ChatRole": {
+      "enum": [
+        "system",
+        "user",
+        "assistant"
+      ],
+      "title": "ChatRole",
+      "type": "string"
+    },
+    "ModelParams": {
+      "additionalProperties": false,
+      "properties": {
+        "context_window": {
+          "default": 4096,
+          "maximum": 8192,
+          "minimum": 2048,
+          "title": "Context Window",
+          "type": "integer"
+        },
+        "max_output_tokens": {
+          "default": 1024,
+          "maximum": 2048,
+          "minimum": 128,
+          "title": "Max Output Tokens",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "seed": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Seed"
+        },
+        "temperature": {
+          "default": 0.0,
+          "maximum": 2.0,
+          "minimum": 0.0,
+          "title": "Temperature",
+          "type": "number"
+        }
+      },
+      "title": "ModelParams",
+      "type": "object"
+    },
+    "ModelSlot": {
+      "description": "Model slots (docs/architecture/MODEL_ROUTING.md; D-37 adds the optional ``review`` slot).",
+      "enum": [
+        "instruct",
+        "coder",
+        "review",
+        "coder_large",
+        "fallback",
+        "embedding"
+      ],
+      "title": "ModelSlot",
+      "type": "string"
+    },
+    "Trust": {
+      "enum": [
+        "trusted",
+        "untrusted"
+      ],
+      "title": "Trust",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "messages": {
+      "items": {
+        "$ref": "#/$defs/ChatMessage"
+      },
+      "maxItems": 64,
+      "minItems": 1,
+      "title": "Messages",
+      "type": "array"
+    },
+    "operation_id": {
+      "pattern": "^[a-z][a-z_]{1,40}\\.[a-z][a-z0-9_]{1,60}$",
+      "title": "Operation Id",
+      "type": "string"
+    },
+    "output_schema": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Z][A-Za-z0-9]{1,80}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Output Schema"
+    },
+    "params": {
+      "$ref": "#/$defs/ModelParams"
+    },
+    "prompt_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Prompt Hash",
+      "type": "string"
+    },
+    "prompt_id": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Prompt Id",
+      "type": "string"
+    },
+    "prompt_version": {
+      "minimum": 1,
+      "title": "Prompt Version",
+      "type": "integer"
+    },
+    "request_id": {
+      "pattern": "^mrq_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Request Id",
+      "type": "string"
+    },
+    "role": {
+      "$ref": "#/$defs/AgentRole"
+    },
+    "run_id": {
+      "anyOf": [
+        {
+          "pattern": "^run_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Run Id"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "slot": {
+      "$ref": "#/$defs/ModelSlot"
+    },
+    "task_id": {
+      "anyOf": [
+        {
+          "pattern": "^tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Task Id"
+    }
+  },
+  "required": [
+    "request_id",
+    "role",
+    "operation_id",
+    "slot",
+    "messages",
+    "prompt_id",
+    "prompt_version",
+    "prompt_hash"
+  ],
+  "title": "ModelRequest",
+  "type": "object"
+}

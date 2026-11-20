@@ -1,0 +1,118 @@
+{
+  "$defs": {
+    "TaskStatus": {
+      "description": "Task statuses (Spec §20.2, nine values).",
+      "enum": [
+        "pending",
+        "ready",
+        "running",
+        "completed",
+        "partially_completed",
+        "blocked",
+        "failed",
+        "skipped",
+        "cancelled"
+      ],
+      "title": "TaskStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "actor": {
+      "pattern": "(^agent:(brd_analyst|requirements_finalizer|head|architect|database_developer|backend_developer|frontend_developer|tester|debugger_reviewer|documenter):tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$)|(^service:[a-z][a-z0-9_]{1,40}$)|(^prn_[0-7][0-9A-HJKMNP-TV-Z]{25}$)",
+      "title": "Actor",
+      "type": "string"
+    },
+    "event_id": {
+      "pattern": "^evt_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Event Id",
+      "type": "string"
+    },
+    "from_status": {
+      "$ref": "#/$defs/TaskStatus"
+    },
+    "kind": {
+      "const": "task.transitioned",
+      "default": "task.transitioned",
+      "title": "Kind",
+      "type": "string"
+    },
+    "project_id": {
+      "anyOf": [
+        {
+          "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Project Id"
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reason"
+    },
+    "run_id": {
+      "anyOf": [
+        {
+          "pattern": "^run_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Run Id"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "task_id": {
+      "anyOf": [
+        {
+          "pattern": "^tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Task Id"
+    },
+    "to_status": {
+      "$ref": "#/$defs/TaskStatus"
+    },
+    "ts": {
+      "format": "date-time",
+      "title": "Ts",
+      "type": "string"
+    }
+  },
+  "required": [
+    "event_id",
+    "ts",
+    "actor",
+    "from_status",
+    "to_status"
+  ],
+  "title": "TaskTransitioned",
+  "type": "object"
+}

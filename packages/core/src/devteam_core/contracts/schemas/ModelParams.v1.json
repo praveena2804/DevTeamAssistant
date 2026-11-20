@@ -1,0 +1,47 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "context_window": {
+      "default": 4096,
+      "maximum": 8192,
+      "minimum": 2048,
+      "title": "Context Window",
+      "type": "integer"
+    },
+    "max_output_tokens": {
+      "default": 1024,
+      "maximum": 2048,
+      "minimum": 128,
+      "title": "Max Output Tokens",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "seed": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Seed"
+    },
+    "temperature": {
+      "default": 0.0,
+      "maximum": 2.0,
+      "minimum": 0.0,
+      "title": "Temperature",
+      "type": "number"
+    }
+  },
+  "title": "ModelParams",
+  "type": "object"
+}

@@ -1,0 +1,129 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "actor": {
+      "pattern": "(^agent:(brd_analyst|requirements_finalizer|head|architect|database_developer|backend_developer|frontend_developer|tester|debugger_reviewer|documenter):tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$)|(^service:[a-z][a-z0-9_]{1,40}$)|(^prn_[0-7][0-9A-HJKMNP-TV-Z]{25}$)",
+      "title": "Actor",
+      "type": "string"
+    },
+    "after_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "After Sha256"
+    },
+    "before_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Before Sha256"
+    },
+    "bytes_written": {
+      "minimum": 0,
+      "title": "Bytes Written",
+      "type": "integer"
+    },
+    "diff_ref": {
+      "anyOf": [
+        {
+          "maxLength": 240,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Diff Ref"
+    },
+    "event_id": {
+      "pattern": "^evt_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Event Id",
+      "type": "string"
+    },
+    "kind": {
+      "const": "file.changed",
+      "default": "file.changed",
+      "title": "Kind",
+      "type": "string"
+    },
+    "path": {
+      "maxLength": 240,
+      "title": "Path",
+      "type": "string"
+    },
+    "project_id": {
+      "anyOf": [
+        {
+          "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Project Id"
+    },
+    "run_id": {
+      "anyOf": [
+        {
+          "pattern": "^run_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Run Id"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "task_id": {
+      "anyOf": [
+        {
+          "pattern": "^tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Task Id"
+    },
+    "ts": {
+      "format": "date-time",
+      "title": "Ts",
+      "type": "string"
+    }
+  },
+  "required": [
+    "event_id",
+    "ts",
+    "actor",
+    "path",
+    "bytes_written"
+  ],
+  "title": "FileChanged",
+  "type": "object"
+}

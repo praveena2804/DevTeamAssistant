@@ -1,0 +1,217 @@
+{
+  "$defs": {
+    "Blocker": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "requirement_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^(FR|NFR|BR)-[0-9]{3,4}$",
+            "type": "string"
+          },
+          "maxItems": 500,
+          "title": "Requirement Ids",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "description"
+      ],
+      "title": "Blocker",
+      "type": "object"
+    },
+    "ExecutionKind": {
+      "description": "What an agent may *request*; the harness decides and runs it (Spec §11.2).",
+      "enum": [
+        "build",
+        "test_run",
+        "migration_check",
+        "static_check"
+      ],
+      "title": "ExecutionKind",
+      "type": "string"
+    },
+    "ExecutionRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/ExecutionKind"
+        },
+        "requirement_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^(FR|NFR|BR)-[0-9]{3,4}$",
+            "type": "string"
+          },
+          "maxItems": 500,
+          "title": "Requirement Ids",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "maxLength": 240,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "ExecutionRequest",
+      "type": "object"
+    },
+    "FileOutput": {
+      "additionalProperties": false,
+      "description": "A file the agent asks the harness to write (the harness computes the authoritative checksum).",
+      "properties": {
+        "path": {
+          "maxLength": 240,
+          "title": "Path",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "title": "FileOutput",
+      "type": "object"
+    },
+    "RequirementMapping": {
+      "additionalProperties": false,
+      "properties": {
+        "paths": {
+          "items": {
+            "maxLength": 240,
+            "type": "string"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "title": "Paths",
+          "type": "array"
+        },
+        "requirement_id": {
+          "pattern": "^(FR|NFR|BR)-[0-9]{3,4}$",
+          "title": "Requirement Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "requirement_id",
+        "paths"
+      ],
+      "title": "RequirementMapping",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Migrations are *files*; applying them is the harness's job (Spec §6.6).",
+  "properties": {
+    "blockers": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Blocker"
+      },
+      "maxItems": 500,
+      "title": "Blockers",
+      "type": "array"
+    },
+    "execution_requests": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ExecutionRequest"
+      },
+      "maxItems": 50,
+      "title": "Execution Requests",
+      "type": "array"
+    },
+    "files": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/FileOutput"
+      },
+      "maxItems": 500,
+      "title": "Files",
+      "type": "array"
+    },
+    "implementation_mapping": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/RequirementMapping"
+      },
+      "maxItems": 500,
+      "title": "Implementation Mapping",
+      "type": "array"
+    },
+    "project_id": {
+      "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Project Id",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^run_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "task_id": {
+      "pattern": "^tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Task Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "project_id",
+    "run_id",
+    "task_id"
+  ],
+  "title": "DatabaseDeveloperOutput",
+  "type": "object"
+}

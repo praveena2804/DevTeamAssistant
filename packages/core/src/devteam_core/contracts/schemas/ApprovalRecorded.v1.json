@@ -1,0 +1,118 @@
+{
+  "$defs": {
+    "ApprovalDecision": {
+      "description": "F-4. 'Edit' is not a decision: it returns the draft for changes.",
+      "enum": [
+        "approved",
+        "rejected",
+        "cancelled"
+      ],
+      "title": "ApprovalDecision",
+      "type": "string"
+    },
+    "ApprovalType": {
+      "description": "Approval types (roadmap §5.1 HC-13).",
+      "enum": [
+        "feasibility_decision",
+        "spec_approval",
+        "substitution",
+        "test_maintenance",
+        "publish_github",
+        "destructive_db",
+        "db_switch"
+      ],
+      "title": "ApprovalType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "actor": {
+      "pattern": "(^agent:(brd_analyst|requirements_finalizer|head|architect|database_developer|backend_developer|frontend_developer|tester|debugger_reviewer|documenter):tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$)|(^service:[a-z][a-z0-9_]{1,40}$)|(^prn_[0-7][0-9A-HJKMNP-TV-Z]{25}$)",
+      "title": "Actor",
+      "type": "string"
+    },
+    "approval_id": {
+      "pattern": "^apr_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Approval Id",
+      "type": "string"
+    },
+    "approval_type": {
+      "$ref": "#/$defs/ApprovalType"
+    },
+    "decision": {
+      "$ref": "#/$defs/ApprovalDecision"
+    },
+    "event_id": {
+      "pattern": "^evt_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Event Id",
+      "type": "string"
+    },
+    "kind": {
+      "const": "approval.recorded",
+      "default": "approval.recorded",
+      "title": "Kind",
+      "type": "string"
+    },
+    "project_id": {
+      "anyOf": [
+        {
+          "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Project Id"
+    },
+    "run_id": {
+      "anyOf": [
+        {
+          "pattern": "^run_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Run Id"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "task_id": {
+      "anyOf": [
+        {
+          "pattern": "^tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Task Id"
+    },
+    "ts": {
+      "format": "date-time",
+      "title": "Ts",
+      "type": "string"
+    }
+  },
+  "required": [
+    "event_id",
+    "ts",
+    "actor",
+    "approval_id",
+    "approval_type",
+    "decision"
+  ],
+  "title": "ApprovalRecorded",
+  "type": "object"
+}
