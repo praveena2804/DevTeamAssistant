@@ -19,15 +19,15 @@
 | Item | Value |
 |---|---|
 | Current milestone | **M0 Foundation** |
-| Current part | **Part C: In progress.** C.1 done (CH-0046…0050); C.2 done (CH-0051…0060); C.3 done (CH-0061…0070); **C.4 Execution done** (CH-0071…0082). Gate G-C not started |
+| Current part | **Part C: complete, awaiting gate G-C approval.** C.1 (CH-0046…0050), C.2 (CH-0051…0060), C.3 (CH-0061…0070), C.4 (CH-0071…0082); G-C verification and completion report (CH-0083) |
 | Overall status | Part A approved (v0.1.0) and Part B approved (v0.2.0), both merged to `main` with local tags. M0 Foundation complete |
-| Last completed activity | C.4 final TR-0076: pytest 1,755 passed / 0 failed / 1 skipped (symlink privilege); security marker 1,346; coverage 96% total; static gates clean (lint-imports 7/7). Mutation controls TR-0074/TR-0075: 62/62 after one added test. Real DB migrated 0003→0004 with backup; earlier audit rows byte-identical; chain intact; smoke OK (TR-0077) |
+| Last completed activity | G-C verification TR-0078…TR-0083: pytest 1,755 passed / 1 skipped (symlink privilege); security 1,346; coverage 96% (harness 96.6%, contracts 96.2%); static gates clean (7/7 import contracts); web 15 Vitest + build; pip-audit (runtime and dev) and npm audit clean; gitleaks history clean; real DB read-only: revision 0004, audit intact, key in Credential Manager, no plaintext key file; demo OK. `docs/parts/PART-C-COMPLETION-REPORT.md` written |
 | Code written | Parts A and B: `devteam_core`, `devteam_state`, `devteam_harness` (HC-15/18/20/21 foundations), `devteam_services` (extraction, workspace, intake), `devteam_api`, `apps/web`, scripts, tests |
 | Dependencies installed | Python (uv, `uv.lock`), npm (`package-lock.json`), Gitleaks (winget, user scope), Ollama models `qwen2.5:3b` and `qwen2.5-coder:3b` |
 | Git / GitHub operations | Local: `main` holds Parts A and B (tags `v0.1.0`, `part-a-approved`, `v0.2.0`, `part-b-approved`); `part/c-harness-core` holds C.1 (`d25e4b6`), C.2 (`9787b3a`), C.3 (`934b7f0`), C.4 (CH-0082). Push authorised (AP-009) but refused by GitHub (HTTP 403, KI-014); nothing pushed |
-| Tests executed | TR-0001…TR-0077 |
-| Blocking items | Owner review of the C.4 checkpoint report before gate G-C. GitHub push blocked by account permissions (KI-014). For Part E: D-07 |
-| Next authorised action | **None.** C.4 reported; wait for the owner before the G-C gate procedure (full regression, dependency audit, completion report) |
+| Tests executed | TR-0001…TR-0083 |
+| Blocking items | **Owner approval of G-C.** GitHub push blocked by account permissions (KI-014). For Part E: D-07 |
+| Next authorised action | **None.** Wait for the owner's G-C decision. On approval: version 0.3.0, CHANGELOG, local merge to `main`, tags `v0.3.0` + `part-c-approved`. Part D not started |
 
 ---
 
@@ -50,7 +50,7 @@
 |---|---|---|---|---|---|---|---|
 | A | Foundation, Repository Conventions & Environment Benchmark | M0 | **Approved** | G-A | Retrospectively, at G-A (DV-001) | 2026-11-19 (AP-005) | `part-a-approved`, `v0.1.0` (local) |
 | B | Intake, Extraction, Human IAM & Audit Foundation | M0 | **Approved** | G-B | 2026-11-19 (AP-005) | 2026-11-19 (AP-006) | `part-b-approved`, `v0.2.0` (local) |
-| C | Shared Contracts & Harness Core | M1 | **In progress** (C.1–C.4 done; G-C not started) | G-C | 2026-11-20 (AP-007, AP-008) | — | — (branch `part/c-harness-core`, local) |
+| C | Shared Contracts & Harness Core | M1 | **Complete — awaiting G-C** | G-C | 2026-11-20 (AP-007, AP-008) | — | — (branch `part/c-harness-core`, local) |
 | D | LangGraph Orchestration, Ten Stub Agents & Head Agent Deterministic Core | M1 | Not started | G-D | — | — | — |
 | E | Isolated Execution Sandbox & Target-App Templates | M1 | Not started | G-E | — | — | — |
 | F | LLM Gateway, Model Routing, Context & Memory, and RAG | M1 | Not started | G-F | — | — | — |
@@ -103,6 +103,7 @@ Only explicit owner approvals are recorded here.
 | AP-009 | 2026-11-20 | **Push authorised** ("push everything") and **C.2 authorised** ("proceed C.2") | Owner | Owner message 2026-11-20 "push everything and proceed C.2" | Push attempted to `origin` (github.com/praveena2804/DevTeamAssistant): refused, HTTP 403 for the account signed in on this machine (KI-014). Pre-push checks run: remote empty (no overwrite possible), gitleaks over the 4 commits clean, no data/secret files tracked. Not retried with other credentials; never force-pushed |
 | AP-010 | 2026-11-20 | **C.3 authorised** | Owner | Owner message 2026-11-20 "Proceed with C.3" | — |
 | AP-011 | 2026-11-20 | **C.4 authorised** | Owner | Owner message 2026-11-20 "Proceed with C.4" | — |
+| AP-012 | 2026-11-20 | **G-C verification authorised** (verification and report only; no feature changes without approval; no Part D; no push) | Owner | Owner message 2026-11-20 "Proceed with the G-C final verification gate only" | — |
 
 *Roadmap v2.0: adopted as the working default under AP-003. An explicit formal "roadmap approved" statement has not been given, so it is recorded as adopted, not approved.*
 
@@ -240,6 +241,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | CH-0080 | 2026-11-20 | C.4 | Tests created: `tests/fixtures/harness.py`, `tests/security/test_{executor,budgets,approvals,llm_gateway,tracing,agent_sdk,agent_static_rules}.py`, `packages/state/tests/test_execution_repo.py`, `tests/scripts/test_demo_part_c.py`. Adapted: `tests/scripts/test_scripts.py` (skeleton test passes `strict=False`; fixture packages get `spec.py`; 2 new tests), `tests/integration/test_migrations.py` and `apps/api/tests/test_system.py` (head `0004_execution`), `tests/integration/test_api_boot.py` (server output to a file instead of an unread pipe, KI-021) | C.4 suite | AC-C-02…07 | TR-0068…TR-0076 | Done |
 | CH-0081 | 2026-11-20 | C.4 | Product fixes found by tests: `approvals` (naive SQLite timestamp → UTC), `prompts` (identical re-registration keeps the first object) | See TR-0070, TR-0072 | — | TR-0070, TR-0072 | Done |
 | CH-0082 | 2026-11-20 | C.4 | `docs/architecture/harness.md` (C.4 section); `README.md`; `CHANGELOG.md`; this tracker; progress tracker Runs 13–15; local Git commit on `part/c-harness-core` | C.4 documentation and checkpoint commit (not pushed) | Plan §10 | TR-0076 | Done |
+| CH-0083 | 2026-11-20 | G-C | `docs/parts/PART-C-COMPLETION-REPORT.md` (created); `CLAUDE.md` §9 (static gates list adds `scripts/check_agent_rules.py`); this tracker; progress tracker Run 16; local Git commit | G-C evidence package; no feature code changed | Roadmap §17 | TR-0078…TR-0083 | Done |
 | CH-0044 | 2026-11-20 | C | `docs/parts/PART-C-PLAN.md` (status table; §2 rewritten as §2.0 rulings + §2.1 full F-1…F-11 table with values, defaults, min/max, rationale, dependents; new §10 checkpoint breakdown; confirmation line); `CLAUDE.md` §11 (stale "Git not authorised" sentence aligned with AP-005); this tracker (§1, §3 AP-007, §4 D-18/D-26/D-30/D-32, §11) | Record AP-007; owner asked for the full F table. First-draft error corrected: context 8,000 tokens exceeded the benchmarked 4,096 window | AP-007 | — | Done (plan awaiting F approval) |
 | CH-0043 | 2026-11-19 | C | `docs/parts/PART-C-PLAN.md` (created, on branch `part/c-harness-core`, uncommitted until approval) | Part C plan: scope C.1–C.4, decisions D-18/D-18a/D-26/D-30/D-32, flagged field values F-1…F-11, design, tests, demo, risks | Roadmap §13 C; Plan §20 C | — | Awaiting owner approval |
 | CH-0042 | 2026-11-19 | B | Version 0.1.0 → 0.2.0 in all `pyproject.toml` files, `apps/web/package.json`, lock files; `CHANGELOG.md` (0.2.0 section); `README.md`; this tracker; `docs/PROJECT_PROGRESS_TRACKER.md` (Run 10); local Git: release commit on `part/b-intake`, merged into `main` (`--no-ff`), tags `v0.2.0` + `part-b-approved` | Part B release after G-B | AP-006 | TR-0035 | Done |
@@ -343,6 +345,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | CH-0080 | Created / Modified | 10 new test files; 4 adapted test files | Whole files; see CH-0080 | Tests | AC-C-02…07 |
 | CH-0081 | Modified | `approvals/__init__.py`; `prompts/__init__.py` | `_to_contract`; `InMemoryPromptRegistry.register` | Fixes | — |
 | CH-0082 | Modified | `docs/architecture/harness.md`; `README.md`; `CHANGELOG.md`; trackers | C.4 section; state line; Unreleased C.4 | Docs | Plan §10 |
+| CH-0083 | Created / Modified | `docs/parts/PART-C-COMPLETION-REPORT.md`; `CLAUDE.md`; trackers | Whole file; §9 static gates; §1/§2/§3/§5/§6/§7/§8/§9/§11 | Gate | Roadmap §17 |
 | CH-0051 | Modified | `settings.py`; `config/defaults.yaml`; `config/profiles/test.yaml` | `SecretsSettings`, `Settings.secrets`, `_memory_secrets_only_in_tests`; `secrets:` sections | D-18 | AP-007 |
 | CH-0052 | Created | `config/guardrails/*.yaml` (4) | Whole files | HC-01 | HS-08 |
 | CH-0053 | Created / Modified | `iam/principals.py`; `iam/__init__.py` | Whole file; exports | HC-15 | HS-07 |
@@ -449,6 +452,12 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | TR-0075 | 2026-11-20 15:28 | C.4 | Added `test_run_token_limit_counts_every_task_of_the_run`; re-ran that mutant | 17 | 0 | 0 | **62/62 detected.** Sources restored byte-for-byte (git shows no change to harness sources from the run) |
 | TR-0076 | 2026-11-20 15:17 | C.4 | **C.4 final:** ruff check + format; mypy (152 files); lint-imports; agent count; agent rules; contract schema check; `-m security`; fast suite; earlier `--cov` run (same code, before the two test-only edits); gitleaks | pytest **1,755 passed, 1 skipped** (symlink privilege); security **1,346 passed, 1 skipped**; coverage **96%** total (new modules ≈95–100%); lint-imports 7/7; schemas 71, 0 stale; gitleaks git history: no leaks; working-tree `--no-git`: 2 findings, both in gitignored `__pycache__` bytecode of synthetic test strings (Part A logging test; fake `ghp_` shape in the gateway test), source files clean | 0 | 1 | Web unchanged in C.4, so not re-run |
 | TR-0077 | 2026-11-20 15:14 | C.4 | **Real database:** fingerprint; `./scripts/dev.ps1 -Smoke`; fingerprint; `scripts/verify_audit.py` | Before: revision `0003`, 7 rows, fingerprint `ec526025029f6f7d`, log intact. Smoke: backup `data/backups/20261120T094410472263Z`, migration 0003→0004, SMOKE OK (401/200). After: revision `0004`, 4 new tables, first 7 rows fingerprint **`ec526025029f6f7d` (identical)**, 1 new row (smoke auth denial), verify **intact**; ports freed | 0 | — | Vite EBUSY message (KI-017), harmless |
+| TR-0078 | 2026-11-20 15:51 | G-C | `uv sync --locked`; fast suite `--cov` | **1,755** | 0 | 1 | Skip: symlink privilege (KI-020). Coverage 96% total; per package (branch): harness 96.6%, contracts 96.2%, core 96.2%, state 97.0%, API 94.7%, services 90.3%, agents 100% |
+| TR-0079 | 2026-11-20 15:57 | G-C | `pytest -m security` | **1,346** | 0 | 1 | Same skip |
+| TR-0080 | 2026-11-20 15:50 | G-C | Static: ruff check; ruff format --check; mypy (152 files); lint-imports; `check_agent_count.py --strict`; `check_agent_rules.py`; `export_contract_schemas.py --check` | all clean | 0 | — | Import contracts 7 kept / 0 broken; 71 schemas, 0 stale, 0 orphaned |
+| TR-0081 | 2026-11-20 15:49 | G-C | Web (PowerShell): check:api, lint, typecheck, Vitest, build | Vitest **15** | 0 | 0 | Build OK |
+| TR-0082 | 2026-11-20 15:50 | G-C | Dependency and secret audits: `uvx pip-audit --strict` on runtime export and on runtime+dev export (79 packages); `npm audit --audit-level=high`; `gitleaks detect` (history incl. the four C commits) | — | 0 | — | **No known vulnerabilities**; npm 0; gitleaks no leaks (exit 0) |
+| TR-0083 | 2026-11-20 15:58 | G-C | Real DB/install **read-only**: revision; audit fingerprint; `scripts/verify_audit.py`; `data/api_token` absence; keyring key presence (value never printed); demo `scripts/demo_part_c.py` | Revision `0004_execution`; 8 audit rows, first 7 fingerprint `ec526025029f6f7d` (unchanged since C.4 migration); verify **intact** (3 chained + 5 earlier); plaintext key file absent; key present in `WinVaultKeyring`; demo exit 0 (allowed / refused / refused / stopped / intact / broken at 10) | 0 | — | No smoke run at G-C, so no new log entries |
 
 ---
 
@@ -472,6 +481,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | VR-014 | 2026-11-20 12:44 | C.2 | C.2 exit criteria (PART-C-PLAN §10) | Every role × tool × stage cell (10 × 7 × 7 = 490) matches an independent spec table; deny audited (fail closed); canary absent from logs (incl. foreign handlers), exceptions, audit, migration records; keyring-unavailable → API refuses to start, no file; D-18a 4/4 on the real install | **Pass** (TR-0053, TR-0055, TR-0056) | Tests, console |
 | VR-015 | 2026-11-20 14:15 | C.3 | C.3 exit criteria (PART-C-PLAN §10) | Path attacks (explicit + hypothesis + real junction/hard-link/8.3) rejected and audited; frozen files protected; diff + checksum per write; tamper (edit/delete/reorder/insert/Part B change) detected at the exact entry; Part B rows untouched (real DB fingerprint); illegal transitions rejected + audited; concurrent writers keep a valid chain (6×10 appends) | **Pass** (TR-0065…TR-0067); symlink case not executable on this account (skipped with reason) | Tests, console |
 | VR-016 | 2026-11-20 15:28 | C.4 | C.4 exit criteria (PART-C-PLAN §10) | Every F-9 dimension stops a task (executor/budget tests); F-10 counts exact; approvals reject wrong role, forged ID, mismatched version, stale checksum, double submit, out-of-band rows; no network trace exporter; stand-in integration (allowed/denied/retry/budget); planted violations make import-linter, Ruff and AST checks fail; coverage ≥ 90% | **Pass** (TR-0070…TR-0077) | Tests, console |
+| VR-017 | 2026-11-20 15:58 | G-C | AC-C-01…AC-C-07 and roadmap §17.2 Definition of Done | All seven ACs pass with evidence (completion report); full regression green; coverage targets met; ruff/mypy/ESLint/tsc/import-linter/agent checks/Gitleaks/pip-audit/npm audit clean; migrations up/down tested; contract changes versioned; docs updated; demonstration performed | **Pass — awaiting owner approval** | Completion report |
 
 ---
 
@@ -494,7 +504,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | KI-015 | 2026-11-20 | `audit_events.principal_id` is `String(40)`; agent principals are up to ~56 characters (`agent:<role>:tsk_…`). SQLite does not enforce the length, so nothing breaks today | Would truncate/fail on a stricter database | C.3 migration `0003_harness_core` widens the column | **Closed (model) 2026-11-20**: model declares String(80) (CH-0064); SQLite does not enforce lengths, so no table rebuild |
 | KI-016 | 2026-11-20 | The `keyring`-marked test needs a real OS credential store; it runs in the fast suite on this Windows machine | A Linux CI runner without Secret Service would fail it | Exclude `keyring` in CI when GitHub CI is set up (AC-A-02) | Open |
 | KI-017 | 2026-11-20 | Vite printed `EBUSY ... rename node_modules/.vite/deps_temp…` while re-optimising its dependency cache during the smoke test | Cosmetic; the UI was served and the smoke passed | Recurs only after lockfile changes; deleting `apps/web/node_modules/.vite` clears it | Open |
-| KI-018 | 2026-11-20 | `docs/PROJECT_PROGRESS_TRACKER.md` (and `IMPLEMENTATION_ROADMAP.md`) are open in Microsoft Word, which locks them; appending Run 13 failed with "permission denied" | The owner's run history is behind (Runs 13 and 14 pending; retried at the end of C.3, still locked) | Append Run 13 as soon as the owner closes the file in Word (text given in the C.2 report) | Open |
+| KI-018 | 2026-11-20 | `docs/PROJECT_PROGRESS_TRACKER.md` (and `IMPLEMENTATION_ROADMAP.md`) are open in Microsoft Word, which locks them; appending Run 13 failed with "permission denied" | The owner's run history is behind (Runs 13 and 14 pending; retried at the end of C.3, still locked) | Append Run 13 as soon as the owner closes the file in Word (text given in the C.2 report) | **Closed 2026-11-20**: Runs 13–15 appended once Word released the file |
 | KI-019 | 2026-11-20 | Audit chain limit: an attacker with direct file access who drops the triggers, deletes the newest entries **and** rewinds `audit_chain_head` to match is not detectable from inside the same database file (test `test_known_limit_tail_truncation_with_a_rewound_head`) | Tail truncation by a file-level attacker could go unnoticed | Keep an external copy of the head hash (run history / trace export, Part D) | Open |
 | KI-020 | 2026-11-20 | Symlink attack tests skip on this machine: the Windows account may not create symlinks (no Developer Mode). Junctions (same redirection risk, no privilege needed) are tested for real and refused; the symlink check is the same `lstat` reparse-point test | One attack variant not executed locally | Run once with Developer Mode on, or in CI on Linux | Open |
 | KI-021 | 2026-11-20 | `tests/integration/test_api_boot.py` sent the server's output into a pipe it never read; once the output exceeded the pipe buffer the server blocked and the test timed out | Flaky/failing boot test as logging grows | Fixed in C.4: output written to a file | **Closed 2026-11-20** |
@@ -519,14 +529,14 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 
 **Pending:**
 
-1. **Owner review of the C.4 checkpoint report**, then the G-C gate procedure (PART-C-PLAN §10).
+1. **Owner decision on G-C** (`docs/parts/PART-C-COMPLETION-REPORT.md`). On approval: release 0.3.0 locally (merge, tags).
 1a. GitHub push: blocked by account permissions (KI-014); owner action needed before retrying.
 2. Owner approval of the model selection (owner: "keep pending; will approve later").
 3. Owner rulings when they become necessary (never assumed): D-07 (before Part E), D-21, D-26/D-33 confirmation, D-31 final ruling, D-34 (commit the spec .docx; until ruled, the .docx is **not** committed).
 4. Optional: Ollama env vars (KI-004); GitHub push/repository creation (not authorised; AC-A-01 fresh-clone can now be checked locally, AC-A-02 CI still needs GitHub).
 5. Roadmap v2.1 amendment for D-35/D-36/D-37 (DV-003), on owner approval.
 
-**Next authorised action:** **None.** Checkpoint C.4 complete and reported; wait for the owner before the G-C gate procedure.
+**Next authorised action:** **None.** G-C verification complete and reported; wait for the owner's G-C decision. Part D not started.
 
 ---
 

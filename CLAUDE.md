@@ -204,7 +204,7 @@ uv run pytest -m "not llm and not docker and not slow and not acceptance"
 **Static gates:**
 ```text
 uv run ruff check . ; uv run ruff format --check . ; uv run mypy packages apps scripts
-uv run lint-imports ; uv run python scripts/check_agent_count.py
+uv run lint-imports ; uv run python scripts/check_agent_count.py ; uv run python scripts/check_agent_rules.py
 ```
 
 **Web:**
