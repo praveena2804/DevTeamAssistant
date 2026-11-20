@@ -3,6 +3,6 @@
 Every domain query takes ``project_id`` explicitly; cross-project reads are impossible through this API.
 """
 
-from devteam_state.repositories import audit, documents, principals, projects, runs
+from devteam_state.repositories import audit, documents, execution, principals, projects, runs
 
-__all__ = ["audit", "documents", "principals", "projects", "runs"]
+__all__ = ["audit", "documents", "execution", "principals", "projects", "runs"]

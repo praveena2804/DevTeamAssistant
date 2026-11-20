@@ -40,6 +40,9 @@ def _make_agents(root: Path, names: list[str]) -> None:
     for name in names:
         (root / "agents" / name).mkdir(parents=True)
         (root / "agents" / name / "pyproject.toml").write_text("", encoding="utf-8")
+        spec = root / "agents" / name / "src" / "devteam_agents" / name / "spec.py"
+        spec.parent.mkdir(parents=True)
+        spec.write_text("", encoding="utf-8")
 
 
 def test_canonical_list_has_exactly_ten_unique_agents() -> None:
@@ -48,7 +51,7 @@ def test_canonical_list_has_exactly_ten_unique_agents() -> None:
 
 
 def test_skeleton_mode_passes_without_agents_dir(tmp_path: Path) -> None:
-    errors, notes = agent_count.check(_root(tmp_path, ["packages/core"]))
+    errors, notes = agent_count.check(_root(tmp_path, ["packages/core"]), strict=False)
     assert errors == []
     assert any("skeleton" in n for n in notes)
 
@@ -56,6 +59,22 @@ def test_skeleton_mode_passes_without_agents_dir(tmp_path: Path) -> None:
 def test_strict_mode_requires_agents_dir(tmp_path: Path) -> None:
     errors, _ = agent_count.check(_root(tmp_path, []), strict=True)
     assert errors
+
+
+def test_strict_is_the_default_since_part_c(tmp_path: Path) -> None:
+    errors, _ = agent_count.check(_root(tmp_path, []))
+    assert any("agents/ directory is missing" in e for e in errors)
+    assert agent_count.main(["--root", str(_root(tmp_path, []))]) == 1
+    assert agent_count.main(["--root", str(tmp_path), "--skeleton"]) == 0
+
+
+def test_agent_without_spec_module_is_rejected(tmp_path: Path) -> None:
+    names = list(agent_count.CANONICAL_AGENTS)
+    root = _root(tmp_path, [f"agents/{n}" for n in names])
+    _make_agents(root, names)
+    (root / "agents" / "tester" / "src" / "devteam_agents" / "tester" / "spec.py").unlink()
+    errors, _ = agent_count.check(root)
+    assert errors == ["agents/tester has no AgentSpec module (src/devteam_agents/tester/spec.py)"]
 
 
 def test_exactly_ten_agents_pass(tmp_path: Path) -> None:
@@ -91,6 +110,7 @@ def test_members_without_agents_dir_rejected(tmp_path: Path) -> None:
 
 def test_real_repository_passes() -> None:
     assert agent_count.main(["--root", str(REPO_ROOT)]) == 0
+    assert agent_count.main(["--root", str(REPO_ROOT), "--strict"]) == 0
 
 
 # ------------------------------------------------------------------ doctor

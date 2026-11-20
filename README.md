@@ -7,7 +7,7 @@ DevTeam AI is a local-first, BRD-driven software development platform.
 3. A supervised team of **exactly ten AI agents** then designs, generates, tests, repairs, documents and packages the requested application.
 4. The agents work inside a central security and execution **harness**. Models run locally on Ollama; no paid service is used.
 
-> **Current state: Parts A and B approved (v0.2.0). Part C (harness core) in progress: checkpoints C.1, C.2 and C.3 done.**
+> **Current state: Parts A and B approved (v0.2.0). Part C (harness core) in progress: checkpoints C.1, C.2, C.3 and C.4 done; gate G-C not yet started.**
 > What exists:
 > - configuration, logging, trace context and secret redaction (Part A);
 > - a SQLite state database with migrations and automatic backups (Part A);

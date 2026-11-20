@@ -1,5 +1,6 @@
 # DevTeam AI — uv workspace root (roadmap §7, §8; decision D-26 option (a), proceeding on recommended default).
-# Agent packages (exactly ten) are added as workspace members in Part C. Adding an eleventh is prohibited (ADR-0002).
+# The ten agent packages (agents/<name>/, D-26) are workspace members. Adding an eleventh is prohibited (ADR-0002);
+# scripts/check_agent_count.py enforces it.
 
 [project]
 name = "devteam-ai"
@@ -13,6 +14,16 @@ dependencies = [
     "devteam-harness",
     "devteam-services",
     "devteam-api",
+    "devteam-agent-brd-analyst",
+    "devteam-agent-requirements-finalizer",
+    "devteam-agent-head",
+    "devteam-agent-architect",
+    "devteam-agent-database-developer",
+    "devteam-agent-backend-developer",
+    "devteam-agent-frontend-developer",
+    "devteam-agent-tester",
+    "devteam-agent-debugger-reviewer",
+    "devteam-agent-documenter",
 ]
 
 [tool.uv]
@@ -25,6 +36,16 @@ members = [
     "packages/harness",
     "packages/services",
     "apps/api",
+    "agents/brd_analyst",
+    "agents/requirements_finalizer",
+    "agents/head",
+    "agents/architect",
+    "agents/database_developer",
+    "agents/backend_developer",
+    "agents/frontend_developer",
+    "agents/tester",
+    "agents/debugger_reviewer",
+    "agents/documenter",
 ]
 
 [tool.uv.sources]
@@ -33,6 +54,16 @@ devteam-state = { workspace = true }
 devteam-harness = { workspace = true }
 devteam-services = { workspace = true }
 devteam-api = { workspace = true }
+devteam-agent-brd-analyst = { workspace = true }
+devteam-agent-requirements-finalizer = { workspace = true }
+devteam-agent-head = { workspace = true }
+devteam-agent-architect = { workspace = true }
+devteam-agent-database-developer = { workspace = true }
+devteam-agent-backend-developer = { workspace = true }
+devteam-agent-frontend-developer = { workspace = true }
+devteam-agent-tester = { workspace = true }
+devteam-agent-debugger-reviewer = { workspace = true }
+devteam-agent-documenter = { workspace = true }
 
 [dependency-groups]
 dev = [
@@ -69,18 +100,30 @@ ignore = [
 "**/migrations/versions/*.py" = ["N999"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["devteam_core", "devteam_state", "devteam_harness", "devteam_services", "devteam_api"]
+known-first-party = ["devteam_core", "devteam_state", "devteam_harness", "devteam_services", "devteam_api", "devteam_agents"]
 
 [tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "parents"
-# Banned-API rules for agents/** are introduced in Part C via agents/ruff.toml (roadmap §5.3).
+# Banned-API rules for agents/** live in agents/ruff.toml (roadmap §5.3), which extends this file.
 
 # ---------------------------------------------------------------- mypy
 [tool.mypy]
 python_version = "3.12"
 strict = true
 warn_unreachable = true
-mypy_path = ["packages/core/src", "packages/state/src", "packages/harness/src", "packages/services/src", "apps/api/src"]
+mypy_path = [
+    "packages/core/src", "packages/state/src", "packages/harness/src", "packages/services/src", "apps/api/src",
+    "agents/brd_analyst/src",
+    "agents/requirements_finalizer/src",
+    "agents/head/src",
+    "agents/architect/src",
+    "agents/database_developer/src",
+    "agents/backend_developer/src",
+    "agents/frontend_developer/src",
+    "agents/tester/src",
+    "agents/debugger_reviewer/src",
+    "agents/documenter/src",
+]
 explicit_package_bases = true
 namespace_packages = true
 plugins = ["pydantic.mypy"]
@@ -110,7 +153,7 @@ filterwarnings = ["error::DeprecationWarning:devteam_.*"]
 
 [tool.coverage.run]
 branch = true
-source = ["devteam_core", "devteam_state", "devteam_harness", "devteam_services", "devteam_api"]
+source = ["devteam_core", "devteam_state", "devteam_harness", "devteam_services", "devteam_api", "devteam_agents"]
 omit = ["*/migrations/*"]
 
 [tool.coverage.report]
@@ -119,8 +162,8 @@ skip_covered = false
 
 # ---------------------------------------------------------------- import-linter (roadmap §7.1)
 [tool.importlinter]
-root_packages = ["devteam_core", "devteam_state", "devteam_harness", "devteam_services", "devteam_api"]
-include_external_packages = false
+root_packages = ["devteam_core", "devteam_state", "devteam_harness", "devteam_services", "devteam_api", "devteam_agents"]
+include_external_packages = true  # needed to forbid HTTP clients and SQL libraries (Part C)
 
 [[tool.importlinter.contracts]]
 name = "devteam_core depends on no internal package"
@@ -145,3 +188,54 @@ name = "devteam_services must not depend on apps (roadmap 7.1)"
 type = "forbidden"
 source_modules = ["devteam_services"]
 forbidden_modules = ["devteam_api"]
+
+# ---- Part C.4: agent isolation (CLAUDE.md §5, roadmap §5.3, AC-C-04)
+
+[[tool.importlinter.contracts]]
+name = "agents may import only devteam_core and devteam_harness.agent_sdk"
+type = "forbidden"
+source_modules = ["devteam_agents"]
+forbidden_modules = [
+    "devteam_state", "devteam_services", "devteam_api",
+    "devteam_harness.approvals",
+    "devteam_harness.audit",
+    "devteam_harness.budgets",
+    "devteam_harness.errors",
+    "devteam_harness.executor",
+    "devteam_harness.guardrails",
+    "devteam_harness.iam",
+    "devteam_harness.llm_gateway",
+    "devteam_harness.observability",
+    "devteam_harness.prompts",
+    "devteam_harness.ratelimit",
+    "devteam_harness.resilience",
+    "devteam_harness.secrets",
+    "devteam_harness.tools",
+    "devteam_harness.validation",
+    "httpx", "sqlalchemy", "keyring", "psutil", "yaml", "opentelemetry",
+]
+allow_indirect_imports = true  # agent_sdk itself uses harness internals; agents may not import them
+
+[[tool.importlinter.contracts]]
+name = "the ten agents are independent of each other"
+type = "independence"
+modules = [
+    "devteam_agents.brd_analyst",
+    "devteam_agents.requirements_finalizer",
+    "devteam_agents.head",
+    "devteam_agents.architect",
+    "devteam_agents.database_developer",
+    "devteam_agents.backend_developer",
+    "devteam_agents.frontend_developer",
+    "devteam_agents.tester",
+    "devteam_agents.debugger_reviewer",
+    "devteam_agents.documenter",
+]
+
+[[tool.importlinter.contracts]]
+name = "only llm_gateway.providers may import HTTP clients (HC-02)"
+type = "forbidden"
+source_modules = ["devteam_core", "devteam_state", "devteam_harness", "devteam_services", "devteam_agents"]
+forbidden_modules = ["httpx"]
+ignore_imports = ["devteam_harness.llm_gateway.providers.** -> httpx"]
+unmatched_ignore_imports_alerting = "none"

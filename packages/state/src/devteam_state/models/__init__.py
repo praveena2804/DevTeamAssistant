@@ -195,9 +195,78 @@ class TaskAttempt(Base):
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
+class ApprovalRow(Base):
+    """A human approval decision (HC-13). Append-only (database triggers); verified on every use."""
+
+    __tablename__ = "approvals"
+
+    id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), index=True)
+    run_id: Mapped[str] = mapped_column(ForeignKey("runs.id"), index=True)
+    approval_type: Mapped[str] = mapped_column(String(32))
+    spec_version_id: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    spec_checksum: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    # "<run>:<type>:<spec version or ->": one decision per run, type and spec version (no double submit)
+    decision_key: Mapped[str] = mapped_column(String(200), unique=True)
+    decision: Mapped[str] = mapped_column(String(16))
+    decided_by: Mapped[str] = mapped_column(String(40))
+    decided_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    audit_event_id: Mapped[str] = mapped_column(String(40))
+
+
+class SecretReferenceRow(Base):
+    """A pointer to a keyring secret (HC-17). There is deliberately no value column."""
+
+    __tablename__ = "secret_references"
+
+    id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    project_id: Mapped[str | None] = mapped_column(ForeignKey("projects.id"), nullable=True, index=True)
+    name: Mapped[str] = mapped_column(String(100))
+    ref: Mapped[str] = mapped_column(String(120), unique=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class UsageCounter(Base):
+    """Persisted budget usage (HC-05) for one task or one run; ``key`` = ``<run>:<scope>:<task or ->``."""
+
+    __tablename__ = "usage_counters"
+
+    id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), index=True)
+    run_id: Mapped[str] = mapped_column(ForeignKey("runs.id", ondelete="CASCADE"), index=True)
+    task_id: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    scope: Mapped[str] = mapped_column(String(8))  # run | task
+    key: Mapped[str] = mapped_column(String(120), unique=True)
+    model_calls: Mapped[int] = mapped_column(Integer, default=0)
+    input_tokens: Mapped[int] = mapped_column(Integer, default=0)
+    output_tokens: Mapped[int] = mapped_column(Integer, default=0)
+    tool_calls: Mapped[int] = mapped_column(Integer, default=0)
+    bytes_written: Mapped[int] = mapped_column(Integer, default=0)
+    active_ms: Mapped[int] = mapped_column(Integer, default=0)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class TraceSpanRow(Base):
+    """A finished OpenTelemetry span (HC-11, D-30: local storage only). Attributes are allowlisted."""
+
+    __tablename__ = "trace_spans"
+
+    span_id: Mapped[str] = mapped_column(String(16), primary_key=True)
+    trace_id: Mapped[str] = mapped_column(String(32), index=True)
+    parent_span_id: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    name: Mapped[str] = mapped_column(String(100))
+    project_id: Mapped[str | None] = mapped_column(String(40), nullable=True, index=True)
+    start_ts: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    end_ts: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    duration_ms: Mapped[int] = mapped_column(Integer)
+    status: Mapped[str] = mapped_column(String(16))  # unset | ok | error
+    attributes: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+
 __all__ = [
     "NAMING_CONVENTION",
     "AgentTaskRow",
+    "ApprovalRow",
     "AuditChainHead",
     "AuditEvent",
     "Base",
@@ -206,6 +275,9 @@ __all__ = [
     "PrincipalRole",
     "Project",
     "Run",
+    "SecretReferenceRow",
     "SourceDocument",
     "TaskAttempt",
+    "TraceSpanRow",
+    "UsageCounter",
 ]

@@ -38,6 +38,7 @@ from devteam_core.contracts.tasks import AgentTask
 from devteam_core.logging import redact_value
 from devteam_harness.guardrails.config import Guardrails, ToolGrant
 from devteam_harness.iam.principals import AgentPrincipal, AnyPrincipal
+from devteam_state.repositories.audit import Outcome
 
 SPEC_APPROVAL_STAGES = frozenset({Stage.BUILD, Stage.DELIVERY, Stage.CHANGE_REQUEST})
 _AUDIT_PATH_CHARS = 120
@@ -152,11 +153,13 @@ class PolicyEngine:
 
 
 class AuditSink(Protocol):
+    """Where harness components write audit events (``devteam_harness.audit.DatabaseAuditSink``)."""
+
     def record(
         self,
         *,
         action: str,
-        outcome: str,
+        outcome: Outcome,
         principal_id: str | None,
         project_id: str | None,
         details: dict[str, Any],

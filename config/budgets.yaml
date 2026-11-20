@@ -1,0 +1,35 @@
+# HC-05 budgets and HC-12 retries (F-9, F-10; approved AP-008, F-9d = 180 s).
+#
+# Every limit is checked by the Budget Manager BEFORE the next action. Reaching one stops the task with
+# category budget_exhausted, is audited, and is never retried automatically (F-10c).
+# Values outside the approved min–max ranges are rejected at load (they are fixed in code, see
+# devteam_harness.budgets.config). Retries after a policy denial or an exhausted budget are always 0 and
+# cannot be configured here.
+version: 1
+
+profiles:
+  default:                       # F-11d: AgentTask.budget_profile names one of these
+    max_output_tokens: 1024      # F-9a answer length per model call
+    max_input_tokens: 3072       # F-9b input context per model call
+    context_window: 4096         # F-9c num_ctx
+    model_call_timeout_s: 180    # F-9d (owner ruling AP-008)
+    max_model_calls: 8           # F-9e per task
+    max_task_tokens: 32768       # F-9f per task (input + output)
+    max_task_minutes: 30         # F-9g wall-clock per task
+    max_tool_calls: 200          # F-9h per task
+    # F-9i (one file write) and F-9j (bytes per task) live in config/defaults.yaml `files:`
+
+run:
+  max_active_hours: 12           # F-9k active time per run (waiting/paused time is not counted)
+  max_tokens: 1500000            # F-9l
+  max_model_calls: 600           # F-9m
+
+resources:
+  min_free_ram_mb: 1024          # F-9n below this a model call is refused as resource_unavailable
+
+retries:
+  invalid_output: 2              # F-10a retries after invalid AI output (3 attempts in total)
+  transient: 2                   # F-10b retries after timeouts / connection errors
+  backoff_base_s: 2              # F-10b backoff: 2 s, then 4 s ...
+  backoff_max_s: 30              # ... never more than 30 s
+  task_reattempts: 1             # F-10d whole-task re-attempts by the Head Agent

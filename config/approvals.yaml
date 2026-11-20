@@ -1,0 +1,15 @@
+# HC-13 Approval Service: which human role may decide each approval type (roadmap §5.1, Spec §4).
+#
+# Only human roles can appear here (project_user, project_admin, reviewer). Agents and services never
+# approve anything; the harness refuses to load this file if it names any other principal kind.
+# bind_spec: the approval is bound to one spec version and its checksum, and is rejected for any other.
+version: 1
+
+approvals:
+  feasibility_decision: {roles: [project_user, project_admin], bind_spec: false}
+  spec_approval:        {roles: [project_admin], bind_spec: true}
+  substitution:         {roles: [project_user, project_admin], bind_spec: false}
+  test_maintenance:     {roles: [reviewer], bind_spec: true}
+  publish_github:       {roles: [project_admin], bind_spec: true}
+  destructive_db:       {roles: [project_admin], bind_spec: true}
+  db_switch:            {roles: [project_admin], bind_spec: true}

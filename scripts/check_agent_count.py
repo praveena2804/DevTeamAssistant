@@ -3,11 +3,12 @@
 Asserts that ``agents/`` contains exactly the ten canonical agent packages and that the root
 ``pyproject.toml`` lists exactly those ten as workspace members.
 
-Part A ships this as a **skeleton**: ``agents/`` does not exist until Part C, so the script verifies the
-canonical list itself and reports skeleton mode. From Part C onward (or with ``--strict``) a missing
-``agents/`` directory is an error.
+Since Part C (C.4) the check is **strict by default**: a missing ``agents/`` directory, a missing or extra
+package, a package that is not a workspace member, or a package without its ``AgentSpec`` module is an
+error. ``--skeleton`` restores the Part A behaviour (missing ``agents/`` is only a note) for old checkouts.
+``--strict`` is accepted for compatibility and is the default.
 
-Usage:  uv run python scripts/check_agent_count.py [--strict]
+Usage:  uv run python scripts/check_agent_count.py [--skeleton]
 """
 
 from __future__ import annotations
@@ -39,7 +40,7 @@ def _workspace_agent_members(pyproject: Path) -> list[str]:
     return [m.split("/", 1)[1] for m in members if isinstance(m, str) and m.startswith("agents/")]
 
 
-def check(root: Path, *, strict: bool = False) -> tuple[list[str], list[str]]:
+def check(root: Path, *, strict: bool = True) -> tuple[list[str], list[str]]:
     """Return ``(errors, notes)``."""
     errors: list[str] = []
     notes: list[str] = []
@@ -72,6 +73,9 @@ def check(root: Path, *, strict: bool = False) -> tuple[list[str], list[str]]:
     for name in found:
         if name in CANONICAL_AGENTS and not (agents_dir / name / "pyproject.toml").is_file():
             errors.append(f"agents/{name} is not a workspace package (no pyproject.toml)")
+        spec = agents_dir / name / "src" / "devteam_agents" / name / "spec.py"
+        if name in CANONICAL_AGENTS and not spec.is_file():
+            errors.append(f"agents/{name} has no AgentSpec module (src/devteam_agents/{name}/spec.py)")
     if sorted(members) != expected:
         errors.append(
             f"root pyproject.toml must list exactly the ten agents as members; found {sorted(members)}"
@@ -81,10 +85,11 @@ def check(root: Path, *, strict: bool = False) -> tuple[list[str], list[str]]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Ten-agent enforcement (L3)")
-    parser.add_argument("--strict", action="store_true", help="treat a missing agents/ directory as an error")
+    parser.add_argument("--strict", action="store_true", help="(default since Part C) kept for compatibility")
+    parser.add_argument("--skeleton", action="store_true", help="Part A mode: missing agents/ is a note")
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
     args = parser.parse_args(argv)
-    errors, notes = check(args.root, strict=args.strict)
+    errors, notes = check(args.root, strict=not args.skeleton)
     for note in notes:
         print(f"note: {note}")
     for error in errors:

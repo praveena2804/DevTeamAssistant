@@ -36,6 +36,21 @@ One section per approved part (roadmap §8). Entries are added at gate approval;
   changed. "Log intact" check on the Activity page, `GET /api/audit/verify`, `scripts/verify_audit.py`.
 - Run and task state machines with an attempt ledger; illegal status changes are refused and recorded.
 
+### Added (checkpoint C.4)
+
+- Budget Manager with persisted usage counters for every F-9 limit (`config/budgets.yaml`), checked before
+  each action; retry policy for F-10 (policy denials and exhausted budgets are never retried).
+- Approval Service (`config/approvals.yaml`): human roles only, bound to run and spec version + checksum;
+  forged, mismatched, stale, duplicate and out-of-band approvals are refused and audited.
+- Centralised LLM Gateway (no LiteLLM) with a scripted fake provider: secret and delimiting checks before
+  any call, one model call at a time, transient retries, structured-output validation, metadata-only audit.
+- Prompt and skill registry interfaces (skills grant no permission); local-only OpenTelemetry tracing to
+  SQLite with an attribute allowlist.
+- Agent SDK (`AgentSpec`, ten-agent `AgentRegistry`, restricted `AgentContext`) and the Agent Executor
+  lifecycle; the ten agent packages under `agents/` (declarations only).
+- Agent isolation enforced by import-linter, Ruff banned-API and AST rules; `check_agent_count.py` strict by
+  default. Migration `0004_execution`; `scripts/demo_part_c.py`.
+
 ## 0.2.0 — Part B: Project Intake, Document Extraction, Human IAM & Audit Foundation (G-B approved 2026-11-19)
 
 ### Added
