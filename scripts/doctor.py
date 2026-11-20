@@ -171,14 +171,29 @@ def check_disk(settings: Settings) -> Check:
 
 
 def check_api_token(settings: Settings) -> Check:
-    """HC-15: the per-install key exists (it is created on the API's first start). Never prints it."""
-    path = settings.api_token_path
-    if not path.exists():
-        return Check("api.token", "warn", f"not created yet; it appears at {path} after the API first starts")
-    length = len(path.read_text(encoding="utf-8").strip())
-    if length < 40:
-        return Check("api.token", "fail", f"{path} is too short; delete it and restart the API")
-    return Check("api.token", "ok", f"present at {path} (value not shown)")
+    """HC-15/HC-17: the per-install key is in the OS credential store (D-18). Never prints it."""
+    from devteam_harness.iam import API_TOKEN_REF, MIN_TOKEN_LENGTH  # noqa: PLC0415
+    from devteam_harness.secrets import SecretsUnavailableError, secrets_manager_from_settings  # noqa: PLC0415
+
+    if settings.api_token_path.exists():
+        return Check(
+            "api.token",
+            "warn",
+            f"plaintext key file {settings.api_token_path} still exists; run "
+            "uv run python scripts/migrate_api_token.py (the API will not start until it is migrated)",
+        )
+    try:
+        store = secrets_manager_from_settings(settings)
+        stored = store.get(API_TOKEN_REF)
+    except SecretsUnavailableError as exc:
+        return Check("api.token", "fail", f"credential store unavailable: {exc.message}")
+    if stored is None:
+        return Check(
+            "api.token", "warn", "not created yet; it is created in the credential store on first API start"
+        )
+    if len(stored.reveal()) < MIN_TOKEN_LENGTH:
+        return Check("api.token", "fail", "the stored key is too short; delete it from Credential Manager")
+    return Check("api.token", "ok", f"stored in {store.backend_description} (value not shown)")
 
 
 def run_checks(

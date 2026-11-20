@@ -1,0 +1,19 @@
+# HC-01 output guardrails: applied to every agent output after schema validation (Working Plan §10.1).
+#
+# Forbidden claims: agents cannot claim results only the harness can record (Spec §6.1). The scan covers
+# text the agent wrote itself; quoted BRD facts and user answers (provenance brd_fact / user_answer) and
+# source quotations are excluded, because a BRD may legitimately say "the user must be verified".
+version: 1
+max_output_chars: 60000
+
+forbidden_claims:
+  - id: tests_passed
+    pattern: '(?i)\b(all\s+)?(the\s+)?tests?\s+(have\s+|has\s+|are\s+)?(now\s+)?(passed|passing|pass|succeeded|green)\b'
+  - id: build_passed
+    pattern: '(?i)\bbuild\s+(has\s+|is\s+)?(now\s+)?(passed|passing|succeeded|successful|green)\b'
+  - id: verified_claim
+    pattern: '(?i)\b(is|are|now|been|fully|successfully)\s+verified\b|\brequirements?\s+(are\s+)?verified\b|\bstatus\s*[:=]\s*verified\b'
+  - id: approval_claim
+    pattern: '(?i)\b(i|we)\s+(have\s+)?approved\b|\b(spec(ification)?|plan|change|release)\s+(is\s+|has\s+been\s+|was\s+)?approved\b'
+  - id: deployment_claim
+    pattern: '(?i)\b(deployed|published|pushed)\s+to\s+(production|github|the\s+repository)\b'

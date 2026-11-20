@@ -2,10 +2,10 @@
 
 import ipaddress
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Self
 from urllib.parse import urlsplit
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 ProfileName = Literal["low_memory", "standard", "test"]
 LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
@@ -136,6 +136,16 @@ class AuthSettings(_Section):
         return tuple(origin.rstrip("/") for origin in value)
 
 
+class SecretsSettings(_Section):
+    """HC-17 secret storage (D-18, AP-007): the OS keyring only, never a plaintext file.
+
+    ``memory`` exists solely for the automated test suite and is rejected in every other profile.
+    """
+
+    backend: Literal["keyring", "memory"] = "keyring"
+    service_name: str = Field(default="devteam-ai", pattern=r"^[a-z][a-z0-9-]{2,40}$")
+
+
 class RateLimitSettings(_Section):
     """HC-18 API token-bucket limits (requests per minute)."""
 
@@ -156,7 +166,14 @@ class Settings(_Section):
     resources: ResourceSettings = ResourceSettings()
     uploads: UploadSettings = UploadSettings()
     auth: AuthSettings = AuthSettings()
+    secrets: SecretsSettings = SecretsSettings()
     ratelimit: RateLimitSettings = RateLimitSettings()
+
+    @model_validator(mode="after")
+    def _memory_secrets_only_in_tests(self) -> Self:
+        if self.secrets.backend == "memory" and self.profile != "test":
+            raise ValueError("secrets.backend 'memory' is allowed only in the test profile (D-18)")
+        return self
 
     # -- derived locations (absolute) ---------------------------------------------------------------
     @property

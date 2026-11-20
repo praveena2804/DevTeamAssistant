@@ -1,0 +1,76 @@
+# HC-01 central action policy (deny by default; roadmap §4.1, Spec §6, §11).
+#
+# Effective permission = this file ∩ the agent's AgentSpec ∩ the task's permitted_paths ∩ the stage rule.
+# Paths are relative to the project workspace (workspaces/<project_id>/). Agents write only under
+# generated/<area>/. The harness refuses to load this file if it grants more than the hard ceilings in
+# devteam_harness.guardrails.config (e.g. the Head Agent can never write files, the Tester can only
+# write tests). Editing this file can narrow permissions, never widen them past the specification.
+version: 1
+
+roles:
+  brd_analyst:
+    stages: [analysis]
+    tools:
+      read_extracted_document: {}
+      search_project_knowledge: {}
+
+  requirements_finalizer:
+    stages: [requirements]
+    tools:
+      read_extracted_document: {}
+      search_project_knowledge: {}
+
+  head:
+    stages: [build, delivery, change_request]
+    tools:
+      list_project_files: {read: [generated/]}
+
+  architect:
+    stages: [build, change_request]
+    tools:
+      read_project_file: {read: [generated/]}
+      list_project_files: {read: [generated/]}
+      write_project_file: {write: [generated/docs/, generated/contracts/]}
+      search_project_knowledge: {}
+
+  database_developer:
+    stages: [build, change_request]
+    tools:
+      read_project_file: {read: [generated/]}
+      list_project_files: {read: [generated/]}
+      write_project_file: {write: [generated/database/, generated/backend/models/]}
+
+  backend_developer:
+    stages: [build, change_request]
+    tools:
+      read_project_file: {read: [generated/]}
+      list_project_files: {read: [generated/]}
+      write_project_file: {write: [generated/backend/, generated/config/]}
+
+  frontend_developer:
+    stages: [build, change_request]
+    tools:
+      read_project_file: {read: [generated/]}
+      list_project_files: {read: [generated/]}
+      write_project_file: {write: [generated/frontend/]}
+
+  tester:
+    stages: [build, change_request]
+    tools:
+      read_project_file: {read: [generated/]}
+      list_project_files: {read: [generated/]}
+      write_project_file: {write: [generated/tests/]}
+
+  debugger_reviewer:
+    stages: [build, change_request]
+    tools:
+      read_project_file: {read: [generated/]}
+      list_project_files: {read: [generated/]}
+      write_project_file: {write: [generated/backend/, generated/frontend/, generated/database/, generated/config/]}
+
+  documenter:
+    stages: [delivery, change_request]
+    tools:
+      read_project_file: {read: [generated/]}
+      list_project_files: {read: [generated/]}
+      write_project_file: {write: [generated/docs/, generated/README.md, generated/PROJECT_DOCUMENTATION.md]}

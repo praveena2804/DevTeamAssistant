@@ -7,7 +7,7 @@ DevTeam AI is a local-first, BRD-driven software development platform.
 3. A supervised team of **exactly ten AI agents** then designs, generates, tests, repairs, documents and packages the requested application.
 4. The agents work inside a central security and execution **harness**. Models run locally on Ollama; no paid service is used.
 
-> **Current state: Parts A and B approved (v0.2.0). Part C (harness core) is being planned.**
+> **Current state: Parts A and B approved (v0.2.0). Part C (harness core) in progress: checkpoints C.1 and C.2 done.**
 > What exists:
 > - configuration, logging, trace context and secret redaction (Part A);
 > - a SQLite state database with migrations and automatic backups (Part A);
@@ -148,7 +148,9 @@ gitleaks dir . --no-banner
 | Ollama not reachable | Start Ollama; the URL must be `127.0.0.1`/`localhost` |
 | Docker engine not running | Needed only from Part E |
 | `gitleaks` not found right after `winget install` | Open a new terminal so `PATH` refreshes |
-| UI says "You are not signed in" | Open the sign-in link printed by `scripts/dev.ps1` (or run `uv run python -m devteam_api.signin_link`). The key is stored in `data/api_token`; never share it |
+| API refuses to start: "A plaintext sign-in key file still exists" | Run `uv run python scripts/migrate_api_token.py` (or just `./scripts/dev.ps1`, which runs it). It moves the old `data/api_token` into Windows Credential Manager under four checks and deletes the file only if all pass |
+| API refuses to start: "no secure OS credential store is available" | The key can only live in Windows Credential Manager; there is no file fallback. Check that the `PYTHON_KEYRING_BACKEND` environment variable is not set |
+| UI says "You are not signed in" | Open the sign-in link printed by `scripts/dev.ps1` (or run `uv run python -m devteam_api.signin_link`). The key is stored in Windows Credential Manager (entry `devteam-ai`), never in a file; never share it |
 | A large PDF takes a long time to upload | Expected for now: reading happens during the upload (≈40 s for 300 pages on this laptop). Background reading arrives with the worker (Part D) |
 | `npm test` fails with "Vitest failed to find the current suite" | Run it from PowerShell or a path that starts with an upper-case `C:`; a lower-case drive letter loads Vitest twice |
 | API reports `degraded` | The state DB schema is behind; restart the API (it backs up, then migrates), or run `uv run alembic -c packages/state/alembic.ini upgrade head` |

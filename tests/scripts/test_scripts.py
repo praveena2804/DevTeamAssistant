@@ -186,15 +186,21 @@ def test_version_parsing(text: str, expected: tuple[int, ...] | None) -> None:
     assert doctor._version(text) == expected
 
 
-def test_doctor_api_token_states_never_print_the_key(isolated_settings: Settings) -> None:
-    from devteam_harness.iam import load_or_create_token  # noqa: PLC0415
-
-    assert doctor.check_api_token(isolated_settings).status == "warn"  # not created yet
-    token = load_or_create_token(isolated_settings.api_token_path)
+def test_doctor_api_token_states_never_print_the_key(
+    isolated_settings: Settings, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    token = "K" * 43
+    monkeypatch.setenv("DTTEST_SECRET__API_TOKEN", token)
     check = doctor.check_api_token(isolated_settings)
-    assert check.status == "ok" and token not in check.detail
-    isolated_settings.api_token_path.write_text("short", encoding="utf-8")
+    assert check.status == "ok" and token not in check.detail and "memory" in check.detail
+    monkeypatch.delenv("DTTEST_SECRET__API_TOKEN")
+    assert doctor.check_api_token(isolated_settings).status == "warn"  # not created yet
+    monkeypatch.setenv("DTTEST_SECRET__API_TOKEN", "short-token")
     assert doctor.check_api_token(isolated_settings).status == "fail"
+    isolated_settings.api_token_path.parent.mkdir(parents=True, exist_ok=True)
+    isolated_settings.api_token_path.write_text(token, encoding="utf-8")
+    legacy = doctor.check_api_token(isolated_settings)
+    assert legacy.status == "warn" and "migrate_api_token" in legacy.detail and token not in legacy.detail
 
 
 def test_signin_link_puts_the_key_only_in_the_fragment(
@@ -204,8 +210,10 @@ def test_signin_link_puts_the_key_only_in_the_fragment(
 
     monkeypatch.setenv("DEVTEAM_ROOT", str(isolated_settings.root))
     monkeypatch.setenv("DEVTEAM_PROFILE", "test")
+    token = "L" * 43
+    monkeypatch.setenv("DTTEST_SECRET__API_TOKEN", token)  # test-profile memory keyring seed
     assert signin_link.main() == 0
     link = capsys.readouterr().out.strip()
-    token = isolated_settings.api_token_path.read_text(encoding="utf-8").strip()
+    assert not isolated_settings.api_token_path.exists()
     assert link == f"http://127.0.0.1:5173/signin#token={token}"
     assert token not in link.split("#", 1)[0]  # never in the part a browser sends to a server

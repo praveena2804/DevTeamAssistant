@@ -14,6 +14,19 @@ One section per approved part (roadmap §8). Entries are added at gate approval;
 - Contract-level enforcement: safe workspace paths, never-assume provenance, bound handoffs, no agent
   field for test results, verification or approval, human-only approvals, trust-labelled model messages.
 
+### Added (checkpoint C.2)
+
+- Deny-by-default policy engine (role x tool x path x stage) with audited denials and code-level ceilings that
+  configuration cannot exceed; agent and service identities; input guardrails (data delimiting, secret
+  refusal, injection flags) and output guardrails (forbidden claims, secret detection).
+- Secrets in Windows Credential Manager only (`keyring`), no plaintext fallback; the sign-in key moved there
+  under four checks (D-18a) and the old `data/api_token` file removed.
+
+### Changed (checkpoint C.2)
+
+- The API refuses to start if the credential store is unavailable or a plaintext key file still exists.
+- Logs are redacted at the source as well as in the platform's own formatters.
+
 ## 0.2.0 — Part B: Project Intake, Document Extraction, Human IAM & Audit Foundation (G-B approved 2026-11-19)
 
 ### Added

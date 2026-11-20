@@ -47,9 +47,13 @@ uploads:                             # HC-20 limits (Part B plan, approved AP-00
   chunk_max_chars: 2000
 
 auth:                                # HC-15 local API token (D-29 (a))
-  token_file: api_token              # under data_dir (gitignored); never logged
+  token_file: api_token              # legacy Part B location, read only by the D-18a migration
   cookie_name: devteam_session
   allowed_origins: ["http://127.0.0.1:5173", "http://localhost:5173"]
+
+secrets:                             # HC-17 (D-18): Windows Credential Manager via keyring; no file fallback
+  backend: keyring
+  service_name: devteam-ai
 
 ratelimit:                           # HC-18 API limits, requests per minute
   enabled: true

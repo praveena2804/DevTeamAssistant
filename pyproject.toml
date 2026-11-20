@@ -104,6 +104,7 @@ markers = [
     "llm: requires local Ollama (never in CI)",
     "slow: long end-to-end tests",
     "acceptance: Spec §23 acceptance scenarios (Part R)",
+    "keyring: touches the real OS keyring (Windows Credential Manager) under a throw-away service name",
 ]
 filterwarnings = ["error::DeprecationWarning:devteam_.*"]
 

@@ -9,6 +9,7 @@ dependencies = [
     "devteam-harness",
     "devteam-services",
     "fastapi>=0.115",
+    "httpx>=0.28",  # in-process ASGI client for the D-18a migration checks (token_checks.py)
     "python-multipart>=0.0.18",
     "uvicorn>=0.32",
 ]

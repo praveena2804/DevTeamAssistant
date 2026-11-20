@@ -55,3 +55,6 @@ evals/reports/tmp/
 Thumbs.db
 desktop.ini
 .idea/
+
+# Microsoft Office lock files (documents open in Word)
+~$*

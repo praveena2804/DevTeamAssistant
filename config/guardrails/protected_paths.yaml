@@ -1,0 +1,9 @@
+# HC-01 protected workspace paths. The harness also enforces a built-in minimum list: this file may add
+# entries but cannot remove the built-in ones (uploads/, extracted/, runs/, package/).
+version: 1
+
+# Platform-owned areas no agent may write (uploaded originals, extraction output, run evidence, packages).
+never_writable: [uploads/, extracted/, runs/, package/]
+
+# Raw uploads are read only through the extractor (read_extracted_document), never as files.
+never_readable: [uploads/]
