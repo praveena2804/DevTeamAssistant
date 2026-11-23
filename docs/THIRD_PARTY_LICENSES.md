@@ -55,6 +55,7 @@ MPL-2.0 is a file-level copyleft licence. Its conditions attach to the MPL-licen
 | click | 8.5.1 | BSD-3-Clause |
 | cryptography | 50.0.2 | Apache-2.0 OR BSD-3-Clause |
 | distro | 1.9.0 | Apache Software License |
+| docker | 7.2.0 | Apache-2.0 |
 | fastapi | 0.165.0 | MIT |
 | h11 | 0.16.0 | MIT License |
 | httpcore | 1.0.9 | BSD-3-Clause |
@@ -101,6 +102,7 @@ MPL-2.0 is a file-level copyleft licence. Its conditions attach to the MPL-licen
 | python-dotenv | 1.2.4 | BSD-3-Clause |
 | python-multipart | 0.0.34 | Apache-2.0 |
 | pywin32-ctypes | 0.2.3 | BSD-3-Clause |
+| pywin32 | 312 | Python Software Foundation License |
 | PyYAML | 6.0.3 | MIT License |
 | requests | 2.34.2 | Apache Software License |
 | requests-toolbelt | 1.0.0 | Apache Software License |

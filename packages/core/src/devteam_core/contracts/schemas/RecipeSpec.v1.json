@@ -1,0 +1,89 @@
+{
+  "additionalProperties": false,
+  "description": "An allowlisted command: fixed argv, fixed environment, declared outputs. Never a shell string.",
+  "properties": {
+    "argv": {
+      "items": {
+        "maxLength": 300,
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Argv",
+      "type": "array"
+    },
+    "env": {
+      "patternProperties": {
+        "^[A-Z][A-Z0-9_]{0,63}$": {
+          "type": "string"
+        }
+      },
+      "title": "Env",
+      "type": "object"
+    },
+    "image": {
+      "enum": [
+        "python_api",
+        "node_web"
+      ],
+      "title": "Image",
+      "type": "string"
+    },
+    "outputs": {
+      "default": [],
+      "items": {
+        "pattern": "^/work/\\.devteam/out/[a-z0-9_.-]+$",
+        "type": "string"
+      },
+      "title": "Outputs",
+      "type": "array"
+    },
+    "recipe": {
+      "pattern": "^[a-z][a-z0-9_]{2,39}$",
+      "title": "Recipe",
+      "type": "string"
+    },
+    "reports_tests": {
+      "default": false,
+      "title": "Reports Tests",
+      "type": "boolean"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "timeout_s": {
+      "maximum": 3600,
+      "minimum": 1,
+      "title": "Timeout S",
+      "type": "integer"
+    },
+    "tool": {
+      "enum": [
+        "request_build",
+        "request_test_run",
+        "request_migration_check"
+      ],
+      "title": "Tool",
+      "type": "string"
+    },
+    "workdir": {
+      "pattern": "^/work(/[a-z0-9_.-]+)*$",
+      "title": "Workdir",
+      "type": "string"
+    }
+  },
+  "required": [
+    "recipe",
+    "image",
+    "argv",
+    "workdir",
+    "env",
+    "timeout_s",
+    "tool"
+  ],
+  "title": "RecipeSpec",
+  "type": "object"
+}

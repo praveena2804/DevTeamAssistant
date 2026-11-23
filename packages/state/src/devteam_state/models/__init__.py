@@ -389,6 +389,61 @@ class AgentOutputRow(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
+class TemplateVerificationRow(Base):
+    """A starter-kit self-test request and result (Part E, migration 0007). Status only moves forward."""
+
+    __tablename__ = "template_verifications"
+
+    id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    template_id: Mapped[str] = mapped_column(String(64), index=True)
+    template_version: Mapped[str] = mapped_column(String(20))
+    template_checksum: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    status: Mapped[str] = mapped_column(String(16), index=True)
+    recipes: Mapped[list[Any]] = mapped_column(JSON)
+    image_digests: Mapped[dict[str, Any]] = mapped_column(JSON)
+    duration_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    peak_memory_mb: Mapped[float | None] = mapped_column(nullable=True)
+    requested_by: Mapped[str] = mapped_column(String(200))
+    requested_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    reason: Mapped[str | None] = mapped_column(String(2000), nullable=True)
+
+
+class SandboxExecutionRow(Base):
+    """One container run (``SandboxExecution`` contract). Append-only (trigger).
+
+    ``project_id`` is NULL for platform work (template verification), as for ``audit_events``.
+    """
+
+    __tablename__ = "sandbox_executions"
+
+    id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    project_id: Mapped[str | None] = mapped_column(String(40), nullable=True, index=True)
+    run_id: Mapped[str | None] = mapped_column(String(40), nullable=True, index=True)
+    verification_id: Mapped[str | None] = mapped_column(
+        ForeignKey("template_verifications.id", ondelete="CASCADE"), nullable=True, index=True
+    )
+    recipe: Mapped[str] = mapped_column(String(40))
+    status: Mapped[str] = mapped_column(String(16))
+    payload: Mapped[dict[str, Any]] = mapped_column(JSON)  # the validated SandboxExecution contract
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    finished_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class ResourceLock(Base):
+    """D-46: the single LLM/sandbox resource lease (``id`` = 1). Holder ``llm`` or ``sandbox``."""
+
+    __tablename__ = "resource_lock"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    holder: Mapped[str] = mapped_column(String(16))
+    owner: Mapped[str] = mapped_column(String(120))
+    pid: Mapped[int] = mapped_column(Integer)
+    acquired_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    heartbeat_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
 __all__ = [
     "NAMING_CONVENTION",
     "AgentOutputRow",
@@ -402,14 +457,17 @@ __all__ = [
     "Principal",
     "PrincipalRole",
     "Project",
+    "ResourceLock",
     "Run",
     "RunEventRow",
     "RunJob",
+    "SandboxExecutionRow",
     "SecretReferenceRow",
     "SourceDocument",
     "SpecVersionRow",
     "TaskAttempt",
     "TaskPlanRow",
+    "TemplateVerificationRow",
     "TraceSpanRow",
     "UsageCounter",
     "WorkerLease",

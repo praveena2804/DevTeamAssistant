@@ -1,0 +1,43 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "engine": {
+      "const": "sqlite",
+      "default": "sqlite",
+      "title": "Engine",
+      "type": "string"
+    },
+    "message": {
+      "anyOf": [
+        {
+          "pattern": "^[a-z0-9_]{1,40}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Message"
+    },
+    "recipe": {
+      "enum": [
+        "alembic_upgrade",
+        "alembic_autogenerate"
+      ],
+      "title": "Recipe",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "recipe"
+  ],
+  "title": "MigrationCheckRequest",
+  "type": "object"
+}

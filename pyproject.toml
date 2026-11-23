@@ -140,7 +140,7 @@ plugins = ["pydantic.mypy"]
 exclude = ["^apps/web/", "/migrations/versions/"]
 
 [[tool.mypy.overrides]]
-module = ["alembic.*", "pdfplumber.*", "docx.*", "lxml.*"]
+module = ["alembic.*", "pdfplumber.*", "docx.*", "lxml.*", "docker.*"]  # docker: no stubs shipped (Part E)
 ignore_missing_imports = true
 
 # ---------------------------------------------------------------- pytest
@@ -258,6 +258,30 @@ source_modules = [
 forbidden_modules = ["httpx"]
 ignore_imports = ["devteam_harness.llm_gateway.providers.** -> httpx"]
 unmatched_ignore_imports_alerting = "none"
+
+# ---- Part E.1: sandbox boundaries (Part E plan 3.1; D-50)
+
+[[tool.importlinter.contracts]]
+name = "only sandbox.engine may import the Docker SDK (HC-14)"
+type = "forbidden"
+source_modules = [
+    "devteam_core", "devteam_state", "devteam_harness", "devteam_services", "devteam_agents",
+    "devteam_orchestration", "devteam_worker", "devteam_api",
+]
+forbidden_modules = ["docker", "requests"]
+ignore_imports = [
+    "devteam_harness.sandbox.engine -> docker",
+    "devteam_harness.sandbox.engine -> docker.utils.proxy",
+    "devteam_harness.sandbox.engine -> requests",
+    "devteam_harness.sandbox.engine -> requests.adapters",
+]
+unmatched_ignore_imports_alerting = "none"
+
+[[tool.importlinter.contracts]]
+name = "agents, orchestration, API and worker never touch the Docker engine directly"
+type = "forbidden"
+source_modules = ["devteam_agents", "devteam_orchestration", "devteam_api", "devteam_worker"]
+forbidden_modules = ["devteam_harness.sandbox.engine", "devteam_harness.sandbox.tls"]
 
 # ---- Part D.1: orchestration and worker boundaries (roadmap 7.1, Part D plan 3.1)
 

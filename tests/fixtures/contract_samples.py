@@ -17,6 +17,7 @@ from devteam_core.contracts import drafts as dr
 from devteam_core.contracts import events as ev
 from devteam_core.contracts import orchestration as o
 from devteam_core.contracts import records as r
+from devteam_core.contracts import sandbox as sb
 from devteam_core.contracts import tools as t
 from devteam_core.contracts.base import Provenance, SourceRef
 from devteam_core.contracts.errors import ErrorCategory, ErrorRef
@@ -582,6 +583,107 @@ def _samples() -> dict[str, Callable[[], Contract]]:
             available_in_part="M",
             recorded_at=NOW,
         ),
+        **_sandbox_samples(),
+    }
+
+
+_LIMITS = {
+    "memory_mb": 1536,
+    "cpus": 1.5,
+    "pids": 256,
+    "wall_clock_s": 600,
+    "tmpfs_mb": 256,
+    "work_copy_mb": 512,
+    "output_kb": 1024,
+}
+_DIGEST = "sha256:" + "a" * 64
+
+
+def _counts() -> sb.TestCounts:
+    return sb.TestCounts(tests=3, passed=3, failed=0, errors=0, skipped=0)
+
+
+def _outcome() -> sb.RecipeOutcome:
+    return sb.RecipeOutcome(
+        recipe="pytest_api",
+        status=sb.SandboxExecutionStatus.COMPLETED,
+        execution_id=new_id("sbx"),
+        exit_code=0,
+        tests=_counts(),
+        reports_tests=True,
+        duration_ms=1200,
+        peak_memory_mb=180.5,
+    )
+
+
+def _sandbox_samples() -> dict[str, Callable[[], Contract]]:
+    return {
+        "ContainerLimits": lambda: sb.ContainerLimits(**_LIMITS),
+        "TestCounts": _counts,
+        "RecipeSpec": lambda: sb.RecipeSpec(
+            recipe="pytest_api",
+            image="python_api",
+            argv=("python", "-m", "pytest", "tests"),
+            workdir="/work/backend",
+            env={"CI": "1"},
+            timeout_s=300,
+            reports_tests=True,
+            outputs=("/work/.devteam/out/junit.xml",),
+            tool="request_test_run",
+        ),
+        "SandboxExecution": lambda: sb.SandboxExecution(
+            execution_id=new_id("sbx"),
+            project_id=PROJECT,
+            run_id=RUN,
+            recipe="pytest_api",
+            image="devteam-sandbox/python_api",
+            image_digest=_DIGEST,
+            engine_version="29.1.3",
+            limits=sb.ContainerLimits(**_LIMITS),
+            status=sb.SandboxExecutionStatus.COMPLETED,
+            exit_code=0,
+            duration_ms=1200,
+            peak_memory_mb=180.5,
+            tests=_counts(),
+            outputs=("runs/x/sandbox/junit.xml",),
+            started_at=NOW,
+            finished_at=NOW + timedelta(seconds=2),
+        ),
+        "RecipeOutcome": _outcome,
+        "TemplateVerification": lambda: sb.TemplateVerification(
+            verification_id=new_id("tvf"),
+            template_id="react_fastapi_sqlite",
+            template_version="1.0.0",
+            template_checksum=SHA,
+            status=sb.TemplateVerificationStatus.PASSED,
+            recipes=(_outcome(),),
+            image_digests={"python_api": _DIGEST},
+            duration_ms=60_000,
+            peak_memory_mb=400.0,
+            requested_by="owner",
+            requested_at=NOW,
+            finished_at=NOW + timedelta(minutes=1),
+        ),
+        "TemplateDependencies": lambda: sb.TemplateDependencies(
+            python=("fastapi==0.120.0",), node=("react==19.2.0", "@vitejs/plugin-react==5.1.0")
+        ),
+        "TemplateManifest": lambda: sb.TemplateManifest(
+            template_id="html_fastapi_sqlite",
+            version="1.0.0",
+            description="Plain HTML frontend with a FastAPI backend and SQLite.",
+            frontend="html",
+            backend="fastapi",
+            database="sqlite",
+            auth="none",
+            writable_slots=("backend/app/api/**",),
+            tester_slots=("backend/tests/**",),
+            protected_files=("backend/app/main.py",),
+            self_test=("ruff_check", "pytest_api"),
+            dependencies=sb.TemplateDependencies(python=("fastapi==0.120.0",)),
+            app_runtime_dependencies=("fastapi",),
+            env_placeholders={"DATABASE_URL": "sqlite:///./data/app.db"},
+        ),
+        "MigrationCheckRequest": lambda: sb.MigrationCheckRequest(recipe="alembic_upgrade"),
     }
 
 

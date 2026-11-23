@@ -47,6 +47,7 @@ from devteam_core.contracts.orchestration import (
     ServiceOutcome,
 )
 from devteam_core.contracts.records import DOMAIN_RECORDS, EntityAttribute, EntityRelationship
+from devteam_core.contracts.sandbox import SANDBOX_MODELS
 from devteam_core.contracts.state import RunState
 from devteam_core.contracts.statuses import EXPECTED_AGENT_COUNT, AgentRole
 from devteam_core.contracts.tasks import AgentTask, TaskPlan
@@ -88,6 +89,7 @@ _REGISTERED: tuple[type[Contract], ...] = (
     PlanValidationReport,
     ServiceOutcome,
     *DRAFT_MODELS,
+    *SANDBOX_MODELS,
 )
 CONTRACT_MODELS: dict[str, type[Contract]] = {model.__name__: model for model in _REGISTERED}
 

@@ -1,0 +1,307 @@
+{
+  "$defs": {
+    "ContainerLimits": {
+      "additionalProperties": false,
+      "properties": {
+        "cpus": {
+          "exclusiveMinimum": 0,
+          "maximum": 8,
+          "title": "Cpus",
+          "type": "number"
+        },
+        "memory_mb": {
+          "maximum": 8192,
+          "minimum": 64,
+          "title": "Memory Mb",
+          "type": "integer"
+        },
+        "output_kb": {
+          "maximum": 16384,
+          "minimum": 1,
+          "title": "Output Kb",
+          "type": "integer"
+        },
+        "pids": {
+          "maximum": 4096,
+          "minimum": 16,
+          "title": "Pids",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "tmpfs_mb": {
+          "maximum": 2048,
+          "minimum": 16,
+          "title": "Tmpfs Mb",
+          "type": "integer"
+        },
+        "wall_clock_s": {
+          "maximum": 3600,
+          "minimum": 1,
+          "title": "Wall Clock S",
+          "type": "integer"
+        },
+        "work_copy_mb": {
+          "maximum": 4096,
+          "minimum": 1,
+          "title": "Work Copy Mb",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "memory_mb",
+        "cpus",
+        "pids",
+        "wall_clock_s",
+        "tmpfs_mb",
+        "work_copy_mb",
+        "output_kb"
+      ],
+      "title": "ContainerLimits",
+      "type": "object"
+    },
+    "SandboxExecutionStatus": {
+      "enum": [
+        "completed",
+        "failed",
+        "timed_out",
+        "oom_killed",
+        "blocked",
+        "cancelled"
+      ],
+      "title": "SandboxExecutionStatus",
+      "type": "string"
+    },
+    "TestCounts": {
+      "additionalProperties": false,
+      "properties": {
+        "errors": {
+          "minimum": 0,
+          "title": "Errors",
+          "type": "integer"
+        },
+        "failed": {
+          "minimum": 0,
+          "title": "Failed",
+          "type": "integer"
+        },
+        "passed": {
+          "minimum": 0,
+          "title": "Passed",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "skipped": {
+          "minimum": 0,
+          "title": "Skipped",
+          "type": "integer"
+        },
+        "tests": {
+          "minimum": 0,
+          "title": "Tests",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "tests",
+        "passed",
+        "failed",
+        "errors",
+        "skipped"
+      ],
+      "title": "TestCounts",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "duration_ms": {
+      "minimum": 0,
+      "title": "Duration Ms",
+      "type": "integer"
+    },
+    "engine_version": {
+      "anyOf": [
+        {
+          "maxLength": 40,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Engine Version"
+    },
+    "execution_id": {
+      "pattern": "^sbx_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Execution Id",
+      "type": "string"
+    },
+    "exit_code": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Exit Code"
+    },
+    "finished_at": {
+      "format": "date-time",
+      "title": "Finished At",
+      "type": "string"
+    },
+    "image": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Image",
+      "type": "string"
+    },
+    "image_digest": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Image Digest"
+    },
+    "limits": {
+      "$ref": "#/$defs/ContainerLimits"
+    },
+    "outputs": {
+      "default": [],
+      "items": {
+        "maxLength": 240,
+        "type": "string"
+      },
+      "title": "Outputs",
+      "type": "array"
+    },
+    "peak_memory_mb": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Peak Memory Mb"
+    },
+    "project_id": {
+      "anyOf": [
+        {
+          "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Project Id"
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reason"
+    },
+    "recipe": {
+      "pattern": "^[a-z][a-z0-9_]{2,39}$",
+      "title": "Recipe",
+      "type": "string"
+    },
+    "run_id": {
+      "anyOf": [
+        {
+          "pattern": "^run_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Run Id"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "started_at": {
+      "format": "date-time",
+      "title": "Started At",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/SandboxExecutionStatus"
+    },
+    "tests": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/TestCounts"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "verification_id": {
+      "anyOf": [
+        {
+          "pattern": "^tvf_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Verification Id"
+    }
+  },
+  "required": [
+    "execution_id",
+    "recipe",
+    "image",
+    "limits",
+    "status",
+    "duration_ms",
+    "started_at",
+    "finished_at"
+  ],
+  "title": "SandboxExecution",
+  "type": "object"
+}

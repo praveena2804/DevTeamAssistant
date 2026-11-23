@@ -1,0 +1,157 @@
+{
+  "$defs": {
+    "TemplateDependencies": {
+      "additionalProperties": false,
+      "properties": {
+        "node": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Node",
+          "type": "array"
+        },
+        "python": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Python",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "title": "TemplateDependencies",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "``template.yaml`` of a starter kit (Part E plan §3.6).",
+  "properties": {
+    "app_runtime_dependencies": {
+      "items": {
+        "maxLength": 100,
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "App Runtime Dependencies",
+      "type": "array"
+    },
+    "auth": {
+      "const": "none",
+      "title": "Auth",
+      "type": "string"
+    },
+    "backend": {
+      "const": "fastapi",
+      "title": "Backend",
+      "type": "string"
+    },
+    "database": {
+      "const": "sqlite",
+      "title": "Database",
+      "type": "string"
+    },
+    "dependencies": {
+      "$ref": "#/$defs/TemplateDependencies"
+    },
+    "description": {
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Description",
+      "type": "string"
+    },
+    "env_placeholders": {
+      "patternProperties": {
+        "^[A-Z][A-Z0-9_]{0,63}$": {
+          "type": "string"
+        }
+      },
+      "title": "Env Placeholders",
+      "type": "object"
+    },
+    "frontend": {
+      "enum": [
+        "react",
+        "html"
+      ],
+      "title": "Frontend",
+      "type": "string"
+    },
+    "protected_files": {
+      "items": {
+        "maxLength": 200,
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Protected Files",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "self_test": {
+      "items": {
+        "pattern": "^[a-z][a-z0-9_]{2,39}$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Self Test",
+      "type": "array"
+    },
+    "template_id": {
+      "pattern": "^[a-z][a-z0-9_]{2,63}$",
+      "title": "Template Id",
+      "type": "string"
+    },
+    "tester_slots": {
+      "default": [],
+      "items": {
+        "maxLength": 200,
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Tester Slots",
+      "type": "array"
+    },
+    "version": {
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "title": "Version",
+      "type": "string"
+    },
+    "writable_slots": {
+      "items": {
+        "maxLength": 200,
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Writable Slots",
+      "type": "array"
+    }
+  },
+  "required": [
+    "template_id",
+    "version",
+    "description",
+    "frontend",
+    "backend",
+    "database",
+    "auth",
+    "writable_slots",
+    "protected_files",
+    "self_test",
+    "dependencies",
+    "app_runtime_dependencies",
+    "env_placeholders"
+  ],
+  "title": "TemplateManifest",
+  "type": "object"
+}

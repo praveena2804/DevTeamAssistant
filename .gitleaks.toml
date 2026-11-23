@@ -17,4 +17,7 @@ paths = [
   '''(^|/)\.ruff_cache/''',
   '''(^|/)\.hypothesis/''',
   '''^apps/web/dist/''',
+  # Part E (D-50): the sandbox client key. Gitignored (data/), never committed, and stored only ENCRYPTED
+  # (PKCS#8 AES-256; passphrase in Windows Credential Manager). Exactly this one file, nothing else in data/.
+  '''^data/sandbox_tls/client-key\.enc\.pem$''',
 ]
