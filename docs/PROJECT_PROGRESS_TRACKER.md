@@ -99,3 +99,7 @@ Following your choice of the free Docker Engine inside WSL instead of Docker Des
 **Run 25 — Part E plan, third version**
 
 Following your review, I corrected the Part E plan. Licences are now handled in sensible groups: the free operating-system parts inside the containers may carry GPL licences, while the libraries that end up in generated applications must be permissive, and all of it is checked automatically. Before anything depends on them, three small trial checks will prove that the secure connection to Docker works with the locked key, that the React starter kit builds without internet, and that files move in and out of containers safely; if any of them fails, I stop and ask you. PostgreSQL is moved to Part K. I also wrote down exactly what "free only" means and where every download comes from. I recorded your Docker decision in its decision document. No Part E code was written and nothing was installed; these changes are not yet committed.
+
+**Run 26 — Part D approved**
+
+You approved Part D. I marked it as version 0.4.0, joined it into the main line of the project on this laptop and labelled it, as was done for Parts A to C. Nothing was uploaded to GitHub.

@@ -18,15 +18,15 @@
 
 | Item | Value |
 |---|---|
-| Current milestone | **M1 Harness & Orchestration** (C approved; D implemented, awaiting G-D) |
-| Current part | **Part D: implemented (D.1–D.5), awaiting the owner's review of gate G-D** (AP-017). Commits `ce49ce3`, `bf21f36`, `4fd4a3f`, `ab5eea0`, `17d0456` and the D.5 commit. Completion report `docs/parts/PART-D-COMPLETION-REPORT.md` |
+| Current milestone | **M1 Harness & Orchestration** (C and D approved; E in progress) |
+| Current part | **Part E: in progress** (AP-021), branch `part/e-sandbox`. Part D approved (G-D, AP-020), merged into `main`, tagged `v0.4.0` / `part-d-approved` |
 | Overall status | Parts A, B, C approved (v0.1.0–v0.3.0). Part D implemented on `part/d-orchestration`, **pushed to GitHub as that branch** (AP-018); not approved, merged into `main` or tagged. Part E plan **revision 3** (`docs/parts/PART-E-PLAN.md`), awaiting owner approval |
 | Last completed activity | D.2 completion (direct local Ollama provider, ten real-model agent behaviours, answer contracts, migration 0006), D.3 graph, D.4 worker + run-control API, D.5 UI + E2E. Complete run (all tests incl. real model): **2,172 passed / 0 failed / 1 skipped** (TR-0100…TR-0108) |
 | Code written | Parts A–C plus Part D: `devteam_orchestration` (graph, runtime, steps, commands, execution, services, prompts, diagram), `devteam_worker`, ten agent behaviours, Head core, Ollama provider, run API, web run pages |
 | Dependencies installed | Python (uv, `uv.lock`), npm (`package-lock.json`), Gitleaks; Ollama 0.40.16 with `qwen2.5:3b`, `qwen2.5-coder:3b`, `qwen2.5:1.5b` (and others, unused) |
 | Git / GitHub operations | `main` = `622f6f5` on GitHub and locally (unchanged). `origin/part/d-orchestration` = `fe567bd` (six Part D commits, pushed 2026-11-23 under AP-018, TR-0109). Six tags identical locally and on GitHub. The Part E plan commit is local only |
 | Tests executed | TR-0001…TR-0108 |
-| Blocking items | Owner review of G-D. Open owner questions: KI-030 (one compiled graph vs subgraph objects), model selection (Part A, pending), KI-033 (pre-existing Part C flaky test). For Part E: D-07 |
+| Blocking items | None for Part E. Open owner items: model selection (Part A, pending), D-21 (platform licence; D-52 depends on it) |
 | Next authorised action | **None.** Wait for the owner's G-D review and the Part E plan review (D-07 and the other §2 rulings). Do not implement Part E or start Part F |
 
 ---
@@ -51,8 +51,8 @@
 | A | Foundation, Repository Conventions & Environment Benchmark | M0 | **Approved** | G-A | Retrospectively, at G-A (DV-001) | 2026-11-19 (AP-005) | `part-a-approved`, `v0.1.0` (local) |
 | B | Intake, Extraction, Human IAM & Audit Foundation | M0 | **Approved** | G-B | 2026-11-19 (AP-005) | 2026-11-19 (AP-006) | `part-b-approved`, `v0.2.0` (local) |
 | C | Shared Contracts & Harness Core | M1 | **Approved** | G-C | 2026-11-20 (AP-007, AP-008) | 2026-11-23 (AP-013) | `v0.3.0`, `part-c-approved` (local) |
-| D | LangGraph Orchestration, Ten Agents & Head Agent Deterministic Core | M1 | **Implemented — awaiting G-D** | G-D | 2026-11-23 (AP-015) | — | — (branch `part/d-orchestration`, local) |
-| E | Isolated Execution Sandbox & Target-App Templates | M1 | Planning | G-E | — | — | — |
+| D | LangGraph Orchestration, Ten Agents & Head Agent Deterministic Core | M1 | **Approved** | G-D | 2026-11-23 (AP-015) | 2026-11-23 (AP-020) | `v0.4.0`, `part-d-approved` |
+| E | Isolated Execution Sandbox & Target-App Templates | M1 | **In progress** | G-E | 2026-11-23 (AP-021) | — | — (branch `part/e-sandbox`, local) |
 | F | LLM Gateway, Model Routing, Context & Memory, and RAG | M1 | Not started | G-F | — | — | — |
 | G | Capability Catalog & Feasibility Gate | M2 | Not started | G-G | — | — | — |
 | H | BRD Analyst | M2 | Not started | G-H | — | — | — |
@@ -111,6 +111,8 @@ Only explicit owner approvals are recorded here.
 | AP-017 | 2026-11-23 | **D-44 (a)**: bring a minimal local Ollama integration forward into Part D through the existing gateway; genuine local calls only; no fake providers, prepared responses, simulated execution, cloud AI or LiteLLM. **KI-026 certifi** accepted conditionally (same terms as orjson). **Part C fake provider** kept only for Part C tests and demo; unreachable from runs, worker, API, agents. **Complete D.2–D.5 in one continuous run**, checkpoints as internal milestones with separate commits; no push; then one report and stop | Owner | Owner message 2026-11-23 "I have reviewed the D.2 implementation report. I approve continuing …" | `docs/parts/PART-D-PLAN.md` §13 |
 | AP-018 | 2026-11-23 | **Push all completed work through Part D** to GitHub (no Part E), verify remote branches and history; then **prepare the Part E plan only** (no implementation) | Owner | Owner message 2026-11-23 "Push all completed work through Part D to GitHub … prepare a detailed Part E implementation plan … Do not implement Part E yet" | TR-0109; `docs/parts/PART-E-PLAN.md` |
 | AP-019 | 2026-11-23 | **D-07 ruled: (b) Docker Engine inside WSL2.** Requirement: **completely free implementation**: free and open-source tools only; no paid subscriptions, proprietary paid dependencies or cloud-service costs. Re-plan Part E accordingly and present the final plan; **no implementation until approved** | Owner | Owner message 2026-11-23 "I approve option B: Docker Engine inside WSL2. My requirement is a completely free implementation …" | `docs/parts/PART-E-PLAN.md` (rev. 2, §2.1, §3.10, §12) |
+| AP-020 | 2026-11-23 | **G-D approved: Part D approved** as reported. Merge `part/d-orchestration` into `main` locally, tag `v0.4.0` and `part-d-approved` (no push). **KI-030 accepted** (one compiled graph with four labelled node groups). **KI-033: leave the Part C test unchanged** | Owner | Owner answers 2026-11-23 to the G-D question ("Approve Part D") and KI-033 question ("Leave it") | `docs/parts/PART-D-COMPLETION-REPORT.md` |
+| AP-021 | 2026-11-23 | **Part E execution authorised** using `PART-E-PLAN.md` rev. 3 as the source of truth. **Approved:** D-04, D-08, D-16 (PostgreSQL deferred to K), D-24, D-45, D-46, D-47, D-48, D-49, D-50 (conditional on spike S-1), D-51. **D-52 stays dependent on D-21.** Docker Engine set-up run by the assistant as root inside WSL (`wsl -u root`). Stop if S-1, S-2 or S-3 fails; never weaken security; one local commit per checkpoint; no push; no Part F | Owner | Owner message 2026-11-23 "Continue development of DevTeam AI and implement Part E …" and answer "You run it as root" | `docs/parts/PART-E-PLAN.md` |
 
 *Roadmap v2.0: adopted as the working default under AP-003. An explicit formal "roadmap approved" statement has not been given, so it is recorded as adopted, not approved.*
 
@@ -125,11 +127,11 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | D-01 | Feasibility decision point | Open | — | — | Roadmap §6.5, §13 G; Plan §20 G |
 | D-02 | Coverage denominator | Open | — | — | Roadmap §13 G |
 | D-03 | Approval-screen edit behaviour | Open | — | — | Roadmap §13 I |
-| D-04 | Target-app auth patterns | **Open, owner ruling required.** Proposed in PART-E-PLAN rev. 3: no authentication in Part E (awaiting approval) | — | — | Roadmap §13 E/K |
+| D-04 | Target-app auth patterns | **Ruled (AP-021)** | (a) no authentication in Part E; `auth` slot reserved in the manifest | 2026-11-23 | Roadmap §13 E/K |
 | D-05 | Deterministic vs LLM share (Head/Architect) | Open | — | — | Roadmap §13 J |
 | D-06 | Per-role model overrides | Open (recommended (b); audited 2026-11-19, see `docs/architecture/MODEL_ROUTING.md`) | — | — | Roadmap §13 F |
 | D-07 | Docker distribution / licensing | **Ruled (AP-019)** | (b) Docker Engine inside WSL2 (`Ubuntu-24.04`); Docker Desktop not used; completely free, open-source tools only. ADR-0007 to be set to Accepted (b) in E.1 | 2026-11-23 | Roadmap §9, §13 A/E; ADR-0007; PART-E-PLAN §2.1, §3.10, §12 |
-| D-08 | Offline sandbox vs installs/audits | Open. Proposed in PART-E-PLAN rev. 3: prebuilt images with locked dependencies, offline execution (awaiting approval) | — | — | Roadmap §13 E/N |
+| D-08 | Offline sandbox vs installs/audits | **Ruled (AP-021)** | (a) prebuilt images with locked dependencies; offline execution; audits at image build ("not run" recorded honestly) | 2026-11-23 | Roadmap §13 E/N |
 | D-09 | Frontend behaviour verification | Open | — | — | Roadmap §13 L/N |
 | D-10 | Test-maintenance approver | Open | — | — | Roadmap §13 N |
 | D-11 | Platform UI login | **Ruled (AP-005)** | (a) no login; loopback + per-install token | 2026-11-19 | Roadmap §13 B; PART-B-PLAN §2 |
@@ -137,7 +139,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | D-13 | Folder layout | **Superseded by D-26** | — | 2026-11-18 | Roadmap §20 |
 | D-14 | Stable ID scope | Open | — | — | Roadmap §13 H/Q |
 | D-15 | Platform-UI E2E automation | **Ruled (AP-005)** | (b) API E2E + manual UI demo until R | 2026-11-19 | Roadmap §15 |
-| D-16 | PostgreSQL Docker validation | Open. Proposed in PART-E-PLAN rev. 3: disabled, PostgreSQL execution **deferred to Part K**, no PostgreSQL code path in E (awaiting approval; deviation from roadmap §13 E wording to be recorded on approval) | — | — | Roadmap §13 E/K |
+| D-16 | PostgreSQL Docker validation | **Ruled (AP-021)** | PostgreSQL execution **deferred to Part K**; no PostgreSQL code path in E (DV-022) | 2026-11-23 | Roadmap §13 E/K |
 | D-17 | Two-stage Completion Gate | Open | — | — | Roadmap §13 N/O |
 | D-18 | Secret store / GitHub auth | **Ruled (AP-007)** for platform secrets | Windows Credential Manager via `keyring`; no plaintext fallback; D-18a key migration with four checks. GitHub PAT half still open (Part P) | 2026-11-20 | Roadmap §13 C/P; PART-C-PLAN §2.0 |
 | D-19 | Pages eligibility | Open | — | — | Roadmap §13 P |
@@ -145,7 +147,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | D-21 | Platform licence | **Open — owner ruling required** (no `LICENSE` file created; does not block A) | — | — | Roadmap §8 |
 | D-22 | MVP supporting-file types | **Ruled (AP-005)** | (b) PDF, DOCX, TXT **and MD** (MD read as plain text). Deviates from Spec §5.1 "PDF, DOCX, TXT initially" by owner decision | 2026-11-19 | Roadmap §13 B, §20; Spec §5.1 |
 | D-23 | DB test ownership | Open | — | — | Roadmap §13 K |
-| D-24 | Integration/Build Service classification | Open. Proposed in PART-E-PLAN rev. 3: deterministic service, not an agent (awaiting approval) | — | — | Roadmap §4.2 |
+| D-24 | Integration/Build Service classification | **Ruled (AP-021)** | Deterministic service, not an agent | 2026-11-23 | Roadmap §4.2 |
 | D-25 | BRD_ANALYSIS.md ownership | Open | — | — | Roadmap §13 H/O |
 | D-26 | uv workspace with per-agent packages | **Ruled (AP-007)** | (a) uv workspace; agents in `agents/<agent_name>/` | 2026-11-20 | Roadmap §7, §8; ADR-0005 |
 | D-27 | Parallel execution policy | **Ruled (AP-015)** | (b): only deterministic, model-free nodes may fan out, limited by `resources.max_parallel_deterministic` (1 on `low_memory`); LLM calls and sandbox runs always sequential | 2026-11-23 | Roadmap §6.6; PART-D-PLAN §2.1 |
@@ -166,6 +168,14 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | D-42 | Background extraction (KI-013) | **Ruled (AP-015)** | Not in D: extraction stays in the upload request (Part B behaviour unchanged) | 2026-11-23 | PART-D-PLAN §2.2 |
 | D-43 | External audit-head copy (KI-019) | **Deferred (AP-015)** | Not implemented in D | 2026-11-23 | PART-D-PLAN §2.2 |
 | D-44 | How agent nodes run in Part D now that a real provider is required (KI-025) | **Ruled (AP-017): option (a)** | Minimal direct Ollama provider in the LLM Gateway (loopback only, no LiteLLM); all agent executions are genuine local model calls | 2026-11-23 | PART-D-PLAN §13; `providers/ollama.py` |
+| D-45 | Docker/WSL memory cap | **Ruled (AP-021)** | Owner-managed `.wslconfig`, 4 GB; doctor warns | 2026-11-23 | PART-E-PLAN §2.3 |
+| D-46 | Cross-process LLM/sandbox lock | **Ruled (AP-021)** | SQLite resource lease | 2026-11-23 | PART-E-PLAN §2.3 |
+| D-47 | Sandbox in the run graph | **Ruled (AP-021)** | No graph wiring in Part E | 2026-11-23 | PART-E-PLAN §2.3 |
+| D-48 | File transfer into containers | **Ruled (AP-021)** | Docker archive API copy-in/out; no host bind mounts | 2026-11-23 | PART-E-PLAN §2.3, §3.12 |
+| D-49 | Who starts template verification | **Ruled (AP-021)** | Manual request (UI or script), run by the worker | 2026-11-23 | PART-E-PLAN §2.3 |
+| D-50 | Windows → engine connection | **Ruled (AP-021), conditional on spike S-1** | Mutual TLS on loopback `127.0.0.1:2376`, encrypted client key, passphrase in Credential Manager | 2026-11-23 | PART-E-PLAN §3.11 |
+| D-51 | Docker Engine source | **Ruled (AP-021)** | Ubuntu archive `docker.io` | 2026-11-23 | PART-E-PLAN §2.3 |
+| D-52 | Licence of template files in generated apps | Open — **depends on D-21** | — | — | PART-E-PLAN §2.3 |
 
 ---
 
@@ -614,10 +624,10 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | KI-027 | 2026-11-23 | The Debugger & Code Reviewer is reached only when a repair is routed; in Part D the stand-in test runner never fails, so normal runs do not exercise it | Repair path untested end to end | Tested directly with the real model (`test_runtime.py`); real repair loop in Part N | Open (by design) |
 | KI-028 | 2026-11-23 | Clarification form and change approval are compiled but fail closed (no critical-gap producer before Part I; change requests in Part Q) | Those gates cannot be passed in Part D | Parts I and Q | Open (by design) |
 | KI-029 | 2026-11-23 | D-40 gives back a crashed attempt only up to the contract cap of 4 attempts | After two crashes on a default task, a further crash consumes an attempt | Revisit if crash loops are seen; the >3-crash block still applies | Open |
-| KI-030 | 2026-11-23 | **Architecture reading:** one compiled LangGraph graph with four node groups (`subgraph` metadata) rather than four LangGraph subgraph objects (ADR-0001 wording) | The compiled edges equal the approved transition table exactly; cancels end the run directly across groups | **Owner confirmation** requested in the completion report | Open |
+| KI-030 | 2026-11-23 | **Architecture reading:** one compiled LangGraph graph with four node groups (`subgraph` metadata) rather than four LangGraph subgraph objects (ADR-0001 wording) | The compiled edges equal the approved transition table exactly; cancels end the run directly across groups | **Accepted by the owner (AP-020)** | Closed |
 | KI-031 | 2026-11-23 | The Part D analyst reads the first 12 BRD pieces (one bounded batch) | Larger BRDs are only partly analysed in Part D | Part H (full analysis) | Open (by design) |
 | KI-032 | 2026-11-23 | Design notes come from a 3B local model: helpful but not authoritative | Content may be imprecise | Labelled "not built, run, tested or verified"; forbidden-claim scan of every written file; real generation in K–L | Open (by design) |
-| KI-033 | 2026-11-23 | **Pre-existing Part C flaky test:** `tests/security/test_audit_chain.py::test_tampering_is_detected_at_the_right_entry[statements8-6-altered]` replaces the first hash character with `f`; when the hash already starts with `f` (1 in 16) nothing changes and the test fails | Random CI failure; no product defect | Owner decision to fix the Part C test (e.g. flip the character) | Open |
+| KI-033 | 2026-11-23 | **Pre-existing Part C flaky test:** `tests/security/test_audit_chain.py::test_tampering_is_detected_at_the_right_entry[statements8-6-altered]` replaces the first hash character with `f`; when the hash already starts with `f` (1 in 16) nothing changes and the test fails | Random CI failure; no product defect | Owner decision (AP-020): **leave the test unchanged**; a flake is re-run and recorded | Open (accepted) |
 | KI-034 | 2026-11-23 | Your real `data/state.db` is still at revision 0004 | None until the app starts | The API backs it up and migrates it to 0006 at the next `scripts/dev.ps1` start (Part A behaviour); rehearsed on a copy (TR-0107) | Open (expected) |
 | KI-035 | 2026-11-23 | Long real-model runs stop when the laptop enters Modern Standby (observed 17:55–19:01) | A run can appear frozen; it resumes when the machine wakes (the worker continues) | Keep the laptop awake during long runs | Open (environment) |
 | KI-002 | 2026-11-18 | Any earlier AI Agent Harness discussion outside this session was not accessible. The roadmap uses only the 21-item harness list from owner instruction #2 | Possible gap if earlier discussion had additional requirements | Owner to confirm nothing is missing | Open |
@@ -641,6 +651,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | DV-019 | 2026-11-23 | D.3 | One compiled graph with four node groups instead of four subgraph objects (KI-030); project-scoped run API paths; `behaviour.py` instead of `stub.py`; no intake `Send` fan-out (nothing pending under D-42 (a), D-27 (b) limit 1) | Exact table conformance; Part B path convention; real behaviours | Agent (owner confirmation requested for KI-030) | PART-D-PLAN §3.1, §3.7, §5 |
 | DV-020 | 2026-11-23 | D.2–D.4 | Approved-part files edited minimally: `tests/security/test_executor.py` l.74 (scripted answer matches the new answer contract), `tests/integration/test_migrations.py` and `apps/api/tests/test_system.py` (head 0006), `tests/security/test_api_security.py` (route inventory + 5 new routes, its review purpose), `apps/api/src/devteam_api/main.py` (router, approvals), core settings/contracts (additive) | Required by Part D; behaviour of A–C unchanged | Agent | §6 |
 | DV-021 | 2026-11-23 | D.2 | Migration `0006_agent_outputs` added (plan listed only 0005) | Outputs must survive restarts; state holds IDs only | Agent | PART-D-PLAN §3.9 |
+| DV-022 | 2026-11-23 | E | Roadmap §13 E lists "PostgreSQL behind a flag" in the Migration Runner; Part E implements SQLite only and refuses PostgreSQL requests | Owner ruling D-16 (AP-021): PostgreSQL execution deferred to Part K (memory risk, no consumer before K) | Owner | PART-E-PLAN §2.2 |
 
 ---
 
