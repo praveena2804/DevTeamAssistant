@@ -20,14 +20,14 @@
 |---|---|
 | Current milestone | **M1 Harness & Orchestration** (C approved; D implemented, awaiting G-D) |
 | Current part | **Part D: implemented (D.1–D.5), awaiting the owner's review of gate G-D** (AP-017). Commits `ce49ce3`, `bf21f36`, `4fd4a3f`, `ab5eea0`, `17d0456` and the D.5 commit. Completion report `docs/parts/PART-D-COMPLETION-REPORT.md` |
-| Overall status | Parts A, B, C approved (v0.1.0–v0.3.0). Part D implemented on `part/d-orchestration` (local); not approved, merged, tagged or pushed |
+| Overall status | Parts A, B, C approved (v0.1.0–v0.3.0). Part D implemented on `part/d-orchestration`, **pushed to GitHub as that branch** (AP-018); not approved, merged into `main` or tagged. Part E plan drafted (`docs/parts/PART-E-PLAN.md`), awaiting review |
 | Last completed activity | D.2 completion (direct local Ollama provider, ten real-model agent behaviours, answer contracts, migration 0006), D.3 graph, D.4 worker + run-control API, D.5 UI + E2E. Complete run (all tests incl. real model): **2,172 passed / 0 failed / 1 skipped** (TR-0100…TR-0108) |
 | Code written | Parts A–C plus Part D: `devteam_orchestration` (graph, runtime, steps, commands, execution, services, prompts, diagram), `devteam_worker`, ten agent behaviours, Head core, Ollama provider, run API, web run pages |
 | Dependencies installed | Python (uv, `uv.lock`), npm (`package-lock.json`), Gitleaks; Ollama 0.40.16 with `qwen2.5:3b`, `qwen2.5-coder:3b`, `qwen2.5:1.5b` (and others, unused) |
-| Git / GitHub operations | `main` = `622f6f5` on GitHub and locally. Part D commits are local on `part/d-orchestration`; **nothing pushed** (AP-017: "Do not push to GitHub") |
+| Git / GitHub operations | `main` = `622f6f5` on GitHub and locally (unchanged). `origin/part/d-orchestration` = `fe567bd` (six Part D commits, pushed 2026-11-23 under AP-018, TR-0109). Six tags identical locally and on GitHub. The Part E plan commit is local only |
 | Tests executed | TR-0001…TR-0108 |
 | Blocking items | Owner review of G-D. Open owner questions: KI-030 (one compiled graph vs subgraph objects), model selection (Part A, pending), KI-033 (pre-existing Part C flaky test). For Part E: D-07 |
-| Next authorised action | **None.** Part D is complete and reported; wait for the owner's review. Do not start Part E or F |
+| Next authorised action | **None.** Wait for the owner's G-D review and the Part E plan review (D-07 and the other §2 rulings). Do not implement Part E or start Part F |
 
 ---
 
@@ -52,7 +52,7 @@
 | B | Intake, Extraction, Human IAM & Audit Foundation | M0 | **Approved** | G-B | 2026-11-19 (AP-005) | 2026-11-19 (AP-006) | `part-b-approved`, `v0.2.0` (local) |
 | C | Shared Contracts & Harness Core | M1 | **Approved** | G-C | 2026-11-20 (AP-007, AP-008) | 2026-11-23 (AP-013) | `v0.3.0`, `part-c-approved` (local) |
 | D | LangGraph Orchestration, Ten Agents & Head Agent Deterministic Core | M1 | **Implemented — awaiting G-D** | G-D | 2026-11-23 (AP-015) | — | — (branch `part/d-orchestration`, local) |
-| E | Isolated Execution Sandbox & Target-App Templates | M1 | Not started | G-E | — | — | — |
+| E | Isolated Execution Sandbox & Target-App Templates | M1 | Planning | G-E | — | — | — |
 | F | LLM Gateway, Model Routing, Context & Memory, and RAG | M1 | Not started | G-F | — | — | — |
 | G | Capability Catalog & Feasibility Gate | M2 | Not started | G-G | — | — | — |
 | H | BRD Analyst | M2 | Not started | G-H | — | — | — |
@@ -109,6 +109,7 @@ Only explicit owner approvals are recorded here.
 | AP-015 | 2026-11-23 | **Part D plan approved**: D-27 (b); D-38 (owner wording: "Stub runs are allowed but must be clearly labelled, with no fake AI execution or verification"; how this applies to the D.2 stubs is to be confirmed before D.2); D-39; D-40 (block a task after more than 3 consecutive crashes); D-41; D-42; **D-43 deferred**. Push `622f6f5` first and verify; then **D.1 only**, report before D.2 | Owner | Owner message 2026-11-23 "I approve the Part D plan with the following decisions …" | `docs/parts/PART-D-PLAN.md` |
 | AP-016 | 2026-11-23 | **D.1 approved. KI-023 accepted conditionally**: verify the exact `orjson` version and licence expression, preserve all licence notices, document MPL-2.0 obligations in a third-party licence inventory, never modify orjson source. **D-38 revised**: "Use real AI providers only. Do not use fake providers, mock AI providers, deterministic fake responses, prepared answers, or simulated agent outputs … If real-provider configuration or safe execution is not available, stop and report the blocker." **Start D.2 only**; commit D.2 separately; do not push D.1; stop after D.2 | Owner | Owner message 2026-11-23 "D.1 is approved. My decisions: …" | `docs/parts/PART-D-PLAN.md` §12 |
 | AP-017 | 2026-11-23 | **D-44 (a)**: bring a minimal local Ollama integration forward into Part D through the existing gateway; genuine local calls only; no fake providers, prepared responses, simulated execution, cloud AI or LiteLLM. **KI-026 certifi** accepted conditionally (same terms as orjson). **Part C fake provider** kept only for Part C tests and demo; unreachable from runs, worker, API, agents. **Complete D.2–D.5 in one continuous run**, checkpoints as internal milestones with separate commits; no push; then one report and stop | Owner | Owner message 2026-11-23 "I have reviewed the D.2 implementation report. I approve continuing …" | `docs/parts/PART-D-PLAN.md` §13 |
+| AP-018 | 2026-11-23 | **Push all completed work through Part D** to GitHub (no Part E), verify remote branches and history; then **prepare the Part E plan only** (no implementation) | Owner | Owner message 2026-11-23 "Push all completed work through Part D to GitHub … prepare a detailed Part E implementation plan … Do not implement Part E yet" | TR-0109; `docs/parts/PART-E-PLAN.md` |
 
 *Roadmap v2.0: adopted as the working default under AP-003. An explicit formal "roadmap approved" statement has not been given, so it is recorded as adopted, not approved.*
 
@@ -280,6 +281,8 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | CH-0107 | 2026-11-23 | D.4 | `devteam_orchestration/commands.py`; `apps/worker/src/devteam_worker/{__init__,__main__,main,worker}.py`; `apps/worker/tests/{test_worker,test_worker_kill}.py`; `apps/api/src/devteam_api/{main.py (router + approvals),routers/runs.py,run_schemas.py}`; `apps/api/openapi.json`; `apps/web/src/api/schema.d.ts`; `tests/integration/test_runs_api.py`; `tests/security/test_api_security.py` (inventory + 5 routes); `scripts/dev.ps1`; `docs/runbooks/worker.md` | Worker, run control, crash recovery | LG-07, LG-08, LG-11, HS-17 | TR-0103, TR-0104 | Done (`17d0456`) |
 | CH-0108 | 2026-11-23 | D.5 | `apps/web/src/{App.tsx,api/client.ts,styles.css,pages/ProjectPage.tsx}` (modified); `components/RunsSection.tsx`, `pages/{RunPage,TracePage,RunHistoryPage,PartD.test}.tsx` (created); `tests/e2e/test_e2e_2_run.py`, `tests/fixtures/loopback_only/sitecustomize.py` (created) | UI, E2E-2 with loopback-only jail and canary scan | HS-18, E2E-2 | TR-0105…TR-0108 | Done (D.5 commit) |
 | CH-0109 | 2026-11-23 | D | `docs/parts/PART-D-PLAN.md` (status, §13), `docs/parts/PART-D-COMPLETION-REPORT.md` (created), `docs/architecture/contracts.md`, `CHANGELOG.md`, `README.md`, trackers | Documentation | Tracker rule | — | Done (D.5 commit) |
+| CH-0110 | 2026-11-23 | Git | No file change: `git push -u origin part/d-orchestration` (new remote branch, `fe567bd`) and verification. `main` and tags not changed; Part D not merged (G-D pending) | Owner request | AP-018 | TR-0109 | Done |
+| CH-0111 | 2026-11-23 | E plan | `docs/parts/PART-E-PLAN.md` (created); this tracker (§1, §2, §3 AP-018, §5, §6, §7 TR-0109, §11); progress tracker Run 23 | Part E plan per Working Plan §20 Part E and template §21.1; no Part E code | AP-018 | — | Done (local commit, not pushed) |
 | CH-0044 | 2026-11-20 | C | `docs/parts/PART-C-PLAN.md` (status table; §2 rewritten as §2.0 rulings + §2.1 full F-1…F-11 table with values, defaults, min/max, rationale, dependents; new §10 checkpoint breakdown; confirmation line); `CLAUDE.md` §11 (stale "Git not authorised" sentence aligned with AP-005); this tracker (§1, §3 AP-007, §4 D-18/D-26/D-30/D-32, §11) | Record AP-007; owner asked for the full F table. First-draft error corrected: context 8,000 tokens exceeded the benchmarked 4,096 window | AP-007 | — | Done (plan awaiting F approval) |
 | CH-0043 | 2026-11-19 | C | `docs/parts/PART-C-PLAN.md` (created, on branch `part/c-harness-core`, uncommitted until approval) | Part C plan: scope C.1–C.4, decisions D-18/D-18a/D-26/D-30/D-32, flagged field values F-1…F-11, design, tests, demo, risks | Roadmap §13 C; Plan §20 C | — | Awaiting owner approval |
 | CH-0042 | 2026-11-19 | B | Version 0.1.0 → 0.2.0 in all `pyproject.toml` files, `apps/web/package.json`, lock files; `CHANGELOG.md` (0.2.0 section); `README.md`; this tracker; `docs/PROJECT_PROGRESS_TRACKER.md` (Run 10); local Git: release commit on `part/b-intake`, merged into `main` (`--no-ff`), tags `v0.2.0` + `part-b-approved` | Part B release after G-B | AP-006 | TR-0035 | Done |
@@ -407,6 +410,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | CH-0107 | Created/Modified | worker, commands, API run router/schemas, `main.py` l.(lifespan: `approval_rules`, `approvals`; `include_router(runs)`), `scripts/dev.ps1` (worker start/stop) | `Worker` (lease, `_beat`, `recover`, `run_once`), `main`; `start_run`, `request_*`, `submit_gate_decision`; 15 routes | D.4 | LG-07, LG-08 |
 | CH-0108 | Created/Modified | web pages, client, e2e test, network jail | `RunsSection`, `RunPage`, `GatePanel`, `useRunEvents`, `TracePage`, `RunHistoryPage`; run client functions | D.5 | HS-18 |
 | CH-0109 | Created/Modified | documentation and trackers | §13, completion report, Run 22 | Docs | Tracker rule |
+| CH-0111 | Created/Modified | `docs/parts/PART-E-PLAN.md`; `docs/IMPLEMENTATION_TRACKER.md`; `docs/PROJECT_PROGRESS_TRACKER.md` | whole plan (§0–§11, proposed D-45…D-49); §1, §2 row E, AP-018, CH-0110/0111, TR-0109, §11; Run 23 | Part E planning | AP-018 |
 | CH-0051 | Modified | `settings.py`; `config/defaults.yaml`; `config/profiles/test.yaml` | `SecretsSettings`, `Settings.secrets`, `_memory_secrets_only_in_tests`; `secrets:` sections | D-18 | AP-007 |
 | CH-0052 | Created | `config/guardrails/*.yaml` (4) | Whole files | HC-01 | HS-08 |
 | CH-0053 | Created / Modified | `iam/principals.py`; `iam/__init__.py` | Whole file; exports | HC-15 | HS-07 |
@@ -544,6 +548,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | TR-0106 | 2026-11-23 | D.5 | `pytest tests/e2e/test_e2e_2_run.py -m llm` | 1 (passed; also inside TR-0108) | 3 earlier runs failed: (1) jail variable named `DEVTEAM_NET_LOG` was correctly rejected by the strict settings loader → renamed; (2) the laptop entered Modern Standby 17:55–19:01 (Windows power log) and froze the run → re-run under a process-scoped keep-awake request; (3) canary scan cast binary checkpoints to text → now scans raw bytes | — | Console |
 | TR-0107 | 2026-11-23 | D | Static: `ruff check .`; `ruff format --check .`; `mypy packages apps scripts` (164 files) + `mypy agents tests/...` (49); `lint-imports` (12 kept); `check_agent_count.py`; `check_agent_rules.py`; `export_contract_schemas.py --check` (92); `export_openapi.py` + `npm run check:api`; `uvx pip-audit --strict` runtime and dev; `gitleaks detect`; migration rehearsal on a read-only copy of `data/state.db` (0004→0006→0004→0006) | all clean | 0 | — | No known vulnerabilities; no leaks; counts unchanged, chain intact, real file byte-identical |
 | TR-0108 | 2026-11-23 | D final | `pytest -m "not docker and not acceptance" --cov` (everything incl. `llm` and `slow`, with a keep-awake request) ; `pytest -m security` | **2,172 passed / 0 failed / 1 skipped** | 0 | 1 (symlink, KI-020) | Coverage 94% (all tests incl. real model). Security 1,445 passed, 1 skipped. A preceding fast run (TR during standby) showed 1 failure of the pre-existing flaky Part C test KI-033 |
+| TR-0109 | 2026-11-23 | Git | Pre-push: `git merge-base --is-ancestor main part/d-orchestration` (yes); forbidden-path check on `main..part/d-orchestration` (none); `gitleaks git . --log-opts=main..part/d-orchestration` (6 commits, no leaks). `git push -u origin part/d-orchestration` (`GIT_TERMINAL_PROMPT=0`). Post: `git fetch --tags --prune`; `git ls-remote --heads origin`; `git rev-parse` local vs remote; `git log origin/main..origin/part/d-orchestration`; local vs remote tag comparison | — | — | — | New branch `origin/part/d-orchestration` = `fe567bd`, 6 commits above `origin/main` = `622f6f5` (unchanged). Tags identical (6). No force-push |
 
 ---
 
@@ -638,14 +643,15 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 
 **Pending:**
 
-1. **Part D implemented (D.1–D.5, AP-017)** on `part/d-orchestration`; completion report written. Waiting for the owner's G-D review. On approval: merge, `v0.4.0`, `part-d-approved` (no push without separate approval). Owner questions: KI-030, KI-033, model selection.
-1a. GitHub push: blocked by account permissions (KI-014); owner action needed before retrying.
+1. **Part D implemented (D.1–D.5, AP-017)** on `part/d-orchestration`, pushed as that branch (AP-018); completion report written. Waiting for the owner's G-D review. On approval: merge, `v0.4.0`, `part-d-approved` (pushing `main`/tags needs separate approval). Owner questions: KI-030, KI-033, model selection.
+1b. **Part E plan drafted** (`docs/parts/PART-E-PLAN.md`). Needs rulings D-07 (blocks E), D-04, D-08, D-16, D-24, proposed D-45…D-49 and container limit values, plus G-D approval, before implementation.
+1a. GitHub push: KI-014 no longer blocks; pushes on 2026-11-23 succeeded (TR-0087, TR-0109).
 2. Owner approval of the model selection (owner: "keep pending; will approve later").
 3. Owner rulings when they become necessary (never assumed): D-07 (before Part E), D-21, D-26/D-33 confirmation, D-31 final ruling, D-34 (commit the spec .docx; until ruled, the .docx is **not** committed).
 4. Optional: Ollama env vars (KI-004); GitHub push/repository creation (not authorised; AC-A-01 fresh-clone can now be checked locally, AC-A-02 CI still needs GitHub).
 5. Roadmap v2.1 amendment for D-35/D-36/D-37 (DV-003), on owner approval.
 
-**Next authorised action:** **None.** Part D is complete and reported; wait for the owner's review. Do not start Part E or Part F.
+**Next authorised action:** **None.** Wait for the owner's review of G-D and of the Part E plan. Do not implement Part E or start Part F.
 
 ---
 
