@@ -1,7 +1,7 @@
 # ADR-0007: Docker distribution for the sandbox
 
-- **Status:** Proposed. **Owner ruling required (D-07).** Blocks Part E; does not block Parts A–D.
-- **Date:** 2026-11-19
+- **Status:** **Accepted: option (b) Docker Engine inside WSL2** (owner ruling AP-019, 2026-11-23), with the owner's requirement of a completely free implementation. Originally proposed 2026-11-19.
+- **Date:** 2026-11-19 (proposed); 2026-11-23 (accepted)
 - **Related:** roadmap §9, §13 E; HC-14; risk R4
 
 ## Context
@@ -27,3 +27,8 @@ The roadmap prohibits paid dependencies (NFR-013), so the licensing context must
 ## Consequences
 
 The sandbox code (Part E) talks to the Docker Engine API and works with options (a) and (b) unchanged.
+
+## Decision (2026-11-23)
+
+- **Option (b)** in the existing `Ubuntu-24.04` WSL2 distribution. Docker Desktop stays installed but is not used; the platform refuses its engine.
+- How the Windows-side platform connects to the engine (mutual TLS on loopback), where the engine packages come from (Ubuntu archive) and how files reach containers are **proposed** in `docs/parts/PART-E-PLAN.md` (D-48, D-50, D-51), still **awaiting owner approval**, and subject to the E.1 feasibility spikes. They will be recorded in ADR-0008.

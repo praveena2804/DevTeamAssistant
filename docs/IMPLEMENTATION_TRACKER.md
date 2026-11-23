@@ -20,7 +20,7 @@
 |---|---|
 | Current milestone | **M1 Harness & Orchestration** (C approved; D implemented, awaiting G-D) |
 | Current part | **Part D: implemented (D.1–D.5), awaiting the owner's review of gate G-D** (AP-017). Commits `ce49ce3`, `bf21f36`, `4fd4a3f`, `ab5eea0`, `17d0456` and the D.5 commit. Completion report `docs/parts/PART-D-COMPLETION-REPORT.md` |
-| Overall status | Parts A, B, C approved (v0.1.0–v0.3.0). Part D implemented on `part/d-orchestration`, **pushed to GitHub as that branch** (AP-018); not approved, merged into `main` or tagged. Part E plan drafted (`docs/parts/PART-E-PLAN.md`), awaiting review |
+| Overall status | Parts A, B, C approved (v0.1.0–v0.3.0). Part D implemented on `part/d-orchestration`, **pushed to GitHub as that branch** (AP-018); not approved, merged into `main` or tagged. Part E plan **revision 3** (`docs/parts/PART-E-PLAN.md`), awaiting owner approval |
 | Last completed activity | D.2 completion (direct local Ollama provider, ten real-model agent behaviours, answer contracts, migration 0006), D.3 graph, D.4 worker + run-control API, D.5 UI + E2E. Complete run (all tests incl. real model): **2,172 passed / 0 failed / 1 skipped** (TR-0100…TR-0108) |
 | Code written | Parts A–C plus Part D: `devteam_orchestration` (graph, runtime, steps, commands, execution, services, prompts, diagram), `devteam_worker`, ten agent behaviours, Head core, Ollama provider, run API, web run pages |
 | Dependencies installed | Python (uv, `uv.lock`), npm (`package-lock.json`), Gitleaks; Ollama 0.40.16 with `qwen2.5:3b`, `qwen2.5-coder:3b`, `qwen2.5:1.5b` (and others, unused) |
@@ -125,11 +125,11 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | D-01 | Feasibility decision point | Open | — | — | Roadmap §6.5, §13 G; Plan §20 G |
 | D-02 | Coverage denominator | Open | — | — | Roadmap §13 G |
 | D-03 | Approval-screen edit behaviour | Open | — | — | Roadmap §13 I |
-| D-04 | Target-app auth patterns | **Open, owner ruling required** | — | — | Roadmap §13 E/K |
+| D-04 | Target-app auth patterns | **Open, owner ruling required.** Proposed in PART-E-PLAN rev. 3: no authentication in Part E (awaiting approval) | — | — | Roadmap §13 E/K |
 | D-05 | Deterministic vs LLM share (Head/Architect) | Open | — | — | Roadmap §13 J |
 | D-06 | Per-role model overrides | Open (recommended (b); audited 2026-11-19, see `docs/architecture/MODEL_ROUTING.md`) | — | — | Roadmap §13 F |
 | D-07 | Docker distribution / licensing | **Ruled (AP-019)** | (b) Docker Engine inside WSL2 (`Ubuntu-24.04`); Docker Desktop not used; completely free, open-source tools only. ADR-0007 to be set to Accepted (b) in E.1 | 2026-11-23 | Roadmap §9, §13 A/E; ADR-0007; PART-E-PLAN §2.1, §3.10, §12 |
-| D-08 | Offline sandbox vs installs/audits | Open | — | — | Roadmap §13 E/N |
+| D-08 | Offline sandbox vs installs/audits | Open. Proposed in PART-E-PLAN rev. 3: prebuilt images with locked dependencies, offline execution (awaiting approval) | — | — | Roadmap §13 E/N |
 | D-09 | Frontend behaviour verification | Open | — | — | Roadmap §13 L/N |
 | D-10 | Test-maintenance approver | Open | — | — | Roadmap §13 N |
 | D-11 | Platform UI login | **Ruled (AP-005)** | (a) no login; loopback + per-install token | 2026-11-19 | Roadmap §13 B; PART-B-PLAN §2 |
@@ -137,7 +137,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | D-13 | Folder layout | **Superseded by D-26** | — | 2026-11-18 | Roadmap §20 |
 | D-14 | Stable ID scope | Open | — | — | Roadmap §13 H/Q |
 | D-15 | Platform-UI E2E automation | **Ruled (AP-005)** | (b) API E2E + manual UI demo until R | 2026-11-19 | Roadmap §15 |
-| D-16 | PostgreSQL Docker validation | Open | — | — | Roadmap §13 E/K |
+| D-16 | PostgreSQL Docker validation | Open. Proposed in PART-E-PLAN rev. 3: disabled, PostgreSQL execution **deferred to Part K**, no PostgreSQL code path in E (awaiting approval; deviation from roadmap §13 E wording to be recorded on approval) | — | — | Roadmap §13 E/K |
 | D-17 | Two-stage Completion Gate | Open | — | — | Roadmap §13 N/O |
 | D-18 | Secret store / GitHub auth | **Ruled (AP-007)** for platform secrets | Windows Credential Manager via `keyring`; no plaintext fallback; D-18a key migration with four checks. GitHub PAT half still open (Part P) | 2026-11-20 | Roadmap §13 C/P; PART-C-PLAN §2.0 |
 | D-19 | Pages eligibility | Open | — | — | Roadmap §13 P |
@@ -145,7 +145,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | D-21 | Platform licence | **Open — owner ruling required** (no `LICENSE` file created; does not block A) | — | — | Roadmap §8 |
 | D-22 | MVP supporting-file types | **Ruled (AP-005)** | (b) PDF, DOCX, TXT **and MD** (MD read as plain text). Deviates from Spec §5.1 "PDF, DOCX, TXT initially" by owner decision | 2026-11-19 | Roadmap §13 B, §20; Spec §5.1 |
 | D-23 | DB test ownership | Open | — | — | Roadmap §13 K |
-| D-24 | Integration/Build Service classification | Open | — | — | Roadmap §4.2 |
+| D-24 | Integration/Build Service classification | Open. Proposed in PART-E-PLAN rev. 3: deterministic service, not an agent (awaiting approval) | — | — | Roadmap §4.2 |
 | D-25 | BRD_ANALYSIS.md ownership | Open | — | — | Roadmap §13 H/O |
 | D-26 | uv workspace with per-agent packages | **Ruled (AP-007)** | (a) uv workspace; agents in `agents/<agent_name>/` | 2026-11-20 | Roadmap §7, §8; ADR-0005 |
 | D-27 | Parallel execution policy | **Ruled (AP-015)** | (b): only deterministic, model-free nodes may fan out, limited by `resources.max_parallel_deterministic` (1 on `low_memory`); LLM calls and sandbox runs always sequential | 2026-11-23 | Roadmap §6.6; PART-D-PLAN §2.1 |
@@ -285,6 +285,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | CH-0110 | 2026-11-23 | Git | No file change: `git push -u origin part/d-orchestration` (new remote branch, `fe567bd`) and verification. `main` and tags not changed; Part D not merged (G-D pending) | Owner request | AP-018 | TR-0109 | Done |
 | CH-0111 | 2026-11-23 | E plan | `docs/parts/PART-E-PLAN.md` (created); this tracker (§1, §2, §3 AP-018, §5, §6, §7 TR-0109, §11); progress tracker Run 23 | Part E plan per Working Plan §20 Part E and template §21.1; no Part E code | AP-018 | — | Done (local commit, not pushed) |
 | CH-0112 | 2026-11-23 | E plan | `docs/parts/PART-E-PLAN.md` revision 2: D-07 ruled (b); new D-50 (mutual-TLS loopback connection to the WSL engine), D-51 (Ubuntu `docker.io` packages); D-45 updated (WSL VM sees 7.8 GB, `autoMemoryReclaim`); new §3.10 (WSL engine set-up, read-only check of the distribution) and §12 (free and open-source inventory and enforcement); settings, guard, security, files, risks, demo and confirmation line updated. This tracker (§3 AP-019, §4 D-07, §5, §6, §11); progress tracker Run 24 | Owner ruling and free-only requirement | AP-019 | — | Done (local commit, not pushed) |
+| CH-0113 | 2026-11-23 | E plan | `docs/parts/PART-E-PLAN.md` revision 3 (review corrections): tiered licence policy §12.3 replacing the blanket GPL ban; mutual-TLS client design and feasibility spike S-1 with stop rule (§3.11); spike S-3 (§3.12); PostgreSQL execution deferred to K (D-16); precise free-only definition and component/download inventory (§12.1, §12.2); offline React dependency strategy (packages in the image's read-only `/node_modules`, standard parent-folder lookup, no npm at run time) and spike S-2 (§3.5); decision summary table with every non-ruled decision marked *proposed, awaiting owner approval*; new D-52. `docs/adr/0007-docker-distribution.md` (status Accepted (b), decision section). This tracker (§1, §4 D-04/D-08/D-16/D-24, §5, §6, §11); progress tracker Run 25 | Owner review feedback on revision 2 | AP-019 | — | Done (not committed: owner instruction) |
 | CH-0044 | 2026-11-20 | C | `docs/parts/PART-C-PLAN.md` (status table; §2 rewritten as §2.0 rulings + §2.1 full F-1…F-11 table with values, defaults, min/max, rationale, dependents; new §10 checkpoint breakdown; confirmation line); `CLAUDE.md` §11 (stale "Git not authorised" sentence aligned with AP-005); this tracker (§1, §3 AP-007, §4 D-18/D-26/D-30/D-32, §11) | Record AP-007; owner asked for the full F table. First-draft error corrected: context 8,000 tokens exceeded the benchmarked 4,096 window | AP-007 | — | Done (plan awaiting F approval) |
 | CH-0043 | 2026-11-19 | C | `docs/parts/PART-C-PLAN.md` (created, on branch `part/c-harness-core`, uncommitted until approval) | Part C plan: scope C.1–C.4, decisions D-18/D-18a/D-26/D-30/D-32, flagged field values F-1…F-11, design, tests, demo, risks | Roadmap §13 C; Plan §20 C | — | Awaiting owner approval |
 | CH-0042 | 2026-11-19 | B | Version 0.1.0 → 0.2.0 in all `pyproject.toml` files, `apps/web/package.json`, lock files; `CHANGELOG.md` (0.2.0 section); `README.md`; this tracker; `docs/PROJECT_PROGRESS_TRACKER.md` (Run 10); local Git: release commit on `part/b-intake`, merged into `main` (`--no-ff`), tags `v0.2.0` + `part-b-approved` | Part B release after G-B | AP-006 | TR-0035 | Done |
@@ -414,6 +415,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | CH-0109 | Created/Modified | documentation and trackers | §13, completion report, Run 22 | Docs | Tracker rule |
 | CH-0111 | Created/Modified | `docs/parts/PART-E-PLAN.md`; `docs/IMPLEMENTATION_TRACKER.md`; `docs/PROJECT_PROGRESS_TRACKER.md` | whole plan (§0–§11, proposed D-45…D-49); §1, §2 row E, AP-018, CH-0110/0111, TR-0109, §11; Run 23 | Part E planning | AP-018 |
 | CH-0112 | Modified | `docs/parts/PART-E-PLAN.md`; `docs/IMPLEMENTATION_TRACKER.md`; `docs/PROJECT_PROGRESS_TRACKER.md` | plan header, §0, §1, §2.1 D-07, §2.2 D-45/D-50/D-51, §3.2, §3.3, §3.10, §5, §6, §8, §9, §10, §12, confirmation; AP-019, D-07, CH-0112, §11; Run 24 | Part E plan revision 2 | AP-019 |
+| CH-0113 | Modified | `docs/parts/PART-E-PLAN.md`; `docs/adr/0007-docker-distribution.md`; `docs/IMPLEMENTATION_TRACKER.md`; `docs/PROJECT_PROGRESS_TRACKER.md` | plan rev. 3 (header, §0–§12, confirmation); ADR status + decision section; §1, §4 rows D-04/D-08/D-16/D-24, CH-0113, §11; Run 25 | Part E plan revision 3 | AP-019 |
 | CH-0051 | Modified | `settings.py`; `config/defaults.yaml`; `config/profiles/test.yaml` | `SecretsSettings`, `Settings.secrets`, `_memory_secrets_only_in_tests`; `secrets:` sections | D-18 | AP-007 |
 | CH-0052 | Created | `config/guardrails/*.yaml` (4) | Whole files | HC-01 | HS-08 |
 | CH-0053 | Created / Modified | `iam/principals.py`; `iam/__init__.py` | Whole file; exports | HC-15 | HS-07 |
@@ -647,7 +649,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 **Pending:**
 
 1. **Part D implemented (D.1–D.5, AP-017)** on `part/d-orchestration`, pushed as that branch (AP-018); completion report written. Waiting for the owner's G-D review. On approval: merge, `v0.4.0`, `part-d-approved` (pushing `main`/tags needs separate approval). Owner questions: KI-030, KI-033, model selection.
-1b. **Part E plan revision 2** (`docs/parts/PART-E-PLAN.md`): D-07 ruled (b), free-only requirement applied (AP-019). Needs approval of the plan, rulings D-04, D-08, D-16, D-24, proposed D-45…D-51 and container limit values, plus G-D approval, before implementation.
+1b. **Part E plan revision 3** (`docs/parts/PART-E-PLAN.md`): D-07 ruled (b), free-only requirement defined and applied (AP-019), review corrections applied. Needs approval of the plan, of the proposed D-04, D-08, D-16, D-24, D-45…D-52, the licence policy and the container limits, plus G-D approval, before implementation. Feasibility spikes S-1, S-2, S-3 gate E.1/E.2. Revision 3 changes are **not committed** (owner instruction).
 1a. GitHub push: KI-014 no longer blocks; pushes on 2026-11-23 succeeded (TR-0087, TR-0109).
 2. Owner approval of the model selection (owner: "keep pending; will approve later").
 3. Owner rulings when they become necessary (never assumed): D-21, D-26/D-33 confirmation, D-31 final ruling, D-34 (commit the spec .docx; until ruled, the .docx is **not** committed).
