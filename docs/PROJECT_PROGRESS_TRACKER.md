@@ -67,3 +67,7 @@ No features were built or changed. I ran every check on the finished Part C: all
 **Run 17 — Part C release**
 
 No new features were built. You approved Part C, so I re-ran the tests and checks after marking it as version 0.3.0, and saved it into the main line of your local Git history with the Part C approval tags. Nothing was sent to GitHub, and Part D has not been started.
+
+**Run 18 — GitHub connection**
+
+No development changes were made. I checked the project's link to GitHub: it already points to your repository, praveena2804/DevTeamAssistant, which is still empty. The push failed again because this computer is signed in to GitHub as a different account (Praveena-ROR), so nothing was sent. Your sign-in as praveena2804 is needed before Parts A to C can be uploaded.
