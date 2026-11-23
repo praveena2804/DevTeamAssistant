@@ -19,15 +19,15 @@
 | Item | Value |
 |---|---|
 | Current milestone | **M0 Foundation** |
-| Current part | **Part C: Approved (G-C, AP-013, 2026-11-23); released as v0.3.0** (merged to `main` locally, tags `v0.3.0`, `part-c-approved`). Part D not started |
+| Current part | **Part C approved and released (v0.3.0).** **Part D: plan drafted** (`docs/parts/PART-D-PLAN.md`), awaiting owner approval; not implemented |
 | Overall status | Part A approved (v0.1.0) and Part B approved (v0.2.0), both merged to `main` with local tags. M0 Foundation complete |
-| Last completed activity | G-C approved; release 0.3.0: versions bumped, `uv lock`, OpenAPI + web types regenerated, CHANGELOG/README updated, release verification TR-0084, local merge and tags (CH-0084) |
+| Last completed activity | GitHub backup completed and verified (TR-0086): `main` and all six tags pushed to `praveena2804/DevTeamAssistant`; local and remote refs identical. Part D plan written (CH-0085) |
 | Code written | Parts A and B: `devteam_core`, `devteam_state`, `devteam_harness` (HC-15/18/20/21 foundations), `devteam_services` (extraction, workspace, intake), `devteam_api`, `apps/web`, scripts, tests |
 | Dependencies installed | Python (uv, `uv.lock`), npm (`package-lock.json`), Gitleaks (winget, user scope), Ollama models `qwen2.5:3b` and `qwen2.5-coder:3b` |
-| Git / GitHub operations | Local: `main` holds Parts A–C (tags `v0.1.0`, `part-a-approved`, `v0.2.0`, `part-b-approved`, `v0.3.0`, `part-c-approved`). Push authorised (AP-009) but refused by GitHub (HTTP 403, KI-014); nothing pushed |
-| Tests executed | TR-0001…TR-0085 |
-| Blocking items | Part D not authorised. GitHub push blocked by account permissions (KI-014). For Part E: D-07 |
-| Next authorised action | **None.** Part C approved and released locally; wait for the owner before any Part D work (planning or implementation) |
+| Git / GitHub operations | `origin` = `https://praveena2804@github.com/praveena2804/DevTeamAssistant.git`. Remote `main` = `c161dd1`; tags `v0.1.0`, `part-a-approved`, `v0.2.0`, `part-b-approved`, `v0.3.0`, `part-c-approved` pushed and verified (AP-014). Later local commits are not pushed without a new request |
+| Tests executed | TR-0001…TR-0086 |
+| Blocking items | Owner approval of the Part D plan and rulings D-27 (confirm), D-38…D-43. For Part E: D-07 |
+| Next authorised action | **None.** Wait for the owner's decision on `docs/parts/PART-D-PLAN.md`. Part D implementation not started |
 
 ---
 
@@ -51,7 +51,7 @@
 | A | Foundation, Repository Conventions & Environment Benchmark | M0 | **Approved** | G-A | Retrospectively, at G-A (DV-001) | 2026-11-19 (AP-005) | `part-a-approved`, `v0.1.0` (local) |
 | B | Intake, Extraction, Human IAM & Audit Foundation | M0 | **Approved** | G-B | 2026-11-19 (AP-005) | 2026-11-19 (AP-006) | `part-b-approved`, `v0.2.0` (local) |
 | C | Shared Contracts & Harness Core | M1 | **Approved** | G-C | 2026-11-20 (AP-007, AP-008) | 2026-11-23 (AP-013) | `v0.3.0`, `part-c-approved` (local) |
-| D | LangGraph Orchestration, Ten Stub Agents & Head Agent Deterministic Core | M1 | Not started | G-D | — | — | — |
+| D | LangGraph Orchestration, Ten Stub Agents & Head Agent Deterministic Core | M1 | **Planning — plan awaiting approval** | G-D | — | — | — |
 | E | Isolated Execution Sandbox & Target-App Templates | M1 | Not started | G-E | — | — | — |
 | F | LLM Gateway, Model Routing, Context & Memory, and RAG | M1 | Not started | G-F | — | — | — |
 | G | Capability Catalog & Feasibility Gate | M2 | Not started | G-G | — | — | — |
@@ -105,6 +105,7 @@ Only explicit owner approvals are recorded here.
 | AP-011 | 2026-11-20 | **C.4 authorised** | Owner | Owner message 2026-11-20 "Proceed with C.4" | — |
 | AP-012 | 2026-11-20 | **G-C verification authorised** (verification and report only; no feature changes without approval; no Part D; no push) | Owner | Owner message 2026-11-20 "Proceed with the G-C final verification gate only" | — |
 | AP-013 | 2026-11-23 | **G-C approved**: Part C accepted; release 0.3.0 (local merge and tags) | Owner | Owner message 2026-11-23 "approve G-C" | `docs/parts/PART-C-COMPLETION-REPORT.md` |
+| AP-014 | 2026-11-23 | **GitHub backup and Part D planning authorised**: push `main` and all tags to `praveena2804/DevTeamAssistant` (no force-push, no overwrite); prepare the Part D plan; **no Part D implementation** | Owner | Owner message 2026-11-23 "Push all remaining changes … Prepare Part D … Do not implement Part D yet" | `docs/parts/PART-D-PLAN.md` |
 
 *Roadmap v2.0: adopted as the working default under AP-003. An explicit formal "roadmap approved" statement has not been given, so it is recorded as adopted, not approved.*
 
@@ -244,6 +245,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | CH-0082 | 2026-11-20 | C.4 | `docs/architecture/harness.md` (C.4 section); `README.md`; `CHANGELOG.md`; this tracker; progress tracker Runs 13–15; local Git commit on `part/c-harness-core` | C.4 documentation and checkpoint commit (not pushed) | Plan §10 | TR-0076 | Done |
 | CH-0083 | 2026-11-20 | G-C | `docs/parts/PART-C-COMPLETION-REPORT.md` (created); `CLAUDE.md` §9 (static gates list adds `scripts/check_agent_rules.py`); this tracker; progress tracker Run 16; local Git commit | G-C evidence package; no feature code changed | Roadmap §17 | TR-0078…TR-0083 | Done |
 | CH-0084 | 2026-11-23 | C release | All 16 `pyproject.toml` (version 0.2.0 → 0.3.0); `apps/web/package.json` + `package-lock.json` (`npm version 0.3.0 --no-git-tag-version`); `uv.lock` (`uv lock`); `apps/api/openapi.json` (`scripts/export_openapi.py`); `apps/web/src/api/schema.d.ts` (`npm run gen:api`, if changed); `CHANGELOG.md` (Unreleased → 0.3.0); `README.md` (state line); trackers; local merge into `main` and tags | Release after G-C approval | AP-013 | TR-0084 | Done |
+| CH-0085 | 2026-11-23 | D plan | `docs/parts/PART-D-PLAN.md` (created); this tracker (§1, §2, §3 AP-014, §5, §6, §7 TR-0086, §9 KI-014 closed, §11); progress tracker Run 19 | Part D plan per Working Plan §20 Part D [ARCH] and template §21.1; GitHub backup recorded | AP-014 | TR-0086 | Done |
 | CH-0044 | 2026-11-20 | C | `docs/parts/PART-C-PLAN.md` (status table; §2 rewritten as §2.0 rulings + §2.1 full F-1…F-11 table with values, defaults, min/max, rationale, dependents; new §10 checkpoint breakdown; confirmation line); `CLAUDE.md` §11 (stale "Git not authorised" sentence aligned with AP-005); this tracker (§1, §3 AP-007, §4 D-18/D-26/D-30/D-32, §11) | Record AP-007; owner asked for the full F table. First-draft error corrected: context 8,000 tokens exceeded the benchmarked 4,096 window | AP-007 | — | Done (plan awaiting F approval) |
 | CH-0043 | 2026-11-19 | C | `docs/parts/PART-C-PLAN.md` (created, on branch `part/c-harness-core`, uncommitted until approval) | Part C plan: scope C.1–C.4, decisions D-18/D-18a/D-26/D-30/D-32, flagged field values F-1…F-11, design, tests, demo, risks | Roadmap §13 C; Plan §20 C | — | Awaiting owner approval |
 | CH-0042 | 2026-11-19 | B | Version 0.1.0 → 0.2.0 in all `pyproject.toml` files, `apps/web/package.json`, lock files; `CHANGELOG.md` (0.2.0 section); `README.md`; this tracker; `docs/PROJECT_PROGRESS_TRACKER.md` (Run 10); local Git: release commit on `part/b-intake`, merged into `main` (`--no-ff`), tags `v0.2.0` + `part-b-approved` | Part B release after G-B | AP-006 | TR-0035 | Done |
@@ -349,6 +351,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | CH-0082 | Modified | `docs/architecture/harness.md`; `README.md`; `CHANGELOG.md`; trackers | C.4 section; state line; Unreleased C.4 | Docs | Plan §10 |
 | CH-0083 | Created / Modified | `docs/parts/PART-C-COMPLETION-REPORT.md`; `CLAUDE.md`; trackers | Whole file; §9 static gates; §1/§2/§3/§5/§6/§7/§8/§9/§11 | Gate | Roadmap §17 |
 | CH-0084 | Modified | 16 `pyproject.toml`; `apps/web/package.json`, `package-lock.json`; `uv.lock`; `apps/api/openapi.json`; `CHANGELOG.md`; `README.md`; trackers | `version`; lockfiles regenerated by their tools; OpenAPI `info.version`; heading; state line | Release | AP-013 |
+| CH-0085 | Created / Modified | `docs/parts/PART-D-PLAN.md`; `docs/IMPLEMENTATION_TRACKER.md`; `docs/PROJECT_PROGRESS_TRACKER.md` | Whole file (plan); §1/§2/§3/§5/§6/§7/§9/§11; Run 19 | Part D planning; backup record | AP-014 |
 | CH-0051 | Modified | `settings.py`; `config/defaults.yaml`; `config/profiles/test.yaml` | `SecretsSettings`, `Settings.secrets`, `_memory_secrets_only_in_tests`; `secrets:` sections | D-18 | AP-007 |
 | CH-0052 | Created | `config/guardrails/*.yaml` (4) | Whole files | HC-01 | HS-08 |
 | CH-0053 | Created / Modified | `iam/principals.py`; `iam/__init__.py` | Whole file; exports | HC-15 | HS-07 |
@@ -463,6 +466,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | TR-0083 | 2026-11-20 15:58 | G-C | Real DB/install **read-only**: revision; audit fingerprint; `scripts/verify_audit.py`; `data/api_token` absence; keyring key presence (value never printed); demo `scripts/demo_part_c.py` | Revision `0004_execution`; 8 audit rows, first 7 fingerprint `ec526025029f6f7d` (unchanged since C.4 migration); verify **intact** (3 chained + 5 earlier); plaintext key file absent; key present in `WinVaultKeyring`; demo exit 0 (allowed / refused / refused / stopped / intact / broken at 10) | 0 | — | No smoke run at G-C, so no new log entries |
 | TR-0084 | 2026-11-23 | C release | After the version bump: `uv sync --locked`; fast suite; ruff check + format; mypy; lint-imports; agent checks; contract schema check; `npm run check:api`, lint, typecheck, test, build | pytest **1,755 passed** | 0 | 1 | Skip: symlink privilege (KI-020). Static gates clean (7/7 import contracts, 71 schemas 0 stale); web check:api/lint/typecheck exit 0, Vitest **15 passed**, build OK |
 | TR-0085 | 2026-11-23 | Git | Read-only remote checks and one push attempt: `git remote -v`; tags on `main`; `git ls-remote origin`; `cmdkey /list` (user names only); `git remote set-url origin https://github.com/praveena2804/DevTeamAssistant.git` (unchanged); `git push origin main` | — | — | — | Remote URL already correct; remote empty; stored GitHub credential is `Praveena-ROR`; push **403**, nothing pushed (KI-014) |
+| TR-0086 | 2026-11-23 | Git | Backup verification: `git push origin --tags` (`GIT_TERMINAL_PROMPT=0`); `git fetch origin --tags`; `git ls-remote origin` vs `git show-ref`; `git merge-base --is-ancestor` for `part/b-intake` and `part/c-harness-core` against `main`; `git status` | — | — | — | Six tags created on the remote (exit 0). Remote `main` = local `main` = `c161dd1`; every tag object ID identical on both sides (`v0.3.0`/`part-c-approved` → `d34e0d4`). Both part branches are already contained in `main`, so they were not pushed. Untracked: only the spec `.docx` (kept untracked, D-34). No force-push |
 
 ---
 
@@ -505,7 +509,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | KI-011 | 2026-11-19 | Embedding model not benchmarked in Part A (roadmap §9.1: "chosen by benchmark (A/F)") | None until RAG (Part F) | Part F plan | Deferred to F |
 | KI-012 | 2026-11-19 | Vitest fails ("failed to find the current suite") when started from a shell whose path has a lower-case drive letter (`c:`), because it loads Vitest twice | Web tests must run from PowerShell or an upper-case `C:` path | — | Open (documented in README) |
 | KI-013 | 2026-11-19 | Extraction runs inside the upload request: ≈39 s for a 300-page PDF (TR-0033); typical BRDs take seconds | Long wait for very large PDFs | Part D worker (background extraction) | Open |
-| KI-014 | 2026-11-20 | `git push` to `origin` refused (HTTP 403): the GitHub account signed in on this computer (`Praveena-ROR`) has no write access to `praveena2804/DevTeamAssistant` | Nothing pushed; local history intact | Owner: sign in as the repository owner or add `Praveena-ROR` as a collaborator, then ask to push again | Open — **Diagnosis 2026-11-23:** the remote URL is correct (`praveena2804/DevTeamAssistant`) and the remote is empty (`git ls-remote` ok, no refs). Windows Credential Manager holds a GitHub login for `Praveena-ROR` (target `git:https://github.com`), which Git uses for every github.com repository; GitHub denies that account write access. Push retried once: 403, nothing pushed. Owner must sign in as `praveena2804` |
+| KI-014 | 2026-11-20 | `git push` to `origin` refused (HTTP 403): the GitHub account signed in on this computer (`Praveena-ROR`) has no write access to `praveena2804/DevTeamAssistant` | Nothing pushed; local history intact | Owner: sign in as the repository owner or add `Praveena-ROR` as a collaborator, then ask to push again | Open — **Diagnosis 2026-11-23:** the remote URL is correct (`praveena2804/DevTeamAssistant`) and the remote is empty (`git ls-remote` ok, no refs). Windows Credential Manager holds a GitHub login for `Praveena-ROR` (target `git:https://github.com`), which Git uses for every github.com repository; GitHub denies that account write access. Push retried once: 403, nothing pushed. Owner must sign in as `praveena2804` **Closed 2026-11-23:** the owner signed in as `praveena2804` (remote URL now carries the user name); `main` and all tags pushed and verified (TR-0086) |
 | KI-015 | 2026-11-20 | `audit_events.principal_id` is `String(40)`; agent principals are up to ~56 characters (`agent:<role>:tsk_…`). SQLite does not enforce the length, so nothing breaks today | Would truncate/fail on a stricter database | C.3 migration `0003_harness_core` widens the column | **Closed (model) 2026-11-20**: model declares String(80) (CH-0064); SQLite does not enforce lengths, so no table rebuild |
 | KI-016 | 2026-11-20 | The `keyring`-marked test needs a real OS credential store; it runs in the fast suite on this Windows machine | A Linux CI runner without Secret Service would fail it | Exclude `keyring` in CI when GitHub CI is set up (AC-A-02) | Open |
 | KI-017 | 2026-11-20 | Vite printed `EBUSY ... rename node_modules/.vite/deps_temp…` while re-optimising its dependency cache during the smoke test | Cosmetic; the UI was served and the smoke passed | Recurs only after lockfile changes; deleting `apps/web/node_modules/.vite` clears it | Open |
@@ -534,14 +538,14 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 
 **Pending:**
 
-1. **Part C approved (AP-013) and released as v0.3.0 locally.** Next: owner authorisation for Part D planning.
+1. **Part C approved (AP-013), released as v0.3.0 and backed up to GitHub (TR-0086).** Part D plan drafted: `docs/parts/PART-D-PLAN.md`; awaiting the owner's approval and rulings D-27, D-38…D-43.
 1a. GitHub push: blocked by account permissions (KI-014); owner action needed before retrying.
 2. Owner approval of the model selection (owner: "keep pending; will approve later").
 3. Owner rulings when they become necessary (never assumed): D-07 (before Part E), D-21, D-26/D-33 confirmation, D-31 final ruling, D-34 (commit the spec .docx; until ruled, the .docx is **not** committed).
 4. Optional: Ollama env vars (KI-004); GitHub push/repository creation (not authorised; AC-A-01 fresh-clone can now be checked locally, AC-A-02 CI still needs GitHub).
 5. Roadmap v2.1 amendment for D-35/D-36/D-37 (DV-003), on owner approval.
 
-**Next authorised action:** **None.** Part C approved and released (v0.3.0, local). Wait for the owner before any Part D work.
+**Next authorised action:** **None.** Wait for the owner's decision on the Part D plan. Do not start Part D implementation.
 
 ---
 
