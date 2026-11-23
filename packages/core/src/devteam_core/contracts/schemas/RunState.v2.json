@@ -79,6 +79,14 @@
       "title": "GateName",
       "type": "string"
     },
+    "RunMode": {
+      "description": "How a run's agents produce output (D-38). Only ``stub`` exists until Part F adds real models.\n\nA stub run is labelled everywhere; its agents return prepared fixture outputs and it can never\nproduce a test result or a project verification status.",
+      "enum": [
+        "stub"
+      ],
+      "title": "RunMode",
+      "type": "string"
+    },
     "Stage": {
       "description": "Workflow stages (Spec §5.1-§5.7).",
       "enum": [
@@ -105,6 +113,11 @@
       "maxItems": 200,
       "title": "Blocker Ids",
       "type": "array"
+    },
+    "clarification_round_used": {
+      "default": false,
+      "title": "Clarification Round Used",
+      "type": "boolean"
     },
     "contract_version_id": {
       "anyOf": [
@@ -185,9 +198,12 @@
       "title": "Run Kind",
       "type": "string"
     },
+    "run_mode": {
+      "$ref": "#/$defs/RunMode"
+    },
     "schema_version": {
-      "const": 1,
-      "default": 1,
+      "const": 2,
+      "default": 2,
       "title": "Schema Version",
       "type": "integer"
     },
@@ -231,7 +247,8 @@
     "run_id",
     "run_kind",
     "stage",
-    "trace_id"
+    "trace_id",
+    "run_mode"
   ],
   "title": "RunState",
   "type": "object"

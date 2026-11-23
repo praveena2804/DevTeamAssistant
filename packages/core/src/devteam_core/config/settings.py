@@ -164,6 +164,24 @@ class RateLimitSettings(_Section):
     session_per_minute: int = Field(default=10, ge=1)
 
 
+class OrchestrationSettings(_Section):
+    """HC-07/HC-19 run orchestration and the run worker (Part D plan §3.6; D-40, D-41)."""
+
+    recursion_limit: int = Field(default=200, ge=25, le=10_000)  # LangGraph backstop (LG-05)
+    poll_interval_s: float = Field(default=1.0, gt=0, le=60)  # worker job polling
+    heartbeat_interval_s: float = Field(default=5.0, gt=0, le=300)
+    lease_ttl_s: float = Field(default=30.0, gt=0, le=3600)  # a lease older than this is dead
+    max_crash_resumes: int = Field(default=3, ge=1, le=10)  # D-40: then the task is Blocked
+    resource_wait_s: float = Field(default=60.0, ge=1, le=3600)  # WAITING_FOR_RESOURCES retry delay
+
+    @model_validator(mode="after")
+    def _heartbeat_inside_lease(self) -> Self:
+        # At least two heartbeats must fit in one lease, or a live worker would look dead.
+        if self.heartbeat_interval_s * 2 > self.lease_ttl_s:
+            raise ValueError("orchestration.lease_ttl_s must be at least twice heartbeat_interval_s")
+        return self
+
+
 class Settings(_Section):
     profile: ProfileName = "low_memory"
     root: Path
@@ -178,6 +196,7 @@ class Settings(_Section):
     secrets: SecretsSettings = SecretsSettings()
     files: FileToolSettings = FileToolSettings()
     ratelimit: RateLimitSettings = RateLimitSettings()
+    orchestration: OrchestrationSettings = OrchestrationSettings()
 
     @model_validator(mode="after")
     def _memory_secrets_only_in_tests(self) -> Self:

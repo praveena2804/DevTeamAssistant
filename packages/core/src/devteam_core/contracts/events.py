@@ -25,8 +25,9 @@ from devteam_core.contracts._base import (
     TaskId,
 )
 from devteam_core.contracts.llm import Provider
+from devteam_core.contracts.orchestration import NodeKind, NodeName, RunMode
 from devteam_core.contracts.records import ApprovalDecision
-from devteam_core.contracts.statuses import ApprovalType, RunStatus, TaskStatus
+from devteam_core.contracts.statuses import ApprovalType, GateName, RunStatus, Stage, TaskStatus
 from devteam_core.contracts.tools import ActorRef, PolicyRuleId, ToolName, ToolOutcome
 
 SummaryValue = Annotated[str, StringConstraints(max_length=200)]
@@ -118,13 +119,73 @@ class FileChanged(EventBase):
         return self
 
 
+# ---- Part D progress events (HC-10): published to the progress stream (SSE) and kept in run_events.
+# They describe *where* a run is, never *what* a document, prompt or file says.
+
+
+class _RunEvent(EventBase):
+    @model_validator(mode="after")
+    def _needs_run(self) -> Self:
+        if self.run_id is None or self.project_id is None:
+            raise ValueError("progress events belong to a project and a run")
+        return self
+
+
+class NodeStarted(_RunEvent):
+    kind: Literal["node.started"] = "node.started"
+    node: NodeName
+    node_kind: NodeKind
+    run_mode: RunMode
+
+
+class NodeFinished(_RunEvent):
+    kind: Literal["node.finished"] = "node.finished"
+    node: NodeName
+    node_kind: NodeKind
+    outcome: Literal["ok", "error", "interrupted", "skipped"]
+    duration_ms: int = Field(ge=0)
+    error_code: Annotated[str, StringConstraints(pattern=r"^[a-z][a-z0-9_.]{0,63}$")] | None = None
+
+
+class GateOpened(_RunEvent):
+    kind: Literal["gate.opened"] = "gate.opened"
+    gate: GateName
+
+
+class RunProgress(_RunEvent):
+    kind: Literal["run.progress"] = "run.progress"
+    stage: Stage
+    status: RunStatus
+    run_mode: RunMode
+    current_node: NodeName | None = None
+    completed_tasks: int = Field(ge=0)
+    total_tasks: int = Field(ge=0)
+
+    @model_validator(mode="after")
+    def _counts(self) -> Self:
+        if self.completed_tasks > self.total_tasks:
+            raise ValueError("completed_tasks cannot exceed total_tasks")
+        return self
+
+
+class MetricSample(_RunEvent):
+    kind: Literal["metric.sampled"] = "metric.sampled"
+    metric: Literal["free_ram_mb", "worker_rss_mb", "queue_depth"]
+    value: int = Field(ge=0)
+
+
 Event = Annotated[
     RunTransitioned
     | TaskTransitioned
     | ToolCallRecorded
     | ModelCallRecorded
     | ApprovalRecorded
-    | FileChanged,
+    | FileChanged
+    | NodeStarted
+    | NodeFinished
+    | GateOpened
+    | RunProgress
+    | MetricSample,
     Field(discriminator="kind"),
 ]
 EVENT_ADAPTER: TypeAdapter[Event] = TypeAdapter(Event)
@@ -135,4 +196,9 @@ EVENT_TYPES: tuple[type[EventBase], ...] = (
     ModelCallRecorded,
     ApprovalRecorded,
     FileChanged,
+    NodeStarted,
+    NodeFinished,
+    GateOpened,
+    RunProgress,
+    MetricSample,
 )

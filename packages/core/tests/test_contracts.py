@@ -17,13 +17,16 @@ from devteam_core.contracts import (
     CONTRACT_MODELS,
     EVENT_ADAPTER,
     SCHEMA_DIR,
+    SCHEMA_VERSION,
     Contract,
+    contract_version,
     export_json_schemas,
     render_schema,
 )
 from devteam_core.contracts.agents import AgentIO, BuildTaskInput, BuildTaskOutput
 from devteam_core.contracts.base import NeverAssumed, Sourced
-from devteam_core.contracts.events import EventBase
+from devteam_core.contracts.events import EventBase, _RunEvent
+from devteam_core.contracts.state import RunState
 from devteam_core.contracts.statuses import (
     BUILD_PLAN_ROLES,
     DISCOVERY_ROLES,
@@ -36,7 +39,18 @@ from tests.fixtures.contract_samples import SAMPLES
 
 pytestmark = pytest.mark.contract
 
-ABSTRACT_BASES = {Contract, Sourced, NeverAssumed, AgentIO, BuildTaskInput, BuildTaskOutput, EventBase}
+ABSTRACT_BASES = {
+    Contract,
+    Sourced,
+    NeverAssumed,
+    AgentIO,
+    BuildTaskInput,
+    BuildTaskOutput,
+    EventBase,
+    _RunEvent,
+}
+# Contracts whose schema_version has been bumped (tracker records every bump).
+BUMPED = {"RunState": 2}
 
 CANONICAL_AGENTS = (
     "brd_analyst",
@@ -82,14 +96,31 @@ def test_round_trip_json(name: str) -> None:
     assert type(instance) is model
     restored = model.model_validate_json(instance.model_dump_json())
     assert restored == instance
-    assert restored.schema_version == 1
+    assert restored.schema_version == contract_version(model) == BUMPED.get(name, SCHEMA_VERSION)
 
 
 @pytest.mark.parametrize("name", sorted(CONTRACT_MODELS))
 def test_schema_forbids_extra_fields_and_is_versioned(name: str) -> None:
     schema = CONTRACT_MODELS[name].model_json_schema()
     assert schema.get("additionalProperties") is False
-    assert schema["properties"]["schema_version"]["const"] == 1
+    assert schema["properties"]["schema_version"]["const"] == BUMPED.get(name, SCHEMA_VERSION)
+
+
+def test_schema_files_carry_the_model_version() -> None:
+    names = set(export_json_schemas())
+    assert "RunState.v2.json" in names
+    assert "RunState.v1.json" not in names
+    assert "AgentTask.v1.json" in names
+
+
+def test_an_older_run_state_version_is_rejected() -> None:
+    """A v1 checkpoint cannot be silently read as v2: the version is part of the contract."""
+    data = SAMPLES["RunState"]().model_dump(mode="json")
+    with pytest.raises(ValidationError):
+        RunState.model_validate({**data, "schema_version": 1})
+    legacy = {k: v for k, v in data.items() if k not in {"run_mode", "clarification_round_used"}}
+    with pytest.raises(ValidationError):
+        RunState.model_validate({**legacy, "schema_version": 1})
 
 
 @pytest.mark.parametrize("name", sorted(CONTRACT_MODELS))

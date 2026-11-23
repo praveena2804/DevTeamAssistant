@@ -4,8 +4,8 @@ Roadmap ref: §13 Part D, §4.3, §6 · Milestone: M1 · Gate: **G-D** · Workin
 
 | Field | Value |
 |---|---|
-| Status | **Draft: awaiting owner approval.** Nothing in this plan is implemented |
-| Preconditions | G-C approved (**done**, AP-013, v0.3.0). D-27 to be confirmed (§2). D-38…D-43 to be ruled (§2) |
+| Status | **Approved** (AP-015, 2026-11-23). Checkpoint D.1 implemented; D.2 not started (waits for the D.1 review) |
+| Preconditions | G-C approved (**done**, AP-013, v0.3.0). D-27 (b), D-38…D-42 approved; **D-43 deferred** (AP-015) |
 | Harness components | Implements HC-07; HC-19 checkpointing; HC-12 resume and crash recovery; HC-13 interrupt mechanics; HC-10 progress, events and metrics; HC-11 graph spans and trace viewer; HC-21 run history. Integrates every Part C component |
 | Agents | All 10 as **stubs**. Agent 3 (Head) also gets its **deterministic core**: plan validator, scheduler, dispatcher, failure router and template planner |
 | Branch | `part/d-orchestration` (local), one local commit per checkpoint D.1–D.5. Push only with your separate approval |
@@ -162,10 +162,10 @@ Every routing function is pure and returns a `NodeName`. A wrapper checks each a
 | `intake` | `brd_analyst` |
 | `brd_analyst` | `feasibility` |
 | `feasibility` | `feasibility_decision` |
-| `feasibility_decision` | `requirements_finalizer`, `route_after_discovery` (cancel) |
+| `feasibility_decision` | `requirements_finalizer`, `finalize_run` (cancel) |
 | `requirements_finalizer` | `clarification_form` (first pass, critical gaps, round unused), `project_approval` |
 | `clarification_form` | `requirements_finalizer` (merge pass) |
-| `project_approval` | `freeze_spec`, `route_after_discovery` (cancel) |
+| `project_approval` | `freeze_spec`, `finalize_run` (cancel) |
 | `freeze_spec` | `route_after_discovery` |
 | `route_after_discovery` | `build_entry_guard`, `finalize_run` |
 | `build_entry_guard` | `head`, `finalize_run` (blocked) |
@@ -179,7 +179,9 @@ Every routing function is pure and returns a `NodeName`. A wrapper checks each a
 | `publish_approval` | `github_deployer`, `final_report` (declined) |
 | `github_deployer` | `final_report` |
 | `final_report` | `finalize_run` |
-| `change_intake` → `change_impact` → `change_approval` → `freeze_change_spec` | then `build_entry_guard`; cancel → `finalize_run` |
+| `change_intake` → `change_impact` → `change_approval` → `freeze_change_spec` → `route_after_change` | then `build_entry_guard`; cancel (at `change_approval`) → `finalize_run` |
+
+**Correction made in D.1 (2026-11-23):** the first draft of this table sent a gate **cancel** to `route_after_discovery`. That router can also continue to `build_entry_guard`, so on paper a path into Build existed that skipped the spec freeze, held shut only by the router's runtime choice. The D.1 topology test found it. Every cancel now goes straight to `finalize_run`, so `route_after_discovery` and the new `route_after_change` are entered **only** from a spec-freeze node (tested, with the old edge kept as a negative control).
 
 **Topology guarantee (AC-D-03, scenario #7):** no path exists from `route_entry` to any build node (`head`, the build agents, the build services) that avoids `freeze_spec` (or `freeze_change_spec`) **and** `build_entry_guard`. This is checked on the compiled graph.
 
@@ -500,4 +502,4 @@ A checkpoint is not done with any failing test, any skip without a recorded reas
 
 ---
 
-## Owner confirmation: ☐ D-27 · ☐ D-38 · ☐ D-39 · ☐ D-40 · ☐ D-41 · ☐ D-42 · ☐ D-43 · ☐ start implementation
+## Owner confirmation: ☑ D-27 (b) · ☑ D-38 · ☑ D-39 · ☑ D-40 (block after more than 3 consecutive crashes) · ☑ D-41 · ☑ D-42 · ☒ D-43 **deferred** · ☑ start implementation, D.1 only first (AP-015, 2026-11-23)

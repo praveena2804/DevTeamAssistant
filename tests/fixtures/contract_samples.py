@@ -14,6 +14,7 @@ from typing import Any
 from devteam_core.contracts import Contract, llm
 from devteam_core.contracts import agents as a
 from devteam_core.contracts import events as ev
+from devteam_core.contracts import orchestration as o
 from devteam_core.contracts import records as r
 from devteam_core.contracts import tools as t
 from devteam_core.contracts.base import Provenance, SourceRef
@@ -23,6 +24,7 @@ from devteam_core.contracts.statuses import (
     AgentRole,
     ApprovalType,
     FeasibilityStatus,
+    GateName,
     ModelSlot,
     RunStatus,
     Stage,
@@ -494,9 +496,66 @@ def _samples() -> dict[str, Callable[[], Contract]]:
             **_event_base(), path="backend/app.py", before_sha256=SHA, after_sha256=SHA_2, bytes_written=12
         ),
         "RunState": lambda: RunState(
-            project_id=PROJECT, run_id=RUN, run_kind="initial", stage=Stage.ANALYSIS, trace_id=TRACE
+            project_id=PROJECT,
+            run_id=RUN,
+            run_kind="initial",
+            stage=Stage.ANALYSIS,
+            trace_id=TRACE,
+            run_mode=o.RunMode.STUB,
+        ),
+        # ---- Part D.1 orchestration contracts and progress events
+        "NodeStarted": lambda: ev.NodeStarted(
+            **_event_base(), node=o.NodeName.BRD_ANALYST, node_kind=o.NodeKind.AGENT, run_mode=o.RunMode.STUB
+        ),
+        "NodeFinished": lambda: ev.NodeFinished(
+            **_event_base(),
+            node=o.NodeName.FEASIBILITY,
+            node_kind=o.NodeKind.SERVICE,
+            outcome="ok",
+            duration_ms=4,
+        ),
+        "GateOpened": lambda: ev.GateOpened(**_event_base(), gate=GateName.PROJECT_APPROVAL),
+        "RunProgress": lambda: ev.RunProgress(
+            **_event_base(),
+            stage=Stage.BUILD,
+            status=RunStatus.RUNNING,
+            run_mode=o.RunMode.STUB,
+            current_node=o.NodeName.ARCHITECT,
+            completed_tasks=1,
+            total_tasks=5,
+        ),
+        "MetricSample": lambda: ev.MetricSample(**_event_base(), metric="free_ram_mb", value=2048),
+        "GateDecision": lambda: o.GateDecision(
+            run_id=RUN, gate=GateName.PROJECT_APPROVAL, decision=r.ApprovalDecision.APPROVED
+        ),
+        "GateResume": lambda: o.GateResume(
+            run_id=RUN, gate=GateName.PROJECT_APPROVAL, approval_id=new_id("apr")
+        ),
+        "DispatchRecord": _dispatch,
+        "PlanIssue": lambda: o.PlanIssue(code=o.PlanIssueCode.CYCLE, detail="tasks form a cycle"),
+        "PlanValidationReport": lambda: o.PlanValidationReport(
+            plan_id=new_id("pln"),
+            run_id=RUN,
+            ok=False,
+            issues=(o.PlanIssue(code=o.PlanIssueCode.UNCOVERED_REQUIREMENT, detail="FR-002 has no task"),),
         ),
     }
+
+
+def _dispatch() -> o.DispatchRecord:
+    task = new_id("tsk")
+    return o.DispatchRecord(
+        project_id=PROJECT,
+        run_id=RUN,
+        task_id=task,
+        agent_type=AgentRole.ARCHITECT,
+        node=o.NodeName.ARCHITECT,
+        attempt=1,
+        idempotency_key=o.attempt_key(RUN, "architect", task, 1),
+        permitted_paths=("generated/docs/",),
+        done_criteria=("architecture document written",),
+        dispatched_at=NOW,
+    )
 
 
 SAMPLES: dict[str, Callable[[], Contract]] = _samples()

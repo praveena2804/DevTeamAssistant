@@ -1,12 +1,14 @@
 # Shared Contracts (C.1, HS-06)
 
-Package: `devteam_core.contracts` · Schema version: **1** · Exported schemas: `packages/core/src/devteam_core/contracts/schemas/*.v1.json` (71 files)
+Package: `devteam_core.contracts` · Schema version: **1** for every model except `RunState` (**2**, Part D.1) · Exported schemas: `packages/core/src/devteam_core/contracts/schemas/<Model>.v<version>.json` (81 files)
 
 Every interface that agents, harness and services exchange is a Pydantic v2 model deriving from `Contract`:
 
 - **Unknown fields are rejected** (`extra="forbid"`), so an agent cannot add a claim the contract does not define.
 - **Instances are immutable.** Changes are made with `model_copy(update=...)` and the result is validated again.
 - **Every model carries `schema_version`.** Changing a contract means bumping the version, re-exporting the schemas (`uv run python scripts/export_contract_schemas.py`) and recording the change in the tracker. The snapshot test fails when the files and the code disagree.
+  - A bumped model overrides `schema_version` with its own `Literal[n]`; `contract_version(model)` reads it and the schema file is named `<Model>.v<n>.json`. Data of an older version is rejected, never read silently as the new one.
+  - Bumps so far: `RunState` v1 → v2 (Part D.1): adds `run_mode` (D-38) and `clarification_round_used` (Spec §5.4, the single clarification round survives a restart).
 
 ## Modules
 
@@ -21,8 +23,9 @@ Every interface that agents, harness and services exchange is a Pydantic v2 mode
 | `agents` | Input/output models for all 10 agents; `AGENT_IO`; `check_output_against_input` | Spec §6.2–6.11 |
 | `tools` | `ToolCall`, `ToolResult`, `SideEffect`, principal formats | Spec §11.2 |
 | `llm` | `ChatMessage` (trust labels), `ModelParams` (F-9 bounds), `ModelRequest`, `ModelResponse` | HC-02; D-35, D-37 |
-| `events` | Metadata-only events (run/task transitions, tool and model calls, approvals, file changes) | Spec §11.4 |
-| `state` | `RunState` (references only) | Roadmap §6.8 |
+| `events` | Metadata-only events (run/task transitions, tool and model calls, approvals, file changes); Part D progress events `NodeStarted`, `NodeFinished`, `GateOpened`, `RunProgress`, `MetricSample` | Spec §11.4; HC-10 |
+| `state` | `RunState` v2 (references only) | Roadmap §6.8 |
+| `orchestration` | `NodeName` (closed node list), `NodeKind`, `Subgraph`, `NODE_KIND`, `NODE_SUBGRAPH`, `AGENT_NODE_FOR_ROLE` (exactly one agent node per role), `GATE_FOR_NODE`, `ALLOWED_TRANSITIONS`, `reachable`, `RunMode`, `GateDecision`, `GateResume`, `DispatchRecord`, `PlanIssue`, `PlanValidationReport` | Roadmap §6.1–6.5; Part D plan §3 (LG-01) |
 
 ## Rules the contracts enforce
 
@@ -39,7 +42,8 @@ Every interface that agents, harness and services exchange is a Pydantic v2 mode
 | An agent principal (`agent:<role>:<task>`) is valid only for its own task. Tool arguments are at most 64 KiB and results at most 1 MiB | `tools` |
 | System prompts are trusted and come first. Untrusted content travels only as a labelled user message. Output and context limits stay within F-9 | `llm` |
 | Events carry metadata only: no prompt, output or file text | `events` |
-| Build and delivery stages need a frozen spec version and checksum | `state.RunState` |
+| Build and delivery stages need a frozen spec version and checksum. The clarification form cannot reopen once its round is used | `state.RunState` |
+| Every graph transition is in a static table. No path reaches a build or delivery node without a spec-freeze node and the build-entry guard; a gate cancel ends the run directly. A gate resumes with one ID (approval or clarification submission), never with the decision itself. A dispatch names its own agent's node and the exact attempt key | `orchestration` |
 
 ## Not yet enforced (later checkpoints)
 

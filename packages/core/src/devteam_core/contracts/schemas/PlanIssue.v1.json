@@ -1,0 +1,59 @@
+{
+  "$defs": {
+    "PlanIssueCode": {
+      "description": "Every reason the Head plan validator can reject a plan (AC-D-04, Spec §23 #10).",
+      "enum": [
+        "schema_invalid",
+        "empty_plan",
+        "too_many_tasks",
+        "duplicate_task_id",
+        "unknown_agent",
+        "role_not_plannable",
+        "missing_dependency",
+        "cycle",
+        "path_outside_scope",
+        "uncovered_requirement",
+        "mixed_spec_version"
+      ],
+      "title": "PlanIssueCode",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "code": {
+      "$ref": "#/$defs/PlanIssueCode"
+    },
+    "detail": {
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Detail",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "task_id": {
+      "anyOf": [
+        {
+          "pattern": "^tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Task Id"
+    }
+  },
+  "required": [
+    "code",
+    "detail"
+  ],
+  "title": "PlanIssue",
+  "type": "object"
+}

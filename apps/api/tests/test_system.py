@@ -38,7 +38,7 @@ def test_version_reports_platform_and_schema(client: TestClient) -> None:
     assert body["name"] == "DevTeam AI"
     assert body["api_version"] == "v1"
     assert body["profile"] == "test"
-    assert body["schema_revision"] == body["schema_head"] == "0004_execution"
+    assert body["schema_revision"] == body["schema_head"] == "0005_orchestration"
     assert re.fullmatch(r"3\.12\.\d+", body["python_version"])
 
 
@@ -61,7 +61,7 @@ def test_request_id_is_generated_or_propagated(client: TestClient) -> None:
 
 @pytest.mark.parametrize("bad", ["x" * 65, "has space", "<script>", "a;b", "é-unicode"])
 def test_unsafe_request_ids_are_replaced(client: TestClient, bad: str) -> None:
-    response = client.get("/health", headers={"X-Request-ID": bad.encode("utf-8")})
+    response = client.get("/health", headers={b"X-Request-ID": bad.encode("utf-8")})
     assert response.headers["x-request-id"].startswith("req_")
 
 

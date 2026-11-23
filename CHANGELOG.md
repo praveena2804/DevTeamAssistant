@@ -4,6 +4,30 @@ One section per approved part (roadmap §8). Entries are added at gate approval;
 
 **Versioning:** SemVer, pre-1.0. Each approved part bumps the minor version (Part A = 0.1.0, B = 0.2.0, …, R = 0.18.0); fixes to an approved part bump the patch version. The accepted MVP is `1.0.0-mvp`. Git tags: `vX.Y.Z` plus `part-<letter>-approved` (roadmap §16.2).
 
+## Unreleased — Part D: LangGraph Orchestration, Ten Stub Agents & Head Agent Deterministic Core (in progress)
+
+### Added (checkpoint D.1)
+
+- New workspace packages `devteam-orchestration` (LangGraph; local-only tracing guard) and
+  `devteam-worker` (skeleton; the worker is built in D.4). Dependencies `langgraph` 1.2.x and
+  `langgraph-checkpoint-sqlite` 3.1.x (orchestration only)
+- Orchestration contracts: closed `NodeName` list with kinds and subgraphs, exactly one agent node per
+  role, the static allowed-transition table, `GateResume` (IDs only), `DispatchRecord`,
+  `PlanValidationReport`, `RunMode` (stub runs, D-38); progress events (node started/finished, gate
+  opened, run progress, metric sample); 81 exported JSON Schemas
+- Migration `0005_orchestration`: run-control columns on `runs`; `spec_versions` (draft → frozen, guarded
+  by triggers, D-39), `task_plans`, `run_jobs`, `worker_lease` (single row), `run_events`, `node_effects`
+  (two-phase idempotency); repositories for each
+- Settings section `orchestration` (recursion limit, worker polling, heartbeat, lease, crash-resume cap
+  D-40, resource wait)
+- Four new import-linter contracts (11 in total) and Ruff bans keeping LangGraph and orchestration out of
+  agents and lower layers, each with a planted-violation test
+
+### Changed (checkpoint D.1)
+
+- `RunState` contract v1 → **v2** (`run_mode`, `clarification_round_used`); schema files are now named
+  by each model's own version (`RunState.v2.json`)
+
 ## 0.3.0 — Part C: Shared Contracts & Harness Core (G-C approved 2026-11-23)
 
 ### Added (checkpoint C.1)

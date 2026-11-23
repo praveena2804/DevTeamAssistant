@@ -1,0 +1,68 @@
+{
+  "$defs": {
+    "GateName": {
+      "description": "Human gate nodes (roadmap §6.5).",
+      "enum": [
+        "feasibility_decision",
+        "clarification_form",
+        "project_approval",
+        "test_maintenance_approval",
+        "publish_approval",
+        "change_approval",
+        "db_switch_approval"
+      ],
+      "title": "GateName",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The only value passed to ``Command(resume=...)``: references, never the decision itself.\n\nThe gate node re-reads the approval (or the clarification submission) by ID and re-verifies it, so\na forged or replayed payload is rejected (Part D plan §3.4).",
+  "properties": {
+    "approval_id": {
+      "anyOf": [
+        {
+          "pattern": "^apr_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Approval Id"
+    },
+    "gate": {
+      "$ref": "#/$defs/GateName"
+    },
+    "run_id": {
+      "pattern": "^run_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "submission_id": {
+      "anyOf": [
+        {
+          "pattern": "^([a-z][a-z0-9]{1,11}_[0-7][0-9A-HJKMNP-TV-Z]{25}|chk_[0-9a-f]{26}|(FR|NFR|BR)-[0-9]{3,4})$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Submission Id"
+    }
+  },
+  "required": [
+    "run_id",
+    "gate"
+  ],
+  "title": "GateResume",
+  "type": "object"
+}

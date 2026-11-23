@@ -1,0 +1,24 @@
+[project]
+name = "devteam-worker"
+version = "0.3.0"
+description = "DevTeam AI run worker (LG-07, D-41): executes runs outside the API process. Part D"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "devteam-core",
+    "devteam-state",
+    "devteam-harness",
+    "devteam-orchestration",
+]
+
+[tool.uv.sources]
+devteam-core = { workspace = true }
+devteam-state = { workspace = true }
+devteam-harness = { workspace = true }
+devteam-orchestration = { workspace = true }
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/devteam_worker"]

@@ -1,0 +1,156 @@
+{
+  "$defs": {
+    "NodeKind": {
+      "description": "Node kinds, tagged in node metadata (roadmap §6.1, §4.4 L4).",
+      "enum": [
+        "agent",
+        "service",
+        "gate",
+        "guard",
+        "router"
+      ],
+      "title": "NodeKind",
+      "type": "string"
+    },
+    "NodeName": {
+      "description": "Every node of the ``project_run`` graph and its four subgraphs (Part D plan §3.2).",
+      "enum": [
+        "route_entry",
+        "route_after_discovery",
+        "route_after_change",
+        "route_after_build",
+        "finalize_run",
+        "intake",
+        "brd_analyst",
+        "feasibility",
+        "feasibility_decision",
+        "requirements_finalizer",
+        "clarification_form",
+        "project_approval",
+        "freeze_spec",
+        "build_entry_guard",
+        "head",
+        "schedule",
+        "architect",
+        "database_developer",
+        "backend_developer",
+        "frontend_developer",
+        "tester",
+        "debugger_reviewer",
+        "integration_build",
+        "test_runner",
+        "verify_task",
+        "failure_router",
+        "completion_gate_1",
+        "documenter",
+        "packager",
+        "completion_gate_2",
+        "publish_approval",
+        "github_deployer",
+        "final_report",
+        "change_intake",
+        "change_impact",
+        "change_approval",
+        "freeze_change_spec"
+      ],
+      "title": "NodeName",
+      "type": "string"
+    },
+    "RunMode": {
+      "description": "How a run's agents produce output (D-38). Only ``stub`` exists until Part F adds real models.\n\nA stub run is labelled everywhere; its agents return prepared fixture outputs and it can never\nproduce a test result or a project verification status.",
+      "enum": [
+        "stub"
+      ],
+      "title": "RunMode",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "actor": {
+      "pattern": "(^agent:(brd_analyst|requirements_finalizer|head|architect|database_developer|backend_developer|frontend_developer|tester|debugger_reviewer|documenter):tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$)|(^service:[a-z][a-z0-9_]{1,40}$)|(^prn_[0-7][0-9A-HJKMNP-TV-Z]{25}$)",
+      "title": "Actor",
+      "type": "string"
+    },
+    "event_id": {
+      "pattern": "^evt_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Event Id",
+      "type": "string"
+    },
+    "kind": {
+      "const": "node.started",
+      "default": "node.started",
+      "title": "Kind",
+      "type": "string"
+    },
+    "node": {
+      "$ref": "#/$defs/NodeName"
+    },
+    "node_kind": {
+      "$ref": "#/$defs/NodeKind"
+    },
+    "project_id": {
+      "anyOf": [
+        {
+          "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Project Id"
+    },
+    "run_id": {
+      "anyOf": [
+        {
+          "pattern": "^run_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Run Id"
+    },
+    "run_mode": {
+      "$ref": "#/$defs/RunMode"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "task_id": {
+      "anyOf": [
+        {
+          "pattern": "^tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Task Id"
+    },
+    "ts": {
+      "format": "date-time",
+      "title": "Ts",
+      "type": "string"
+    }
+  },
+  "required": [
+    "event_id",
+    "ts",
+    "actor",
+    "node",
+    "node_kind",
+    "run_mode"
+  ],
+  "title": "NodeStarted",
+  "type": "object"
+}
