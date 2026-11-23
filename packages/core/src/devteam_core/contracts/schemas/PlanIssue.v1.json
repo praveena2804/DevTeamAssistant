@@ -13,7 +13,10 @@
         "cycle",
         "path_outside_scope",
         "uncovered_requirement",
-        "mixed_spec_version"
+        "mixed_spec_version",
+        "foreign_task",
+        "task_not_new",
+        "unknown_requirement"
       ],
       "title": "PlanIssueCode",
       "type": "string"

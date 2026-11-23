@@ -57,7 +57,7 @@
       "type": "string"
     },
     "RunMode": {
-      "description": "How a run's agents produce output (D-38). Only ``stub`` exists until Part F adds real models.\n\nA stub run is labelled everywhere; its agents return prepared fixture outputs and it can never\nproduce a test result or a project verification status.",
+      "description": "How a run is labelled (D-38, as revised by the owner on 2026-11-23).\n\nA stub run is labelled everywhere and can never produce a test result or a project verification\nstatus. Its agents never receive fake, mocked or prepared AI output: AI work goes only through the\nreal LLM Gateway and a genuinely configured provider, and where none is available the agent step\nis reported as blocked rather than simulated.",
       "enum": [
         "stub"
       ],

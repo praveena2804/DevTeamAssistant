@@ -315,10 +315,12 @@ def reachable(
 
 
 class RunMode(StrEnum):
-    """How a run's agents produce output (D-38). Only ``stub`` exists until Part F adds real models.
+    """How a run is labelled (D-38, as revised by the owner on 2026-11-23).
 
-    A stub run is labelled everywhere; its agents return prepared fixture outputs and it can never
-    produce a test result or a project verification status.
+    A stub run is labelled everywhere and can never produce a test result or a project verification
+    status. Its agents never receive fake, mocked or prepared AI output: AI work goes only through the
+    real LLM Gateway and a genuinely configured provider, and where none is available the agent step
+    is reported as blocked rather than simulated.
     """
 
     STUB = "stub"
@@ -409,6 +411,10 @@ class PlanIssueCode(StrEnum):
     PATH_OUTSIDE_SCOPE = "path_outside_scope"
     UNCOVERED_REQUIREMENT = "uncovered_requirement"
     MIXED_SPEC_VERSION = "mixed_spec_version"
+    # added in D.2
+    FOREIGN_TASK = "foreign_task"  # the task names another project or run
+    TASK_NOT_NEW = "task_not_new"  # a new plan may hold only pending, unattempted tasks
+    UNKNOWN_REQUIREMENT = "unknown_requirement"  # a key that is not in the approved spec's scope
 
 
 class PlanIssue(Contract):
@@ -428,4 +434,54 @@ class PlanValidationReport(Contract):
     def _ok_means_no_issues(self) -> Self:
         if self.ok == bool(self.issues):
             raise ValueError("ok must be true exactly when there are no issues")
+        return self
+
+
+# -------------------------------------------------------------------------------- service outcomes
+
+
+class ServiceOutcomeStatus(StrEnum):
+    """What a deterministic service step did (D.2).
+
+    There is deliberately no value for "passed", "supported", "built" or "verified": until the real
+    service exists (the part named in ``ServiceOutcome.available_in_part``), a step can only say that
+    it did **not** do its job. Real results come from the real services (E, G, M, N, O, P).
+    """
+
+    PERFORMED = "performed"  # a real effect, e.g. a spec version frozen (result_ref names it)
+    NOT_RUN = "not_run"
+    NOT_EVALUATED = "not_evaluated"
+    NOT_BUILT = "not_built"
+    NOT_PUBLISHED = "not_published"
+
+
+ServicePart = Literal["E", "G", "M", "N", "O", "P", "Q"]
+
+
+class ServiceOutcome(Contract):
+    """The recorded result of one service node. A stand-in can never claim success (D-38)."""
+
+    project_id: ProjectId
+    run_id: RunId
+    node: NodeName
+    status: ServiceOutcomeStatus
+    stand_in: bool
+    reason: ShortText
+    available_in_part: ServicePart | None = None
+    result_ref: RecordRef | None = None
+    recorded_at: AwareDatetime
+
+    @model_validator(mode="after")
+    def _honest(self) -> Self:
+        if NODE_KIND[self.node] is not NodeKind.SERVICE:
+            raise ValueError(f"'{self.node.value}' is not a service node")
+        performed = self.status is ServiceOutcomeStatus.PERFORMED
+        if self.stand_in == performed:
+            raise ValueError("a stand-in service never performs its effect, and a real one always does")
+        if self.stand_in and self.available_in_part is None:
+            raise ValueError("a stand-in outcome must name the part that delivers the real service")
+        if performed and self.result_ref is None:
+            raise ValueError("a performed effect must reference what it produced")
+        if self.stand_in and self.result_ref is not None:
+            raise ValueError("a stand-in produces nothing to reference")
         return self

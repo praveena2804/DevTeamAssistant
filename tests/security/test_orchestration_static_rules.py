@@ -35,6 +35,7 @@ ORCH = "orchestration must not depend on apps"
 API = "the API never runs graphs or agents directly"
 WORKER = "the worker reaches agents only through orchestration"
 HTTP = "only llm_gateway.providers may import HTTP clients (HC-02)"
+FAKE = "runs never use the fake model provider (D-38)"  # D.2: owner ruling, real AI providers only
 
 
 def _lint_imports(extra_path: Path | None) -> subprocess.CompletedProcess[str]:
@@ -77,7 +78,7 @@ def test_import_linter_passes_with_the_new_contracts() -> None:
     result = _lint_imports(None)
     assert result.returncode == 0, result.stdout + result.stderr
     flat = " ".join(result.stdout.split())
-    for contract in (LOWER, ORCH, API, WORKER):
+    for contract in (LOWER, ORCH, API, WORKER, FAKE):
         assert f"{contract} KEPT" in flat, contract
     assert "0 broken" in flat
 
@@ -99,6 +100,15 @@ def test_import_linter_passes_with_the_new_contracts() -> None:
         ("devteam_api", "from devteam_agents.head import spec\n", API),
         ("devteam_worker", "from devteam_agents.head import spec\n", WORKER),
         ("devteam_worker", "import httpx\n", HTTP),
+        ("devteam_orchestration", "from devteam_harness.llm_gateway.providers import fake\n", FAKE),
+        (
+            "devteam_orchestration",
+            "from devteam_harness.llm_gateway.providers.fake import FakeProvider\n",
+            FAKE,
+        ),
+        ("devteam_worker", "import devteam_harness.llm_gateway.providers.fake\n", FAKE),
+        ("devteam_api", "from devteam_harness.llm_gateway.providers.fake import FakeProvider\n", FAKE),
+        ("devteam_agents", "from devteam_harness.llm_gateway.providers import fake\n", FAKE),
     ],
 )
 def test_each_planted_violation_breaks_its_contract(

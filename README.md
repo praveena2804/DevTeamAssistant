@@ -7,7 +7,7 @@ DevTeam AI is a local-first, BRD-driven software development platform.
 3. A supervised team of **exactly ten AI agents** then designs, generates, tests, repairs, documents and packages the requested application.
 4. The agents work inside a central security and execution **harness**. Models run locally on Ollama; no paid service is used.
 
-> **Current state: Parts A, B and C approved (v0.3.0). Part D (orchestration) in progress: checkpoint D.1 done; D.2 not started.**
+> **Current state: Parts A, B and C approved (v0.3.0). Part D (orchestration) in progress: D.1 done; D.2 done in part (Head Agent core and service steps); the ten agent stubs are blocked until a real model provider is connected (KI-025).**
 > What exists:
 > - configuration, logging, trace context and secret redaction (Part A);
 > - a SQLite state database with migrations and automatic backups (Part A);
@@ -31,6 +31,7 @@ DevTeam AI is a local-first, BRD-driven software development platform.
 | `docs/architecture/MODEL_ROUTING.md` | Model-routing audit and proposed design (D-06, D-37) |
 | `docs/architecture/HARNESS_ASSESSMENT.md` | Agent and harness architecture assessment |
 | `docs/adr/` | Architecture decision records |
+| `docs/THIRD_PARTY_LICENSES.md` | Runtime dependency licences and the MPL-2.0 obligations |
 | `CLAUDE.md` | Engineering rules for coding agents |
 
 ## Architecture

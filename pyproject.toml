@@ -286,3 +286,9 @@ type = "forbidden"
 source_modules = ["devteam_worker"]
 forbidden_modules = ["devteam_agents", "devteam_api"]
 allow_indirect_imports = true
+
+[[tool.importlinter.contracts]]
+name = "runs never use the fake model provider (D-38)"
+type = "forbidden"
+source_modules = ["devteam_orchestration", "devteam_worker", "devteam_api", "devteam_agents"]
+forbidden_modules = ["devteam_harness.llm_gateway.providers.fake"]

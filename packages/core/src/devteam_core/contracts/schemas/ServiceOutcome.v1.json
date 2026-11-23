@@ -1,0 +1,146 @@
+{
+  "$defs": {
+    "NodeName": {
+      "description": "Every node of the ``project_run`` graph and its four subgraphs (Part D plan §3.2).",
+      "enum": [
+        "route_entry",
+        "route_after_discovery",
+        "route_after_change",
+        "route_after_build",
+        "finalize_run",
+        "intake",
+        "brd_analyst",
+        "feasibility",
+        "feasibility_decision",
+        "requirements_finalizer",
+        "clarification_form",
+        "project_approval",
+        "freeze_spec",
+        "build_entry_guard",
+        "head",
+        "schedule",
+        "architect",
+        "database_developer",
+        "backend_developer",
+        "frontend_developer",
+        "tester",
+        "debugger_reviewer",
+        "integration_build",
+        "test_runner",
+        "verify_task",
+        "failure_router",
+        "completion_gate_1",
+        "documenter",
+        "packager",
+        "completion_gate_2",
+        "publish_approval",
+        "github_deployer",
+        "final_report",
+        "change_intake",
+        "change_impact",
+        "change_approval",
+        "freeze_change_spec"
+      ],
+      "title": "NodeName",
+      "type": "string"
+    },
+    "ServiceOutcomeStatus": {
+      "description": "What a deterministic service step did (D.2).\n\nThere is deliberately no value for \"passed\", \"supported\", \"built\" or \"verified\": until the real\nservice exists (the part named in ``ServiceOutcome.available_in_part``), a step can only say that\nit did **not** do its job. Real results come from the real services (E, G, M, N, O, P).",
+      "enum": [
+        "performed",
+        "not_run",
+        "not_evaluated",
+        "not_built",
+        "not_published"
+      ],
+      "title": "ServiceOutcomeStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The recorded result of one service node. A stand-in can never claim success (D-38).",
+  "properties": {
+    "available_in_part": {
+      "anyOf": [
+        {
+          "enum": [
+            "E",
+            "G",
+            "M",
+            "N",
+            "O",
+            "P",
+            "Q"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Available In Part"
+    },
+    "node": {
+      "$ref": "#/$defs/NodeName"
+    },
+    "project_id": {
+      "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Project Id",
+      "type": "string"
+    },
+    "reason": {
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "recorded_at": {
+      "format": "date-time",
+      "title": "Recorded At",
+      "type": "string"
+    },
+    "result_ref": {
+      "anyOf": [
+        {
+          "pattern": "^([a-z][a-z0-9]{1,11}_[0-7][0-9A-HJKMNP-TV-Z]{25}|chk_[0-9a-f]{26}|(FR|NFR|BR)-[0-9]{3,4})$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Result Ref"
+    },
+    "run_id": {
+      "pattern": "^run_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "stand_in": {
+      "title": "Stand In",
+      "type": "boolean"
+    },
+    "status": {
+      "$ref": "#/$defs/ServiceOutcomeStatus"
+    }
+  },
+  "required": [
+    "project_id",
+    "run_id",
+    "node",
+    "status",
+    "stand_in",
+    "reason",
+    "recorded_at"
+  ],
+  "title": "ServiceOutcome",
+  "type": "object"
+}

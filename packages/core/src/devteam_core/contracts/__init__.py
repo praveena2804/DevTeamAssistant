@@ -43,6 +43,7 @@ from devteam_core.contracts.orchestration import (
     GateResume,
     PlanIssue,
     PlanValidationReport,
+    ServiceOutcome,
 )
 from devteam_core.contracts.records import DOMAIN_RECORDS, EntityAttribute, EntityRelationship
 from devteam_core.contracts.state import RunState
@@ -84,6 +85,7 @@ _REGISTERED: tuple[type[Contract], ...] = (
     DispatchRecord,
     PlanIssue,
     PlanValidationReport,
+    ServiceOutcome,
 )
 CONTRACT_MODELS: dict[str, type[Contract]] = {model.__name__: model for model in _REGISTERED}
 

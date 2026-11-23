@@ -4,7 +4,7 @@ Roadmap ref: §13 Part D, §4.3, §6 · Milestone: M1 · Gate: **G-D** · Workin
 
 | Field | Value |
 |---|---|
-| Status | **Approved** (AP-015, 2026-11-23). Checkpoint D.1 implemented; D.2 not started (waits for the D.1 review) |
+| Status | **Approved** (AP-015, 2026-11-23). D.1 approved (AP-016). **D.2 implemented in part**: Head core, stand-in services and Spec Freeze done; the ten agent stubs are **blocked** by the revised D-38 ruling (§12) |
 | Preconditions | G-C approved (**done**, AP-013, v0.3.0). D-27 (b), D-38…D-42 approved; **D-43 deferred** (AP-015) |
 | Harness components | Implements HC-07; HC-19 checkpointing; HC-12 resume and crash recovery; HC-13 interrupt mechanics; HC-10 progress, events and metrics; HC-11 graph spans and trace viewer; HC-21 run history. Integrates every Part C component |
 | Agents | All 10 as **stubs**. Agent 3 (Head) also gets its **deterministic core**: plan validator, scheduler, dispatcher, failure router and template planner |
@@ -51,7 +51,7 @@ When it is done:
 | Checkpoint | Working Plan steps | What |
 |---|---|---|
 | **D.1 Foundations** | LG-01 completion, LG-05 (part), LG-06 (tables) | Add LangGraph to the project and check its licences and security. Add the missing contracts: `NodeName`, `NodeKind` and the allowed-transition table (LG-01 listed these for C, but they were not built; see §4). Migration `0005_orchestration`. Settings section `orchestration`. Import rules for the new packages. A guard that LangSmith tracing (cloud telemetry) is off |
-| **D.2 Head core and stubs** | Head core; stubs | Head Agent deterministic core: validator, scheduler, dispatcher, failure router, template planner (pure functions, no I/O). Stub behaviour for all 10 agents. Fixture responder for the fake provider. Stub services: feasibility, spec freeze, integration/build, test runner, completion gate, packager, deployer |
+| **D.2 Head core and stubs** | Head core; stubs | Head Agent deterministic core: validator, scheduler, dispatcher, failure router, template planner (pure functions, no I/O). Stub behaviour for all 10 agents. ~~Fixture responder for the fake provider~~ (withdrawn, §12). Stub services: feasibility, spec freeze, integration/build, test runner, completion gate, packager, deployer |
 | **D.3 Graph** | LG-02, LG-03, LG-04, LG-05, LG-06, LG-09, LG-10, LG-13 | Node wrappers (agent, service, gate, guard, router). Four subgraphs plus the parent graph. `build_entry_guard`. Gate nodes using `interrupt()`. SqliteSaver checkpointer on `data/checkpoints.db`. Attempt ledger and two-phase action helper. `Send` fan-out for deterministic nodes (D-27). Topology tests. Generated diagram in `docs/architecture/orchestration.md` |
 | **D.4 Worker and run control** | LG-07, LG-08, LG-11, HS-17 | `apps/worker`: job table, single-worker lease, heartbeat, startup recovery. Run control API: start, pause, resume, cancel, gate decision. Kill-and-restart recovery test |
 | **D.5 Progress, observability, UI** | HS-18, E2E-2 | Progress events delivered live over SSE. Metrics. Graph spans and the trace viewer. Run history. UI: Build Progress page, minimal gate pages, trace viewer, run history. OpenAPI and web types regenerated |
@@ -503,3 +503,34 @@ A checkpoint is not done with any failing test, any skip without a recorded reas
 ---
 
 ## Owner confirmation: ☑ D-27 (b) · ☑ D-38 · ☑ D-39 · ☑ D-40 (block after more than 3 consecutive crashes) · ☑ D-41 · ☑ D-42 · ☒ D-43 **deferred** · ☑ start implementation, D.1 only first (AP-015, 2026-11-23)
+
+---
+
+## 12. Changes after the D.1 review (AP-016, 2026-11-23)
+
+### 12.1 Owner rulings
+
+- **D-38 revised:** "Use real AI providers only. Do not use fake providers, mock AI providers, deterministic fake responses, prepared answers, or simulated agent outputs. All AI agent execution must go through the real AI gateway and a genuinely configured provider. If real-provider configuration or safe execution is not available, stop and report the blocker. Do not silently substitute a fake provider."
+- **KI-023 (`orjson`):** accepted conditionally: verify the exact version and licence expression, keep every licence notice, document the MPL-2.0 obligations in a third-party licence inventory, never modify orjson's source. Done in D.2: `docs/THIRD_PARTY_LICENSES.md`, checked by `tests/contract/test_third_party_licences.py`.
+
+### 12.2 What this changes in the plan
+
+| Plan item | Before | Now |
+|---|---|---|
+| §0 point 2, §2.2 D-38, §5 `providers/fixture.py`, D.2 step 3 "fixture responder" | Stub agents answer from prepared fixture outputs through the gateway's fake provider | **Withdrawn.** No fixture responder is built. Orchestration, the worker, the API and the agents are forbidden by an import-linter contract from importing the fake provider (`runs never use the fake model provider (D-38)`, planted-violation tested). The Part C fake provider stays for the Part C unit tests and `scripts/demo_part_c.py` only; whether it must be removed entirely is an open question to the owner |
+| D.2 step 4: ten `stub.py` behaviours "through the real executor + gateway (fake provider)" | Built in D.2 | **Blocked.** Real AI execution needs a real provider in the LLM Gateway. Only the `fake` provider exists; the direct Ollama provider is Part F scope (roadmap §13 Part F, PART-D-PLAN §1 "Out of scope"). Ollama itself runs locally (0.40.16, loopback, 9 models), so the blocker is the missing gateway adapter, not the machine. Recorded as KI-025; options are in the D.2 report |
+| §3.2 `feasibility` "all fixture technologies supported" | Stub reports "supported" | Stand-in reports **"not evaluated"** (a stand-in can no longer state any result) |
+| Stub services | Stub outputs | `ServiceOutcome` contract: a stand-in can only report "not run / not evaluated / not built / not published" and must name the part delivering the real service; "performed" only for a real effect with a reference (Spec Freeze) |
+| §5 `agents/head/tests/` | Tests next to the Head package | `tests/agents/`. The agent AST rules (`scripts/check_agent_rules.py`, Part C) scan every `.py` file under `agents/` and refuse `pytest`/`hypothesis` imports; changing a Part C rule was not necessary |
+| §3.1 Head uses `graphlib` | Standard-library `graphlib` | Own iterative cycle search: `graphlib` is not on the Part C agent standard-library allowlist |
+| §5 `devteam_orchestration/services/` | A package | One module, `devteam_orchestration/services.py` |
+
+### 12.3 What D.2 delivered
+
+- Head Agent deterministic core (`agents/head/src/devteam_agents/head/`): `validator.py`, `template_planner.py`, `scheduler.py`, `dispatcher.py`, `failure_router.py`. Pure functions; no I/O, no model. Every AC-D-04 case reports its own code.
+- Stand-in services and the real Spec Freeze service (`devteam_orchestration/services.py`).
+- `ServiceOutcome` contract; three plan-issue codes (`foreign_task`, `task_not_new`, `unknown_requirement`); `RunMode` wording corrected to the revised D-38.
+- Import contract against the fake provider; third-party licence inventory and its test.
+
+**Not delivered (blocked):** the ten agent stub behaviours (D.2 step 4) and the exit criterion "each stub returns a schema-valid output via the executor". D.3 builds the graph around agent nodes, so D.3 also depends on the ruling.
+

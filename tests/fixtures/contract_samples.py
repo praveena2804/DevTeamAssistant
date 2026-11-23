@@ -539,6 +539,17 @@ def _samples() -> dict[str, Callable[[], Contract]]:
             ok=False,
             issues=(o.PlanIssue(code=o.PlanIssueCode.UNCOVERED_REQUIREMENT, detail="FR-002 has no task"),),
         ),
+        # ---- Part D.2
+        "ServiceOutcome": lambda: o.ServiceOutcome(
+            project_id=PROJECT,
+            run_id=RUN,
+            node=o.NodeName.TEST_RUNNER,
+            status=o.ServiceOutcomeStatus.NOT_RUN,
+            stand_in=True,
+            reason="no sandbox yet: nothing was run",
+            available_in_part="M",
+            recorded_at=NOW,
+        ),
     }
 
 

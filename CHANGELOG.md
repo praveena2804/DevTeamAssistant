@@ -23,6 +23,23 @@ One section per approved part (roadmap §8). Entries are added at gate approval;
 - Four new import-linter contracts (11 in total) and Ruff bans keeping LangGraph and orchestration out of
   agents and lower layers, each with a planted-violation test
 
+### Added (checkpoint D.2)
+
+- Head Agent deterministic core (no model): plan validator reporting every problem with a code,
+  template planner, sequential scheduler, dispatcher with attempt-ledger keys, failure router rules table
+  (F-10c refusals never retried, F-10d re-attempt bound, crash rule D-40)
+- Service steps: honest stand-ins that can only report "not run / not evaluated / not built / not
+  published" (`ServiceOutcome` contract), and the real Spec Freeze service (re-verifies the approval,
+  freezes the spec version, audited, safe to repeat)
+- Import contract: orchestration, the worker, the API and agents can never use the fake model provider
+  (revised D-38: real AI providers only)
+- `docs/THIRD_PARTY_LICENSES.md`: runtime licence inventory with MPL-2.0 obligations (`orjson`, `certifi`),
+  checked by a test
+
+### Not delivered (checkpoint D.2)
+
+- The ten agent stub behaviours: blocked until a real model provider exists in the LLM Gateway (KI-025)
+
 ### Changed (checkpoint D.1)
 
 - `RunState` contract v1 → **v2** (`run_mode`, `clarification_round_used`); schema files are now named

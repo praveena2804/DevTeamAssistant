@@ -1,6 +1,6 @@
 # Shared Contracts (C.1, HS-06)
 
-Package: `devteam_core.contracts` · Schema version: **1** for every model except `RunState` (**2**, Part D.1) · Exported schemas: `packages/core/src/devteam_core/contracts/schemas/<Model>.v<version>.json` (81 files)
+Package: `devteam_core.contracts` · Schema version: **1** for every model except `RunState` (**2**, Part D.1) · Exported schemas: `packages/core/src/devteam_core/contracts/schemas/<Model>.v<version>.json` (82 files)
 
 Every interface that agents, harness and services exchange is a Pydantic v2 model deriving from `Contract`:
 
@@ -25,7 +25,7 @@ Every interface that agents, harness and services exchange is a Pydantic v2 mode
 | `llm` | `ChatMessage` (trust labels), `ModelParams` (F-9 bounds), `ModelRequest`, `ModelResponse` | HC-02; D-35, D-37 |
 | `events` | Metadata-only events (run/task transitions, tool and model calls, approvals, file changes); Part D progress events `NodeStarted`, `NodeFinished`, `GateOpened`, `RunProgress`, `MetricSample` | Spec §11.4; HC-10 |
 | `state` | `RunState` v2 (references only) | Roadmap §6.8 |
-| `orchestration` | `NodeName` (closed node list), `NodeKind`, `Subgraph`, `NODE_KIND`, `NODE_SUBGRAPH`, `AGENT_NODE_FOR_ROLE` (exactly one agent node per role), `GATE_FOR_NODE`, `ALLOWED_TRANSITIONS`, `reachable`, `RunMode`, `GateDecision`, `GateResume`, `DispatchRecord`, `PlanIssue`, `PlanValidationReport` | Roadmap §6.1–6.5; Part D plan §3 (LG-01) |
+| `orchestration` | `NodeName` (closed node list), `NodeKind`, `Subgraph`, `NODE_KIND`, `NODE_SUBGRAPH`, `AGENT_NODE_FOR_ROLE` (exactly one agent node per role), `GATE_FOR_NODE`, `ALLOWED_TRANSITIONS`, `reachable`, `RunMode`, `GateDecision`, `GateResume`, `DispatchRecord`, `PlanIssueCode`, `PlanIssue`, `PlanValidationReport`; `ServiceOutcomeStatus`, `ServiceOutcome` (D.2) | Roadmap §6.1–6.5; Part D plan §3 (LG-01), §12 |
 
 ## Rules the contracts enforce
 
@@ -44,6 +44,7 @@ Every interface that agents, harness and services exchange is a Pydantic v2 mode
 | Events carry metadata only: no prompt, output or file text | `events` |
 | Build and delivery stages need a frozen spec version and checksum. The clarification form cannot reopen once its round is used | `state.RunState` |
 | Every graph transition is in a static table. No path reaches a build or delivery node without a spec-freeze node and the build-entry guard; a gate cancel ends the run directly. A gate resumes with one ID (approval or clarification submission), never with the decision itself. A dispatch names its own agent's node and the exact attempt key | `orchestration` |
+| A service stand-in can report only that it did **not** do its job (not run, not evaluated, not built, not published) and must name the part that delivers the real service; only a real effect is "performed", and it must reference what it produced. There is no value for passed, supported or verified (D-38) | `orchestration.ServiceOutcome` |
 
 ## Not yet enforced (later checkpoints)
 
