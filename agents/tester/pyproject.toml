@@ -1,6 +1,6 @@
 [project]
 name = "devteam-agent-tester"
-version = "0.2.0"
+version = "0.3.0"
 description = "DevTeam AI agent 8 of 10: Testing & Validation Agent. Declaration (AgentSpec) only; behaviour comes in later parts"
 requires-python = ">=3.12,<3.13"
 dependencies = [

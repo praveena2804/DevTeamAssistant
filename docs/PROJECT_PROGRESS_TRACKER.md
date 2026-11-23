@@ -63,3 +63,7 @@ I built the last checkpoint of Part C. Every agent now has spending limits (time
 **Run 16 — Part C final check**
 
 No features were built or changed. I ran every check on the finished Part C: all tests (all passed except the one symlink test this computer cannot run), the code-quality checks, a security check of every outside package the project uses (no known problems), and a scan for leaked secrets (none). I checked your real database without changing it: the activity log is intact, and your sign-in key is still safely in Windows Credential Manager. I ran the demonstration and wrote the Part C completion report for your approval.
+
+**Run 17 — Part C release**
+
+No new features were built. You approved Part C, so I re-ran the tests and checks after marking it as version 0.3.0, and saved it into the main line of your local Git history with the Part C approval tags. Nothing was sent to GitHub, and Part D has not been started.

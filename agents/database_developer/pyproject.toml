@@ -1,6 +1,6 @@
 [project]
 name = "devteam-agent-database-developer"
-version = "0.2.0"
+version = "0.3.0"
 description = "DevTeam AI agent 5 of 10: Database Developer. Declaration (AgentSpec) only; behaviour comes in later parts"
 requires-python = ">=3.12,<3.13"
 dependencies = [

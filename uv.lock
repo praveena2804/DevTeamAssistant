@@ -287,7 +287,7 @@ wheels = [
 
 [[package]]
 name = "devteam-agent-architect"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "agents/architect" }
 dependencies = [
     { name = "devteam-core" },
@@ -302,7 +302,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-agent-backend-developer"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "agents/backend_developer" }
 dependencies = [
     { name = "devteam-core" },
@@ -317,7 +317,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-agent-brd-analyst"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "agents/brd_analyst" }
 dependencies = [
     { name = "devteam-core" },
@@ -332,7 +332,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-agent-database-developer"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "agents/database_developer" }
 dependencies = [
     { name = "devteam-core" },
@@ -347,7 +347,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-agent-debugger-reviewer"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "agents/debugger_reviewer" }
 dependencies = [
     { name = "devteam-core" },
@@ -362,7 +362,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-agent-documenter"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "agents/documenter" }
 dependencies = [
     { name = "devteam-core" },
@@ -377,7 +377,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-agent-frontend-developer"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "agents/frontend_developer" }
 dependencies = [
     { name = "devteam-core" },
@@ -392,7 +392,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-agent-head"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "agents/head" }
 dependencies = [
     { name = "devteam-core" },
@@ -407,7 +407,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-agent-requirements-finalizer"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "agents/requirements_finalizer" }
 dependencies = [
     { name = "devteam-core" },
@@ -422,7 +422,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-agent-tester"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "agents/tester" }
 dependencies = [
     { name = "devteam-core" },
@@ -437,7 +437,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-ai"
-version = "0.2.0"
+version = "0.3.0"
 source = { virtual = "." }
 dependencies = [
     { name = "devteam-agent-architect" },
@@ -508,7 +508,7 @@ dev = [
 
 [[package]]
 name = "devteam-api"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "apps/api" }
 dependencies = [
     { name = "devteam-core" },
@@ -535,7 +535,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-core"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "packages/core" }
 dependencies = [
     { name = "pydantic" },
@@ -554,7 +554,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-harness"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "packages/harness" }
 dependencies = [
     { name = "devteam-core" },
@@ -577,7 +577,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-services"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "packages/services" }
 dependencies = [
     { name = "charset-normalizer" },
@@ -602,7 +602,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-state"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "packages/state" }
 dependencies = [
     { name = "alembic" },

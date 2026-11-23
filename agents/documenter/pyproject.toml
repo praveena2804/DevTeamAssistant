@@ -1,6 +1,6 @@
 [project]
 name = "devteam-agent-documenter"
-version = "0.2.0"
+version = "0.3.0"
 description = "DevTeam AI agent 10 of 10: Documentation & Reporting Agent. Declaration (AgentSpec) only; behaviour comes in later parts"
 requires-python = ">=3.12,<3.13"
 dependencies = [
