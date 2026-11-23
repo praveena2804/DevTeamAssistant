@@ -4,7 +4,7 @@ Roadmap ref: §13 Part D, §4.3, §6 · Milestone: M1 · Gate: **G-D** · Workin
 
 | Field | Value |
 |---|---|
-| Status | **Approved** (AP-015, 2026-11-23). D.1 approved (AP-016). **D.2 implemented in part**: Head core, stand-in services and Spec Freeze done; the ten agent stubs are **blocked** by the revised D-38 ruling (§12) |
+| Status | **Approved** (AP-015). D.1 approved (AP-016). **D.1–D.5 implemented** (AP-017: D-44 (a), real local Ollama brought forward; all checkpoints in one run). Awaiting the owner's review of the whole of Part D (G-D) |
 | Preconditions | G-C approved (**done**, AP-013, v0.3.0). D-27 (b), D-38…D-42 approved; **D-43 deferred** (AP-015) |
 | Harness components | Implements HC-07; HC-19 checkpointing; HC-12 resume and crash recovery; HC-13 interrupt mechanics; HC-10 progress, events and metrics; HC-11 graph spans and trace viewer; HC-21 run history. Integrates every Part C component |
 | Agents | All 10 as **stubs**. Agent 3 (Head) also gets its **deterministic core**: plan validator, scheduler, dispatcher, failure router and template planner |
@@ -533,4 +533,30 @@ A checkpoint is not done with any failing test, any skip without a recorded reas
 - Import contract against the fake provider; third-party licence inventory and its test.
 
 **Not delivered (blocked):** the ten agent stub behaviours (D.2 step 4) and the exit criterion "each stub returns a schema-valid output via the executor". D.3 builds the graph around agent nodes, so D.3 also depends on the ruling.
+
+---
+
+## 13. Owner rulings after the D.2 report (AP-017, 2026-11-23) and what changed
+
+### 13.1 Rulings
+
+- **D-44 (a):** bring a minimal local Ollama integration forward into Part D, through the existing AI gateway; genuine local model calls only; no fake providers, prepared responses, simulated agent execution, cloud AI or LiteLLM.
+- **KI-026 (`certifi`):** accepted conditionally on the same terms as orjson (done: `docs/THIRD_PARTY_LICENSES.md`, licence test).
+- **Part C fake provider:** kept only for Part C's tests and `scripts/demo_part_c.py`; unreachable from workflow execution, the worker, the API and agents (import contract, runtime and subprocess checks).
+- **Complete D.2–D.5 in one run**; checkpoints are internal milestones with their own commits; no push.
+
+### 13.2 What was built differently from §1–§11
+
+| Plan item | Now | Reason |
+|---|---|---|
+| §1 out of scope: "Any real model call; the Ollama adapter" (Part F) | `llm_gateway/providers/ollama.py`: direct loopback-only adapter (no LiteLLM, no proxies, no redirects, never pulls a model). Routing, RAG and fallback stay in Part F | D-44 (a) |
+| §0, §3.2: stub agents with prepared answers | Ten agent behaviours (`agents/*/behaviour.py`) with **minimal real behaviour**: each makes a genuine local model call through the executor and the gateway, constrained by an answer contract (`contracts/drafts.py`) sent as Ollama's JSON Schema format. Build agents write design notes (not code) under an honest header. Real behaviour arrives in Parts H–O | D-38 revised, D-44 |
+| §5 `agents/<x>/stub.py` | `agents/<x>/behaviour.py` | Not stubs any more |
+| §3.2 Head plan | The plan is built by the Head's deterministic template planner and validator (orchestration calls them); the Head agent's model call writes the progress summary | HeadInput has no write scopes; Part J adds the model planner |
+| §3.1 four LangGraph subgraphs | One compiled graph whose nodes carry `subgraph` metadata (the four groups); edges generated from the transition table | The D.1 table has edges that cross group boundaries (every cancel ends the run directly); one graph keeps "compiled edges = table" exact. Flagged in the completion report |
+| §3.9 data | Migration **0006** `agent_outputs` (validated outputs by task, append-only) | State is references only; outputs are needed after a restart |
+| §3.7 paths `/api/runs/{run_id}` | `/api/projects/{project_id}/runs/{run_id}/…` | Project-scoped like every Part B route (404 across projects) |
+| §3.4 gates | Clarification form and change approval are compiled but **fail closed** (no critical-gap producer before Part I; change requests in Part Q) | Nothing to submit yet |
+| §3.2 intake `Send` fan-out | Not used: uploads already extract (D-42 (a)), so nothing is pending; D-27 (b) limits parallel work to one on this laptop | No work to fan out |
+| §5 worker modules `queue/lease/heartbeat/recovery.py` | `devteam_worker/worker.py` + `main.py` | Small enough for one module |
 

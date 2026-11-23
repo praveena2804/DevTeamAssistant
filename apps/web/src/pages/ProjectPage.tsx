@@ -4,6 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import { type UploadResponse, getProject, listDocuments, uploadDocuments } from "../api/client";
 import { useLoad } from "../api/useLoad";
 import { ErrorNotice } from "../components/ErrorNotice";
+import { RunsSection } from "../components/RunsSection";
 
 const ACCEPT = ".pdf,.docx,.txt,.md";
 
@@ -131,6 +132,11 @@ export function ProjectPage() {
             </tbody>
           </table>
         ))}
+
+      <RunsSection
+        projectId={projectId}
+        hasDocuments={documents.kind === "loaded" && documents.data.some((d) => d.chunk_count > 0)}
+      />
     </section>
   );
 }

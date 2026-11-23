@@ -23,6 +23,16 @@ export type FileResult = Schemas["FileResult"];
 export type AuditPage = Schemas["AuditPage"];
 export type AuditEvent = Schemas["AuditEventOut"];
 export type AuditIntegrity = Schemas["AuditIntegrity"];
+export type Run = Schemas["RunOut"];
+export type RunDetail = Schemas["RunDetail"];
+export type GateInfo = Schemas["GateInfo"];
+export type GateDecisionOut = Schemas["GateDecisionOut"];
+export type RunTask = Schemas["TaskOut"];
+export type RunEvent = Schemas["RunEventOut"];
+export type RunTrace = Schemas["TraceOut"];
+export type Span = Schemas["SpanOut"];
+export type HistoryItem = Schemas["HistoryItem"];
+export type RunMetrics = Schemas["MetricsOut"];
 
 export class ApiError extends Error {
   readonly status: number;
@@ -133,3 +143,33 @@ export const listAudit = (projectId: string | null, offset: number, limit: numbe
       : `/api/audit?offset=${offset}&limit=${limit}`,
     opt(signal),
   );
+
+// ---------------------------------------------------------------- runs (Part D)
+const runsPath = (projectId: string) => `/api/projects/${encodeURIComponent(projectId)}/runs`;
+export const runPath = (projectId: string, runId: string) => `${runsPath(projectId)}/${encodeURIComponent(runId)}`;
+
+export const listRuns = (projectId: string, signal?: AbortSignal) => request<Run[]>(runsPath(projectId), opt(signal));
+export const startRun = (projectId: string) => request<Run>(runsPath(projectId), { method: "POST", json: {} });
+export const getRun = (projectId: string, runId: string, signal?: AbortSignal) =>
+  request<RunDetail>(runPath(projectId, runId), opt(signal));
+export const controlRun = (projectId: string, runId: string, action: "pause" | "resume" | "cancel") =>
+  request<Run>(`${runPath(projectId, runId)}/${action}`, { method: "POST" });
+export const getGate = (projectId: string, runId: string, signal?: AbortSignal) =>
+  request<GateInfo>(`${runPath(projectId, runId)}/gate`, opt(signal));
+export const decideGate = (projectId: string, runId: string, gate: string, decision: "approved" | "rejected") =>
+  request<GateDecisionOut>(`${runPath(projectId, runId)}/gates/${encodeURIComponent(gate)}/decision`, {
+    method: "POST",
+    json: { decision },
+  });
+export const listRunTasks = (projectId: string, runId: string, signal?: AbortSignal) =>
+  request<RunTask[]>(`${runPath(projectId, runId)}/tasks`, opt(signal));
+export const listRunEvents = (projectId: string, runId: string, after: number, signal?: AbortSignal) =>
+  request<RunEvent[]>(`${runPath(projectId, runId)}/events?after=${after}`, opt(signal));
+export const runEventsStreamUrl = (projectId: string, runId: string, after: number) =>
+  `${runPath(projectId, runId)}/events/stream?after=${after}`;
+export const getRunTrace = (projectId: string, runId: string, signal?: AbortSignal) =>
+  request<RunTrace>(`${runPath(projectId, runId)}/trace`, opt(signal));
+export const getRunHistory = (projectId: string, runId: string, signal?: AbortSignal) =>
+  request<HistoryItem[]>(`${runPath(projectId, runId)}/history`, opt(signal));
+export const getRunMetrics = (projectId: string, runId: string, signal?: AbortSignal) =>
+  request<RunMetrics>(`${runPath(projectId, runId)}/metrics`, opt(signal));

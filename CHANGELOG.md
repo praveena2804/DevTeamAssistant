@@ -4,7 +4,7 @@ One section per approved part (roadmap §8). Entries are added at gate approval;
 
 **Versioning:** SemVer, pre-1.0. Each approved part bumps the minor version (Part A = 0.1.0, B = 0.2.0, …, R = 0.18.0); fixes to an approved part bump the patch version. The accepted MVP is `1.0.0-mvp`. Git tags: `vX.Y.Z` plus `part-<letter>-approved` (roadmap §16.2).
 
-## Unreleased — Part D: LangGraph Orchestration, Ten Stub Agents & Head Agent Deterministic Core (in progress)
+## Unreleased — Part D: LangGraph Orchestration, Ten Agents & Head Agent Deterministic Core (implemented; awaiting G-D)
 
 ### Added (checkpoint D.1)
 
@@ -36,9 +36,32 @@ One section per approved part (roadmap §8). Entries are added at gate approval;
 - `docs/THIRD_PARTY_LICENSES.md`: runtime licence inventory with MPL-2.0 obligations (`orjson`, `certifi`),
   checked by a test
 
-### Not delivered (checkpoint D.2)
+### Added (D.2 completion; D-44)
 
-- The ten agent stub behaviours: blocked until a real model provider exists in the LLM Gateway (KI-025)
+- Direct local Ollama provider in the LLM Gateway: loopback only, proxies ignored, no redirects, answers
+  constrained by JSON Schema, honest failures (unreachable or missing model = waiting for resources). No
+  LiteLLM. Models per slot in `config/defaults.yaml` (`qwen2.5:3b`, `qwen2.5-coder:3b`, `qwen2.5:1.5b`)
+- The ten agents' behaviours: each runs a genuine local model call through the executor and the gateway
+  (minimal behaviour; real behaviour arrives in Parts H–O); model answer contracts (`contracts.drafts`)
+- Migration `0006_agent_outputs` (validated outputs by task, append-only); certifi licence ruling recorded
+
+### Added (checkpoint D.3)
+
+- The `project_run` LangGraph graph: 37 nodes, edges generated from the transition table, three layers
+  keeping Build behind approval (topology, build-entry guard, spec re-check in every Build/Delivery
+  node), gates with `interrupt()`, SQLite checkpoints without pickle, effects ledger, diagram document
+
+### Added (checkpoint D.4)
+
+- `python -m devteam_worker`: single-worker lease, heartbeat with metrics, recovery after a crash (D-40),
+  pause/resume/cancel at node boundaries, waiting for resources; started by `scripts/dev.ps1`
+- Run-control API: start, list, read, pause, resume, cancel, gate view and decision (through the Approval
+  Service), tasks, events (JSON and server-sent events), trace, history, metrics
+
+### Added (checkpoint D.5)
+
+- UI: runs on the project page, live Build Progress page with gate decisions, trace viewer, run history
+- End-to-end test through the API and a real worker process in a loopback-only network jail
 
 ### Changed (checkpoint D.1)
 

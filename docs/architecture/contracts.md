@@ -1,6 +1,6 @@
 # Shared Contracts (C.1, HS-06)
 
-Package: `devteam_core.contracts` · Schema version: **1** for every model except `RunState` (**2**, Part D.1) · Exported schemas: `packages/core/src/devteam_core/contracts/schemas/<Model>.v<version>.json` (82 files)
+Package: `devteam_core.contracts` · Schema version: **1** for every model except `RunState` (**2**, Part D.1) · Exported schemas: `packages/core/src/devteam_core/contracts/schemas/<Model>.v<version>.json` (92 files)
 
 Every interface that agents, harness and services exchange is a Pydantic v2 model deriving from `Contract`:
 
@@ -23,8 +23,9 @@ Every interface that agents, harness and services exchange is a Pydantic v2 mode
 | `agents` | Input/output models for all 10 agents; `AGENT_IO`; `check_output_against_input` | Spec §6.2–6.11 |
 | `tools` | `ToolCall`, `ToolResult`, `SideEffect`, principal formats | Spec §11.2 |
 | `llm` | `ChatMessage` (trust labels), `ModelParams` (F-9 bounds), `ModelRequest`, `ModelResponse` | HC-02; D-35, D-37 |
-| `events` | Metadata-only events (run/task transitions, tool and model calls, approvals, file changes); Part D progress events `NodeStarted`, `NodeFinished`, `GateOpened`, `RunProgress`, `MetricSample` | Spec §11.4; HC-10 |
+| `events` | Metadata-only events (run/task transitions, tool and model calls, approvals, file changes); Part D progress events `NodeStarted`, `NodeFinished`, `GateOpened`, `RunProgress`, `MetricSample`, `ServiceStepRecorded`, `RunSummaryRecorded` (`verified` is always `false`) | Spec §11.4; HC-10 |
 | `state` | `RunState` v2 (references only) | Roadmap §6.8 |
+| `drafts` | Model answer contracts (D-44): `AnalysisDraft` (+ `ChecklistFinding`, `RequirementDraft`), `ScopeDraft`, `QuestionsDraft`, `SummaryDraft`, `DocumentDraft`, `RepairDraft`. Small and flat; sent to Ollama as the required JSON Schema; the agent maps a valid answer onto its full v1 output contract. Material is numbered, so a model never returns record IDs it could invent | Part D plan §13 |
 | `orchestration` | `NodeName` (closed node list), `NodeKind`, `Subgraph`, `NODE_KIND`, `NODE_SUBGRAPH`, `AGENT_NODE_FOR_ROLE` (exactly one agent node per role), `GATE_FOR_NODE`, `ALLOWED_TRANSITIONS`, `reachable`, `RunMode`, `GateDecision`, `GateResume`, `DispatchRecord`, `PlanIssueCode`, `PlanIssue`, `PlanValidationReport`; `ServiceOutcomeStatus`, `ServiceOutcome` (D.2) | Roadmap §6.1–6.5; Part D plan §3 (LG-01), §12 |
 
 ## Rules the contracts enforce
