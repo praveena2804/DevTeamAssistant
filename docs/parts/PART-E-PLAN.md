@@ -4,8 +4,9 @@ Roadmap ref: §13 Part E, §3.2, §5.1 (HC-14, HC-06, HC-05), §6.6, §19 (R2, R
 
 | Field | Value |
 |---|---|
-| Status | **Draft for the owner's review.** Not confirmed; no Part E code written |
-| Preconditions | **G-D approved: not yet** (Part D awaits your review). **D-07 ruled: not yet** (blocks Part E). D-04, D-08, D-16, D-24 confirmed: not yet (§2) |
+| Status | **Final draft for the owner's approval** (revision 2). Not confirmed; no Part E code written |
+| Owner rulings so far | **D-07 = (b) Docker Engine inside WSL2** (AP-019). **Completely free implementation:** free and open-source tools only; no paid subscriptions, proprietary paid dependencies or cloud-service costs (AP-019, §12) |
+| Preconditions | **G-D approved: not yet** (Part D awaits your review). D-04, D-08, D-16, D-24 and the new D-45…D-51 confirmed: not yet (§2) |
 | Harness components | Implements **HC-14** (sandbox). Extends **HC-06** (execute tools), **HC-05** (Resource Guard, LLM/sandbox lock), HC-21 (audit of every execution), HC-11 (spans) |
 | Agents | **None.** No agent behaviour changes. The ten agents stay exactly as in Part D |
 | Branch | `part/e-sandbox`, created from `main` **after** G-D is approved and Part D is merged. One local commit per checkpoint E.1–E.5. No push without your separate approval |
@@ -31,7 +32,8 @@ When it is done:
    - `react_fastapi_sqlite` — React + Vite + TypeScript frontend, FastAPI backend, SQLite database;
    - `html_fastapi_sqlite` — plain HTML/CSS/JS frontend, same backend.
 6. **Each starter kit proves itself.** Its own tests and build run inside the sandbox, offline, and the result is stored as a *template verification* record. Part G will only call a technology "supported" when that record says it passed.
-7. **What Part E does not do:** no agent writes real application code yet (K, L); real test results for generated projects arrive in M; no repair loop (N); no packaging (O); nothing is published (P).
+7. **Everything is free and open source.** Docker Engine runs inside the Ubuntu system already installed in WSL2 on this laptop. Docker Desktop is **not** used. Every tool, library and container image is listed with its licence and cost in §12. Nothing needs an account, a subscription or a cloud service.
+8. **What Part E does not do:** no agent writes real application code yet (K, L); real test results for generated projects arrive in M; no repair loop (N); no packaging (O); nothing is published (P).
 
 ---
 
@@ -41,7 +43,7 @@ When it is done:
 
 | Checkpoint | Working Plan steps | What |
 |---|---|---|
-| **E.1 Foundations** | TS-04 (contracts), TS-07 (detection) | Decisions recorded. Docker SDK dependency with licence check. Contracts: `ContainerLimits`, `RecipeSpec`, `SandboxExecution`, `TemplateManifest`, `TemplateVerification`. Migration `0007_sandbox`. Settings section `sandbox`. Import rules. Doctor: Docker engine, WSL memory cap, images. **Spike:** confirm the copy-in/copy-out mechanism (§3.3) on this laptop's engine |
+| **E.1 Foundations** | TS-04 (contracts), TS-07 (detection) | Decisions recorded. **Docker Engine in WSL2 set up by you with the runbook and setup script** (§3.10): free Ubuntu packages, mutual-TLS loopback connection, WSL memory cap. Docker SDK dependency with licence check. Contracts: `ContainerLimits`, `RecipeSpec`, `SandboxExecution`, `TemplateManifest`, `TemplateVerification`. Migration `0007_sandbox`. Settings section `sandbox`. Import rules. Doctor: Docker engine, WSL memory cap, images. **Spike:** confirm on this laptop (1) WSL localhost forwarding and idle behaviour, (2) the SDK's mutual-TLS connection using an encrypted client key without writing it decrypted to disk, (3) the copy-in/copy-out mechanism (§3.3) |
 | **E.2 Sandbox runner & Resource Guard** | TS-04, TS-07, TS-08 | `ContainerSpec` builder (limits can never be loosened). Runner: create → copy in → start → watchdog → collect → remove (always, in `finally`). Peak-memory sampling. Startup sweep of leftover containers. Resource Guard: cross-process LLM/sandbox lock, Ollama unload, free-RAM check, Docker availability → **Blocked**. Offline image Dockerfiles + trusted build script + digest lock |
 | **E.3 Recipes, tools, runners** | TS-05, TS-06 | Recipe registry (10 recipes, argument schemas). Tools `request_build`, `request_test_run`, `request_migration_check` (side effect `execute`). JUnit XML and coverage parsing (test runner base). Migration Runner (disposable SQLite; PostgreSQL behind the D-16 flag) |
 | **E.4 Templates & Integration/Build Service base** | Templates, self-test | Both templates with `template.yaml` manifests and the `req` pytest marker plugin. Integration/Build Service base: copy a template into `generated/`, protect files by checksum, render `.env` from placeholders. Template self-test → `TemplateVerification` records. Worker job, API endpoints and a small UI panel to request and view verifications |
@@ -69,7 +71,7 @@ When it is done:
 
 | ID | Decision | Options | Recommendation and reason |
 |---|---|---|---|
-| **D-07** | Docker distribution (ADR-0007). **Blocks Part E** | (a) Docker Desktop (already installed: 29.6.2, engine currently stopped). (b) Docker Engine inside WSL2 (an `Ubuntu-24.04` distribution is already installed). (c) Podman | **Your ruling on licensing is required.** Docker Desktop is free only for personal use, education, non-commercial open source and small businesses (fewer than 250 employees **and** under USD 10 million annual revenue). If this project falls under those terms, choose **(a)**. If not, or if unsure, choose **(b)**: free and open source, more set-up (documented in the runbook). The sandbox code talks to the Docker Engine API, so it is identical for (a) and (b). (c) is not recommended (Docker SDK compatibility unverified) |
+| **D-07** | Docker distribution (ADR-0007) | (a) Docker Desktop; (b) Docker Engine inside WSL2; (c) Podman | **Ruled (AP-019): (b) Docker Engine inside WSL2**, in the existing `Ubuntu-24.04` distribution (systemd already enabled). Docker Desktop stays installed but is **not used**: the platform refuses its connection and refuses an engine that reports itself as Docker Desktop. ADR-0007 becomes *Accepted (b)* |
 | **D-04** | Authentication pattern for generated apps | (a) `no_auth` only; (b) also `local_password_rbac` | **(a) for Part E.** Both templates ship without login. The manifest reserves an `auth` slot so (b) can be added in Part K as a template extension with its own verification. Choosing (b) now adds template scope, security tests and a password-hashing dependency to E |
 | **D-08** | Offline sandbox vs dependency installs and audits | (a) Pre-built images with allowlisted dependencies; audits run in a separate allowlisted step; (b) disclose that audits are unavailable | **(a) with (b) as fallback.** Dependencies are installed **only when the trusted image-build script runs** (network at build time only). The same script runs `pip-audit` and `npm audit` against the image's locked dependencies and stores the result next to the image digest. Inside the sandbox there is never network. A template that needs a package not in its image's allowlist is refused, not fetched |
 | **D-16** | PostgreSQL in Docker | Include behind a flag / defer | **Behind a flag, off by default** (`sandbox.postgres.enabled: false`). E implements the Migration Runner's PostgreSQL mode (disposable container, random credentials in environment only, container and volume destroyed after) and its `docker` test. It is enabled only after a measured run under `low_memory` shows enough free memory. With the flag off, a PostgreSQL request is reported "not enabled", never silently replaced by SQLite |
@@ -79,10 +81,12 @@ When it is done:
 
 | ID | Question | Options | Recommendation and reason |
 |---|---|---|---|
-| **D-45** | Docker/WSL memory cap (Spec §25 lists it as configuration) | (a) Runbook tells you to set `%USERPROFILE%\.wslconfig` (`memory=4GB`, `processors=2`, `swap=2GB`); doctor warns if it is missing or larger; the platform never edits files in your home folder. (b) Platform writes `.wslconfig` itself | **(a).** No `.wslconfig` exists today, so WSL can take up to half the RAM (≈8 GB). 4 GB leaves room for Ollama (≈2.1 GB for a 3B model, which is unloaded before any sandbox run anyway), the API, the worker and a browser. Writing to your home folder is outside the platform's scope |
+| **D-45** | Docker/WSL memory cap (Spec §25 lists it as configuration) | (a) Runbook tells you to set `%USERPROFILE%\.wslconfig` (`memory=4GB`, `processors=2`, `swap=2GB`, `autoMemoryReclaim=gradual`); doctor warns if it is missing or larger; the platform never edits files in your home folder. (b) Platform writes `.wslconfig` itself | **(a).** No `.wslconfig` exists today; the WSL VM currently sees 7.8 GB (checked 2026-11-23). With Docker Engine inside WSL, this cap is the ceiling for all containers together. 4 GB leaves room for Ollama on Windows (≈2.1 GB for a 3B model, unloaded before any sandbox run anyway), the API, the worker and a browser. `autoMemoryReclaim=gradual` (a free WSL setting) returns memory to Windows after builds. Writing to your home folder is outside the platform's scope |
 | **D-46** | The LLM/sandbox lock must work across processes. Today `MODEL_LOCK` is a thread lock inside one process | (a) One SQLite-backed resource lease (`resource_lock` row, like the worker lease) taken by both the gateway and the sandbox, with heartbeat and stale takeover. (b) An OS file lock in `data/` | **(a).** Same proven pattern as the D.4 worker lease, visible in the database, recoverable after a crash. The existing in-process `MODEL_LOCK` stays as an extra inner guard |
 | **D-47** | Should E connect the sandbox to the run graph? | (a) No. The `integration_build` and `test_runner` nodes stay honest stand-ins; the sandbox is reached through template verification jobs and the new tools (which no agent uses until K). (b) Make `integration_build` copy the template and build it during every run | **(a).** In Part D no agent writes code, so building in a run would only rebuild an empty starter kit and could be mistaken for building the project. Wiring happens in K/L, when there is real code to build |
-| **D-48** | How files get into and out of a container | (a) **No host folder mounted.** Files are copied into the container through the Docker API archive call and results copied back out. (b) Bind-mount one disposable staging copy of `generated/` (roadmap TS-04 wording) | **(a), confirmed by the E.1 spike; (b) as fallback.** With (a) no host path is ever visible to the container, so mount-escape and Windows path-translation problems cannot occur, and it works the same on Docker Desktop and on Docker Engine in WSL. If the spike shows (a) cannot work with a read-only root plus a writable work volume, (b) is used with a per-execution copy (never `generated/` itself) and the escape tests still apply |
+| **D-48** | How files get into and out of a container | (a) **No host folder mounted.** Files are copied into the container through the Docker API archive call and results copied back out. (b) Bind-mount one disposable staging copy of `generated/` (roadmap TS-04 wording) | **(a), confirmed by the E.1 spike; (b) as fallback.** With (a) no host path is ever visible to the container, so mount-escape problems cannot occur, and Windows folders never have to be shared into the WSL engine (a Windows-to-WSL bind mount would also be slow and translate permissions badly). If the spike shows (a) cannot work with a read-only root plus a writable work volume, (b) is used with a per-execution copy (never `generated/` itself) and the escape tests still apply |
+| **D-50** | How the platform (Windows) reaches Docker Engine (inside WSL2). The engine's own socket lives inside the Linux VM; Windows programs cannot open it directly | (a) **Mutual-TLS on loopback:** the engine listens on `127.0.0.1:2376` inside WSL (forwarded to Windows `127.0.0.1` by WSL's built-in localhost forwarding) and accepts only clients presenting a certificate from a private certificate authority made for this laptop. (b) Plain TCP on loopback, no authentication. (c) SSH transport. (d) Move the worker into WSL | **(a).** Free (OpenSSL plus Docker's own TLS support), documented by Docker, and needs no extra program. **(b) is refused:** any local program, and even a web page through the browser, could then drive the engine with root power inside WSL. (c) needs `paramiko` (LGPL) or running `ssh.exe` from the harness. (d) changes the approved architecture (D-41). Details: the client private key is stored **encrypted** (AES-256) in `data/sandbox_tls/`; its passphrase lives only in Windows Credential Manager (D-18); the CA's private key is deleted after the certificates are issued; the server key stays inside WSL (root-only). The setting `sandbox.docker_host` accepts only `tcp://127.0.0.1:<port>` **with** TLS verification; plain `tcp://`, remote hosts and Docker Desktop's pipe are rejected at startup |
+| **D-51** | Where Docker Engine comes from | (a) Ubuntu's own archive packages `docker.io` and `docker-buildx` (Moby, Apache-2.0). (b) Docker's apt repository (`docker-ce`, also free, Apache-2.0) | **(a).** Free, open source, security updates through normal Ubuntu updates, no third-party package repository or signing key to add. The engine version is recorded by the doctor and in every `SandboxExecution`. If a needed feature is missing from Ubuntu's version, (b) is the free fallback, with your approval |
 | **D-49** | Who may request a template verification | (a) You, from the UI or `scripts/verify_templates.py`; it is queued and run by the worker (D-41: only the worker executes). (b) Automatically at every start | **(a)**, plus an automatic "stale" flag when a template's or image's checksum changes. A verification run takes minutes and needs Ollama unloaded, so it should not start on its own |
 
 ---
@@ -130,14 +134,14 @@ Every container is built by one function. The limits are **minimums of security,
 | Environment | — | — | Only what the recipe declares (e.g. `DATABASE_URL=sqlite:////work/.devteam/test.db`, `CI=1`). Host environment is never passed through |
 | Labels | — | — | `devteam.sandbox=1`, `devteam.execution_id`, `devteam.project_id` (for the startup sweep) |
 
-Settings: new `sandbox` section in `config/defaults.yaml` and profiles (validated, unknown keys rejected): `enabled`, `docker_host` (optional; must be a local pipe or socket, never `tcp://`), the limits above, `min_free_ram_mb` (2,048 on `low_memory`), `unload_models_before_run: true`, `postgres.enabled: false`, `image_lock_path`.
+Settings: new `sandbox` section in `config/defaults.yaml` and profiles (validated, unknown keys rejected): `enabled`, `docker_host` (default `tcp://127.0.0.1:2376`; only loopback with mutual TLS is accepted, D-50), `tls_dir` (default `data/sandbox_tls`), `wsl_distribution` (default `Ubuntu-24.04`, used by the doctor and `dev.ps1` only), the limits above, `min_free_ram_mb` (2,048 on `low_memory`), `unload_models_before_run: true`, `postgres.enabled: false`, `image_lock_path`.
 
 ### 3.3 Execution flow (one sandbox run)
 
 1. **Request.** A tool call (`request_test_run`, …) or a service asks for recipe *R* with arguments *A* on project *P*. Arguments are validated against *R*'s schema; unknown recipes and extra arguments are refused.
 2. **Policy.** The Tool Layer checks role grant, stage and approved spec (Part C engine). Execute tools are allowed only in stages `build`, `delivery` and `change_request`, which already require an approved, frozen spec.
 3. **Resource Guard.**
-   1. Docker check: SDK can reach the engine (`ping`), engine is Linux, image exists **and its digest matches `images.lock.json`**. If not → **Blocked** with a specific reason (`sandbox.docker_unavailable`, `sandbox.image_missing`, `sandbox.image_digest_mismatch`). Never a host fallback.
+   1. Docker check: the SDK reaches the engine over mutual TLS (`ping`); the engine is Linux and is **not** Docker Desktop; the image exists **and its digest matches `images.lock.json`**. If not → **Blocked** with a specific reason (`sandbox.docker_unavailable`, `sandbox.tls_not_configured`, `sandbox.engine_not_allowed`, `sandbox.image_missing`, `sandbox.image_digest_mismatch`). Never a host fallback.
    2. Take the cross-process resource lease (D-46). If an LLM call holds it → wait.
    3. Ask Ollama to unload loaded models and confirm with `/api/ps`. If Ollama is not running, nothing is loaded: continue.
    4. Free RAM ≥ `sandbox.min_free_ram_mb` → continue; otherwise release the lease and return **waiting for resources** (the existing Part D mechanism).
@@ -233,6 +237,29 @@ Every domain row carries `project_id` (verifications use a reserved platform pro
 
 UI: a small **Sandbox** page (linked from the header): Docker status, the two templates, "Verify" button, results. OpenAPI and web types regenerated. Under D-15, platform UI is checked by API E2E plus a manual demo.
 
+### 3.10 Docker Engine inside WSL2 (D-07 (b), D-50, D-51)
+
+Current state (checked read-only, 2026-11-23): WSL 2.7.11; `Ubuntu-24.04` with **systemd enabled**; OpenSSL present; Docker Engine **not installed**; no `.wslconfig`.
+
+**One-time set-up, done by you** (it needs your Ubuntu `sudo` password, which the platform never sees or stores). `docs/runbooks/docker-setup.md` gives every command; `scripts/setup_wsl_docker.ps1` runs the same steps and stops at the first error.
+
+1. Optional: set `.wslconfig` (D-45), then `wsl --shutdown`.
+2. Inside Ubuntu: `sudo apt install docker.io docker-buildx` (D-51); `sudo systemctl enable --now docker`.
+3. Certificates (OpenSSL inside Ubuntu):
+   - a private CA, valid 2 years;
+   - a server certificate for `127.0.0.1` and `localhost`; its key stays in `/etc/docker/tls/` (root only);
+   - a client certificate whose key is **encrypted** with a random passphrase. The passphrase is passed through standard input (never on a command line), then saved in Windows Credential Manager under the `devteam-ai` entry;
+   - the CA key is deleted.
+4. The engine listens on its normal Unix socket **and** on `tcp://127.0.0.1:2376` with `tlsverify` (a systemd override plus `/etc/docker/daemon.json`).
+5. Client certificate, encrypted key and CA certificate are copied to `data/sandbox_tls/` (git-ignored, like all of `data/`).
+6. `uv run python scripts/doctor.py` confirms everything; `uv run python scripts/build_sandbox_images.py` builds the two images (the only step with network).
+
+**Day-to-day:** `scripts/dev.ps1` starts the Ubuntu distribution and keeps one idle session open while the platform runs, because WSL stops an idle distribution. If the engine is not reachable, sandbox work is **Blocked** with the reason, as for "Docker absent".
+
+**Platform code** never runs `wsl.exe`, `docker.exe` or any other program (AC-E-04). It only talks to the engine API through the Docker SDK in `sandbox/engine.py`. The SDK's TLS connection is built from an `ssl.SSLContext` loaded with the encrypted key and the passphrase from Credential Manager. The decrypted key is never written to disk.
+
+**Docker Desktop:** not needed and not used. If its WSL integration is enabled for `Ubuntu-24.04`, the runbook explains how to turn it off so the two engines do not clash. Uninstalling it is your choice and not required.
+
 ---
 
 ## 4. Gaps found in completed parts (reported, not silently fixed)
@@ -261,9 +288,9 @@ UI: a small **Sandbox** page (linked from the header): Docker status, the two te
 | Templates | `templates/target_apps/react_fastapi_sqlite/**`, `templates/target_apps/html_fastapi_sqlite/**` | — |
 | Images | `sandbox/images/python_api/{Dockerfile,requirements.lock}`, `sandbox/images/node_web/{Dockerfile,package.json,package-lock.json}`, `sandbox/images/images.lock.json`, `sandbox/tools/devteam_static_check/`, `sandbox/tools/devteam_req/` | — |
 | Config | `config/profiles/*` sandbox values | `config/defaults.yaml`, `config/guardrails/policies.yaml` |
-| Scripts | `scripts/build_sandbox_images.py`, `scripts/verify_templates.py` | `scripts/doctor.py`, `scripts/dev.ps1` (status line only) |
+| Scripts | `scripts/setup_wsl_docker.ps1` (run by you once), `scripts/build_sandbox_images.py`, `scripts/verify_templates.py` | `scripts/doctor.py` (WSL distribution, engine over TLS, not Docker Desktop, `.wslconfig` cap, images), `scripts/dev.ps1` (start and keep the WSL distribution open; status line) |
 | Repo | — | `.dockerignore`, root `pyproject.toml` (import contracts, ruff/mypy/pytest excludes for `templates/` and `sandbox/`), `agents/ruff.toml`, `.github/workflows/ci.yml` (still deselects `docker`) |
-| Docs | `docs/architecture/sandbox.md`, `docs/runbooks/docker-setup.md` (Docker Desktop or WSL engine, `.wslconfig`, image build), `docs/adr/0008-sandbox-file-transfer.md` (D-48) | ADR-0007 (status after ruling), README, CHANGELOG, `docs/THIRD_PARTY_LICENSES.md`, `docs/architecture/contracts.md`, trackers, completion report |
+| Docs | `docs/architecture/sandbox.md`, `docs/runbooks/docker-setup.md` (Docker Engine in WSL2, certificates, `.wslconfig`, image build, turning off Docker Desktop's WSL integration), `docs/adr/0008-sandbox-engine-connection.md` (D-48, D-50, D-51) | ADR-0007 (Accepted (b)), `.gitignore` (confirm `data/` covers `sandbox_tls/`), README, CHANGELOG, `docs/THIRD_PARTY_LICENSES.md`, `docs/architecture/contracts.md`, trackers, completion report |
 
 ---
 
@@ -273,9 +300,9 @@ UI: a small **Sandbox** page (linked from the header): Docker status, the two te
 |---|---|---|---|
 | `docker` (Docker SDK for Python) | `>=7.1,<8` | Apache-2.0 | Engine API client (HC-14). Imported only by `sandbox/engine.py` |
 | — transitively `requests` | (via docker) | Apache-2.0 | Used by the SDK only; import contract 7 still forbids our code from importing it outside providers |
-| — `pywin32` (Windows, via docker) | (via docker) | PSF | Named-pipe transport to Docker Desktop |
+| — `pywin32` (Windows only, via docker) | (via docker) | PSF-2.0 | Installed by the SDK on Windows; not used by our TLS connection |
 
-`urllib3` and `certifi` are already present (certifi accepted under KI-026). Before adding: `uv lock`, `pip-audit`, licence inventory test update, and a check that no GPL-family licence enters. Images (§3.5) pull their own pinned packages; their licences are listed in `images.lock.json` and `docs/THIRD_PARTY_LICENSES.md` (target-app section). No paid service; no new npm dependency for the platform UI.
+`urllib3` and `certifi` are already present (certifi accepted under KI-026). Before adding: `uv lock`, `pip-audit`, licence inventory test update, and a check that no GPL-family licence enters. Images (§3.5) pull their own pinned packages; their licences are listed in `images.lock.json` and `docs/THIRD_PARTY_LICENSES.md` (target-app section). No paid service; no new npm dependency for the platform UI. The full free-tool inventory is in §12.
 
 ---
 
@@ -310,7 +337,7 @@ Docker tests run locally only (CI keeps deselecting `docker`, like `llm`). Cover
 - **Supply chain:** base images pinned by digest; dependencies pinned with hashes; audit results recorded; digest checked before every run.
 - **Untrusted output:** stdout, stderr, JUnit and coverage are data: size-capped, safely parsed, labelled untrusted when shown to agents later (Part C input guard), never written to logs, audit or traces.
 - **Secrets:** none enter a container. The environment comes only from the recipe; a canary secret registered in the Secret Manager must never appear in container environment, files or outputs (test).
-- **Docker daemon:** reached only through the local named pipe or Unix socket; `tcp://` refused at config load; the socket is never mounted into a container.
+- **Docker daemon:** reached only on `127.0.0.1` with mutual TLS (D-50). Plain TCP, remote hosts and Docker Desktop's pipe are refused at config load, with tests. The client key is encrypted at rest and its passphrase is only in Credential Manager. The engine socket is never mounted into a container. A test checks that a connection without a client certificate is rejected by the engine (negative control: the same call with the certificate succeeds).
 - **Approval:** execute tools require an approved, frozen spec (existing policy stage checks); verification requests require sign-in and are rate-limited and audited.
 - **Cleanup:** `finally` removal + startup sweep by label.
 
@@ -318,12 +345,13 @@ Docker tests run locally only (CI keeps deselecting `docker`, like `llm`). Cover
 
 ## 9. Demonstration (G-E)
 
-1. `scripts/doctor.py`: Docker engine running, WSL cap set, images present and digests match.
+1. `scripts/doctor.py`: Docker Engine in WSL (`Ubuntu-24.04`) reachable over mutual TLS, not Docker Desktop, WSL cap set, images present and digests match.
 2. Sandbox page → **Verify** both templates → both `passed`, offline, with duration and peak memory.
 3. Blocked network: a probe container tries to reach the internet → refused; recorded.
-4. Timeout: a sleeping recipe is killed at its limit; container gone (`docker ps -a` empty for the label).
-5. Docker stopped → Verify → **Blocked: Docker engine not running**; nothing runs on the laptop.
+4. Timeout: a sleeping recipe is killed at its limit; container gone (`docker ps -a` inside Ubuntu shows nothing with the label).
+5. Docker stopped (`sudo systemctl stop docker` inside Ubuntu) → Verify → **Blocked: Docker engine not running**; nothing runs on the laptop.
 6. LLM/sandbox lock: start a verification while a run's agent step is in progress → the verification waits for the model call to finish and the model to unload.
+7. A connection attempt without the client certificate is refused by the engine.
 
 ---
 
@@ -331,10 +359,14 @@ Docker tests run locally only (CI keeps deselecting `docker`, like `llm`). Cover
 
 | Risk | Impact | Mitigation |
 |---|---|---|
-| Docker Desktop licence not applicable (R4) | Blocks E | D-07 (b): Docker Engine in WSL; code unchanged |
+| Docker licensing (R4) | — | Closed by D-07 (b): Docker Engine (Apache-2.0) from Ubuntu's archive; Docker Desktop not used |
+| WSL localhost forwarding or idle shutdown behaves differently on this WSL version | Engine unreachable from Windows | Verified in the E.1 spike; `dev.ps1` keeps a session open; failure is reported as **Blocked**, never bypassed. Free fallback: WSL `networkingMode=mirrored` |
+| Ubuntu's `docker.io` lacks a needed feature | Rework | D-51 fallback to Docker's free apt repository, with your approval |
+| Docker Hub limits anonymous image downloads (free, about 100 per 6 hours) | Image build delayed | Images are built rarely (2 base images); no account needed. If limited, wait and retry |
+| Client certificate expires (2 years) | Blocked | Doctor warns 30 days ahead; the setup script re-issues |
 | Memory: Docker VM + Ollama + browser on ≈5–6 GB free (R2) | Runs wait or OOM | Ollama unloaded before every run; WSL cap 4 GB (D-45); container 1.5 GB; peak recorded (AC-E-03) |
 | `npm run build` for React needs more than 1.5 GB or more than 600 s on this CPU | AC-E-01 for react | Measure in E.4; raise the ceiling in `standard` only with evidence and your approval |
-| Archive copy-in with a read-only root may need a writable volume layout that the SDK handles differently on Docker Desktop vs WSL engine | E.1 spike | D-48 fallback (b) |
+| Archive copy-in with a read-only root may need a writable volume layout that needs adjusting on Ubuntu's engine version | E.1 spike | D-48 fallback (b) |
 | Base-image or package vulnerabilities found by the build-time audit | Image refused | Pin to fixed versions; record and report; never silently ignore |
 | Long `docker` suite slows gates | Time | Kept out of the fast suite and CI; run at checkpoints and at the gate |
 | Laptop sleep during long docker runs (KI-035) | Spurious failures | Same process-scoped keep-awake wrapper used in D |
@@ -345,7 +377,7 @@ Docker tests run locally only (CI keeps deselecting `docker`, like `llm`). Cover
 
 | Checkpoint | Exit criteria (internal) |
 |---|---|
-| E.1 | Rulings recorded; dependency + licences + `pip-audit` clean; contracts + schemas; migration 0007 tested + rehearsal; settings; import contracts with planted violations; doctor checks; spike result recorded (ADR-0008); fast suite + static gates green; commit |
+| E.1 | Docker Engine in WSL set up and reachable over mutual TLS (plain TCP and Docker Desktop refused, with tests); rulings recorded; dependency + licences + `pip-audit` clean; contracts + schemas; migration 0007 tested + rehearsal; settings; import contracts with planted violations; doctor checks; spike result recorded (ADR-0008); fast suite + static gates green; commit |
 | E.2 | Spec builder, runner, guard, sweep; images built by the script and locked; isolation tests for network, timeout, memory, PIDs, root FS, cleanup, Docker-absent, lock; commit |
 | E.3 | 10 recipes, 3 tools with policy grants, JUnit/coverage parser, Migration Runner (SQLite; PostgreSQL flag path); commit |
 | E.4 | Both templates + manifests + `req` plugin; Integration/Build base; self-tests pass offline; worker job, API, UI; OpenAPI/types; web suite; commit |
@@ -355,4 +387,30 @@ Gate procedure: roadmap §17.1. After G-E approval: merge locally, `v0.5.0`, `pa
 
 ---
 
-## Owner confirmation: ☐ D-07 · ☐ D-04 · ☐ D-08 · ☐ D-16 · ☐ D-24 · ☐ D-45 · ☐ D-46 · ☐ D-47 · ☐ D-48 · ☐ D-49 · ☐ container limit values (§3.2) · ☐ start implementation (after G-D)
+## 12. Free and open-source inventory (AP-019)
+
+Every item is free to use, needs no account or subscription, and runs locally. Paid items are excluded by rule and by checks.
+
+| Item | Used for | Licence | Cost / account |
+|---|---|---|---|
+| WSL 2 (Microsoft, open source since 2025) and Ubuntu 24.04 | Linux VM for the engine | MIT (WSL); Ubuntu free (mostly GPL/MIT/BSD packages, used as an OS, not linked into our code) | Free; already installed |
+| Docker Engine `docker.io` (Moby), `containerd`, `runc`, `docker-buildx` | Containers, image builds | Apache-2.0 | Free, Ubuntu archive |
+| OpenSSL | Certificates (inside Ubuntu, set-up only) | Apache-2.0 | Free; already installed |
+| Docker SDK for Python (`docker`), `requests`, `urllib3`, `pywin32` | Engine API client | Apache-2.0, Apache-2.0, MIT, PSF-2.0 | Free (PyPI) |
+| Base images `python:3.12-slim`, `node:22-slim` (Debian based) | Sandbox images | PSF-2.0 / MIT plus Debian free packages | Free anonymous Docker Hub download; no account |
+| Python packages in the `python_api` image: FastAPI, Uvicorn, Pydantic, SQLAlchemy, Alembic, HTTPX, pytest, pytest-cov, Ruff, Bandit | Template backend and checks | MIT, BSD-3, MIT, MIT, MIT, BSD-3, MIT, MIT, MIT, Apache-2.0 | Free (PyPI) |
+| npm packages in the `node_web` image: React, React DOM, Vite, @vitejs/plugin-react, TypeScript, Vitest, jsdom | Template frontend and checks | MIT, MIT, MIT, MIT, Apache-2.0, MIT, MIT | Free (npm registry) |
+| `pip-audit`, `npm audit` | Vulnerability check at image build | Apache-2.0; part of npm (Artistic-2.0) | Free public advisory databases (OSV, GitHub advisories); no account |
+| Ollama, LangGraph, SQLite, FastAPI, React (platform, unchanged) | Existing platform | MIT and similar (inventory in `docs/THIRD_PARTY_LICENSES.md`) | Free |
+
+**Explicitly not used:** Docker Desktop, Docker Hub accounts or paid registries, Docker Scout, Testcontainers Cloud, any cloud build or CI minutes, any paid AI or API. The `.github/workflows/ci.yml` inside each template is only a **file delivered** with the generated app; the platform never runs it.
+
+**How "free only" is enforced:**
+
+- the licence inventory test (Part D) is extended to the new Python packages, and fails on any licence not in the approved free list;
+- `build_sandbox_images.py` records every package licence in each image and refuses unknown, proprietary or AGPL/GPL-family licences in image contents (a contract test re-checks `images.lock.json`);
+- the doctor and the sandbox refuse Docker Desktop's engine, so a paid-tier product cannot be used by accident.
+
+---
+
+## Owner confirmation: ☑ D-07 (b) Docker Engine inside WSL2 (AP-019) · ☐ D-04 · ☐ D-08 · ☐ D-16 · ☐ D-24 · ☐ D-45 · ☐ D-46 · ☐ D-47 · ☐ D-48 · ☐ D-49 · ☐ D-50 · ☐ D-51 · ☐ container limit values (§3.2) · ☐ start implementation (after G-D)

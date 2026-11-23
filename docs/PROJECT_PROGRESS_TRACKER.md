@@ -91,3 +91,7 @@ Following your decision, I connected the platform to the AI model that runs on t
 **Run 23 — Part D upload and Part E plan**
 
 I uploaded the finished Part D work to GitHub as its own branch, separate from the main line, because you have not approved Part D yet, and checked that GitHub now holds exactly the same six commits and the same version tags as this laptop. I then read the specification, roadmap, working plan and trackers again and wrote the plan for Part E: the sealed, offline Docker room where generated code will be allowed to run, and the two starter kits every generated application will begin from. No Part E code was written; the plan waits for your decisions, starting with which Docker you can use under its licence terms.
+
+**Run 24 — Part E plan, second version**
+
+Following your choice of the free Docker Engine inside WSL instead of Docker Desktop, and your rule that everything must be free, I reworked the Part E plan. I looked (without changing anything) at the Ubuntu system already installed in WSL on this laptop: it is ready for Docker, but Docker is not installed yet. The plan now explains how Docker will be installed from Ubuntu's own free packages, how the platform will connect to it safely using private certificates so no other program can use it, and lists every tool and library with its free licence. No Part E code was written; the plan waits for your approval.
