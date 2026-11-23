@@ -16,7 +16,12 @@ from pathlib import Path
 import pytest
 
 from devteam_core.config import Settings, load_settings
+from devteam_core.contracts.sandbox import ContainerLimits
+from devteam_core.ids import new_id
 from devteam_harness.sandbox.engine import Engine, connect
+from devteam_harness.sandbox.images import ImageLock
+from devteam_harness.sandbox.runner import RunRequest, SandboxRunner
+from devteam_harness.sandbox.spec import ContainerSpec, create_arguments, host_config_arguments
 from devteam_harness.secrets import SecretsManager, secrets_manager_from_settings
 
 
@@ -66,6 +71,84 @@ def engine(live_settings: Settings, live_secrets: SecretsManager, wsl_keepalive:
         yield eng
     finally:
         eng.close()
+
+
+@pytest.fixture(scope="session")
+def image_lock(live_settings: Settings) -> ImageLock:
+    return ImageLock.load(live_settings.sandbox_image_lock_path)
+
+
+@pytest.fixture(scope="session")
+def runner(engine: Engine, image_lock: ImageLock) -> SandboxRunner:
+    return SandboxRunner(engine, image_lock)
+
+
+def limits(**kw: float) -> ContainerLimits:
+    base = {
+        "memory_mb": 512,
+        "cpus": 1.0,
+        "pids": 128,
+        "wall_clock_s": 60,
+        "tmpfs_mb": 64,
+        "work_copy_mb": 64,
+        "output_kb": 256,
+    }
+    return ContainerLimits.model_validate({**base, **kw})
+
+
+def python_probe(code: str, **kw: object) -> RunRequest:
+    """A production-path run of ``python -c <code>`` in the python_api image."""
+    args: dict[str, object] = {
+        "image": "python_api",
+        "argv": ("python", "-c", code),
+        "workdir": "/work",
+        "env": {"CI": "1"},
+        "files": {"probe/readme.txt": b"probe"},
+        "limits": limits(),
+        "execution_id": new_id("sbx"),
+        "labels": {"devteam.test": "isolation"},
+    }
+    args.update(kw)
+    return RunRequest(**args)  # type: ignore[arg-type]
+
+
+def run_raw(
+    engine: Engine,
+    image_tag: str,
+    code: str,
+    *,
+    host_overrides: dict[str, object] | None = None,
+    create_overrides: dict[str, object] | None = None,
+    memory_mb: int = 512,
+    pids: int = 128,
+) -> tuple[int, str]:
+    """NEGATIVE CONTROLS ONLY: the production container with exactly one control changed.
+
+    Proves each isolation probe detects the absence of the control it tests. Never used by the platform.
+    """
+    spec = ContainerSpec(
+        image=image_tag,
+        argv=("python", "-c", code),
+        workdir="/work",
+        env={},
+        limits=limits(memory_mb=memory_mb, pids=pids),
+        execution_id=new_id("sbx"),
+        labels={"devteam.test": "negative-control"},
+    )
+    host = {**host_config_arguments(spec), **(host_overrides or {})}
+    host = {key: value for key, value in host.items() if value is not None}
+    engine.api.create_volume(name=spec.volume_name, driver="local", labels=spec.all_labels)
+    container = None
+    try:
+        container = engine.api.create_container(
+            host_config=engine.api.create_host_config(**host),
+            **{**create_arguments(spec), **(create_overrides or {})},
+        )["Id"]
+        engine.api.start(container)
+        code_ = int(engine.api.wait(container, timeout=120)["StatusCode"])
+        return code_, engine.api.logs(container).decode("utf-8", "replace")
+    finally:
+        engine.remove(container, spec.volume_name)
 
 
 def wsl_root(settings: Settings, command: str, stdin: bytes | None = None) -> bytes:

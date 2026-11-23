@@ -90,7 +90,7 @@ dev = [
 [tool.ruff]
 line-length = 110
 target-version = "py312"
-extend-exclude = ["apps/web", "data", "workspaces"]
+extend-exclude = ["apps/web", "data", "workspaces", "templates"]  # templates: generated-app code, checked in the sandbox
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "S", "N", "SIM", "RUF", "TID", "PTH", "C4", "PL"]
@@ -104,6 +104,11 @@ ignore = [
 "tests/**" = ["S101", "S105", "S106", "PLR2004", "S603", "S607", "S608"]
 "scripts/**" = ["S603", "S607", "T201"]
 "**/migrations/versions/*.py" = ["N999"]
+# Part E: "/tmp" in these files is a path INSIDE the sandbox container (a noexec tmpfs), not a host temp dir.
+"packages/harness/src/devteam_harness/sandbox/spec.py" = ["S108"]
+"tests/sandbox/**" = ["S101", "S105", "S106", "PLR2004", "S603", "S607", "S608", "S108", "PLR0917"]
+"tests/security/test_sandbox_units.py" = ["S101", "PLR2004", "S108"]
+"sandbox/tools/devteam_static_check.py" = ["PLR0912"]
 
 [tool.ruff.lint.isort]
 known-first-party = [

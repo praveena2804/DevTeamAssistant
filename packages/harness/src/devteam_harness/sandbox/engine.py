@@ -18,7 +18,9 @@ pinned API version is refused (:class:`SandboxBlockedError`). There is no fallba
 
 from __future__ import annotations
 
+import contextlib
 import ssl
+from collections.abc import Iterator
 from dataclasses import dataclass
 from typing import Any
 from urllib.parse import urlsplit
@@ -30,6 +32,7 @@ from requests.adapters import HTTPAdapter
 
 from devteam_core.config import Settings
 from devteam_harness.sandbox.errors import SandboxBlockedError
+from devteam_harness.sandbox.spec import LABEL, ContainerSpec, create_arguments, host_config_arguments
 from devteam_harness.sandbox.tls import SandboxTLSError, assert_verifying, build_client_context
 from devteam_harness.secrets import SecretsManager
 
@@ -116,6 +119,123 @@ class Engine:
 
     def __exit__(self, *_exc: object) -> None:
         self.close()
+
+    # -- narrow operations used by the runner (the SDK and its errors stay in this module) ------------
+
+    @property
+    def api(self) -> Any:
+        return self.client.api
+
+    def image_id(self, tag: str) -> str | None:
+        try:
+            return str(self.api.inspect_image(tag)["Id"])
+        except docker.errors.ImageNotFound:
+            return None
+        except _ENGINE_ERRORS as exc:
+            raise _unavailable(exc) from None
+
+    def create(self, spec: ContainerSpec) -> str:
+        """Create the per-run volume and the container (not started). Nothing runs yet."""
+        try:
+            self.api.create_volume(name=spec.volume_name, driver="local", labels=spec.all_labels)
+            host_config = self.api.create_host_config(**host_config_arguments(spec))
+            created = self.api.create_container(host_config=host_config, **create_arguments(spec))
+        except _ENGINE_ERRORS as exc:
+            self.remove(None, spec.volume_name)
+            raise _unavailable(exc) from None
+        return str(created["Id"])
+
+    def inspect(self, container_id: str) -> dict[str, Any]:
+        return dict(self.api.inspect_container(container_id))
+
+    def put_tar(self, container_id: str, path: str, data: bytes) -> None:
+        if not self.api.put_archive(container_id, path, data):
+            raise SandboxBlockedError(
+                "sandbox.copy_in_failed", "files could not be copied into the container"
+            )
+
+    def start(self, container_id: str) -> None:
+        self.api.start(container_id)
+
+    def wait(self, container_id: str, timeout_s: float) -> int | None:
+        """Exit code, or ``None`` if the container is still running after ``timeout_s``."""
+        try:
+            result = self.api.wait(container_id, timeout=timeout_s)
+        except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError):
+            return None
+        return int(result.get("StatusCode", -1))
+
+    def kill(self, container_id: str) -> None:
+        with contextlib.suppress(docker.errors.APIError):  # already stopped
+            self.api.kill(container_id)
+
+    def state(self, container_id: str) -> dict[str, Any]:
+        return dict(self.inspect(container_id).get("State") or {})
+
+    def stats_stream(self, container_id: str) -> Iterator[dict[str, Any]]:
+        try:
+            yield from self.api.stats(container_id, decode=True, stream=True)
+        except (*_ENGINE_ERRORS, ValueError):
+            return
+
+    def log_chunks(self, container_id: str, *, stdout: bool) -> Iterator[bytes]:
+        yield from self.api.logs(container_id, stdout=stdout, stderr=not stdout, stream=True, follow=False)
+
+    def get_tar(self, container_id: str, path: str) -> Iterator[bytes] | None:
+        try:
+            stream, _stat = self.api.get_archive(container_id, path)
+        except docker.errors.NotFound:
+            return None
+        chunks: Iterator[bytes] = iter(stream)
+        return chunks
+
+    def diff(self, container_id: str) -> list[dict[str, Any]]:
+        return list(self.api.diff(container_id) or [])
+
+    def remove(self, container_id: str | None, volume_name: str | None) -> None:
+        """Force-remove the container and its volume. Missing objects are fine; never raises."""
+        if container_id is not None:
+            try:
+                self.api.remove_container(container_id, v=True, force=True)
+            except docker.errors.NotFound:
+                pass
+            except _ENGINE_ERRORS:
+                pass
+        if volume_name is not None:
+            try:
+                self.api.remove_volume(volume_name, force=True)
+            except docker.errors.NotFound:
+                pass
+            except _ENGINE_ERRORS:
+                pass
+
+    def labelled(self) -> tuple[list[str], list[str]]:
+        """IDs of every sandbox container and volume still present (label ``devteam.sandbox=1``)."""
+        containers = [c["Id"] for c in self.api.containers(all=True, filters={"label": f"{LABEL}=1"})]
+        volumes = [
+            v["Name"] for v in (self.api.volumes(filters={"label": f"{LABEL}=1"}).get("Volumes") or [])
+        ]
+        return containers, volumes
+
+    def sweep(self) -> tuple[int, int]:
+        """Remove leftovers of crashed runs (startup sweep, plan §3.3 step 6)."""
+        containers, volumes = self.labelled()
+        for container_id in containers:
+            self.remove(container_id, None)
+        for name in volumes:
+            self.remove(None, name)
+        return len(containers), len(volumes)
+
+
+_ENGINE_ERRORS = (docker.errors.DockerException, requests.RequestException, OSError)
+
+
+def _unavailable(exc: BaseException) -> SandboxBlockedError:
+    if isinstance(exc, docker.errors.APIError):
+        return SandboxBlockedError(
+            "sandbox.engine_error", f"the engine refused the request ({exc.status_code})"
+        )
+    return SandboxBlockedError("sandbox.docker_unavailable", "the Docker Engine in WSL is not reachable")
 
 
 def build_client(
