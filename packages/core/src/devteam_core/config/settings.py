@@ -63,9 +63,23 @@ def is_loopback_host(host: str) -> bool:
         return False
 
 
+_MODEL_TAG = r"^[a-z0-9][a-z0-9._-]{0,80}(:[A-Za-z0-9._-]{1,40})?$"
+
+
+class OllamaModels(_Section):
+    """Local model per slot (Part D, D-44; Part A benchmark recommendation, docs/benchmarks)."""
+
+    instruct: str = Field(default="qwen2.5:3b", pattern=_MODEL_TAG)
+    coder: str = Field(default="qwen2.5-coder:3b", pattern=_MODEL_TAG)
+    review: str = Field(default="qwen2.5:3b", pattern=_MODEL_TAG)
+    fallback: str = Field(default="qwen2.5:1.5b", pattern=_MODEL_TAG)
+
+
 class OllamaSettings(_Section):
     base_url: str = "http://127.0.0.1:11434"
     request_timeout_s: float = Field(default=600, gt=0, le=7200)
+    models: OllamaModels = Field(default_factory=OllamaModels)
+    keep_alive: str = Field(default="1m", pattern=r"^[0-9]{1,4}[smh]$")  # unload soon after use (Spec §9.3)
 
     @field_validator("base_url")
     @classmethod
@@ -164,6 +178,24 @@ class RateLimitSettings(_Section):
     session_per_minute: int = Field(default=10, ge=1)
 
 
+class OrchestrationSettings(_Section):
+    """HC-07/HC-19 run orchestration and the run worker (Part D plan §3.6; D-40, D-41)."""
+
+    recursion_limit: int = Field(default=200, ge=25, le=10_000)  # LangGraph backstop (LG-05)
+    poll_interval_s: float = Field(default=1.0, gt=0, le=60)  # worker job polling
+    heartbeat_interval_s: float = Field(default=5.0, gt=0, le=300)
+    lease_ttl_s: float = Field(default=30.0, gt=0, le=3600)  # a lease older than this is dead
+    max_crash_resumes: int = Field(default=3, ge=1, le=10)  # D-40: then the task is Blocked
+    resource_wait_s: float = Field(default=60.0, ge=1, le=3600)  # WAITING_FOR_RESOURCES retry delay
+
+    @model_validator(mode="after")
+    def _heartbeat_inside_lease(self) -> Self:
+        # At least two heartbeats must fit in one lease, or a live worker would look dead.
+        if self.heartbeat_interval_s * 2 > self.lease_ttl_s:
+            raise ValueError("orchestration.lease_ttl_s must be at least twice heartbeat_interval_s")
+        return self
+
+
 class Settings(_Section):
     profile: ProfileName = "low_memory"
     root: Path
@@ -178,6 +210,7 @@ class Settings(_Section):
     secrets: SecretsSettings = SecretsSettings()
     files: FileToolSettings = FileToolSettings()
     ratelimit: RateLimitSettings = RateLimitSettings()
+    orchestration: OrchestrationSettings = OrchestrationSettings()
 
     @model_validator(mode="after")
     def _memory_secrets_only_in_tests(self) -> Self:

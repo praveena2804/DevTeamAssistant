@@ -1,0 +1,30 @@
+{
+  "additionalProperties": false,
+  "description": "Debugger & Code Reviewer ``repair``: suspected root cause and repair notes.",
+  "properties": {
+    "content": {
+      "maxLength": 4000,
+      "minLength": 1,
+      "title": "Content",
+      "type": "string"
+    },
+    "root_cause": {
+      "maxLength": 400,
+      "minLength": 1,
+      "title": "Root Cause",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "root_cause",
+    "content"
+  ],
+  "title": "RepairDraft",
+  "type": "object"
+}

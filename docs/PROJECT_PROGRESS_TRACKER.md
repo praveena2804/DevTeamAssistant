@@ -75,3 +75,31 @@ No development changes were made. I checked the project's link to GitHub: it alr
 **Run 19 — GitHub backup and Part D plan**
 
 No features were built. Parts A to C are now safely on GitHub: the main line and all six version and approval labels were uploaded to praveena2804/DevTeamAssistant, and I checked that GitHub matches this computer exactly. I then read the plans and the finished Part C and wrote the Part D plan, which explains how the project will move through all its stages with stand-in agents, wait for your approvals, and survive a crash or restart. Part D has not been started; the plan is waiting for your approval.
+
+**Run 20 — Part D, step 1 (foundations)**
+
+I uploaded the plan to GitHub and checked it matches this computer. Then I laid the groundwork for the assembly line: added the LangGraph library, wrote down the full list of workflow steps and which step may follow which, added the database tables the background worker will need (job queue, worker lock, progress events, spec versions, plans), and added rules that stop agents and lower layers from ever touching the workflow engine. A check while writing the step list found a mistake in my own plan (a "cancel" could, on paper, have led into building), which I fixed. Nothing runs yet; the stand-in agents and the workflow itself come in the next steps.
+
+**Run 21 — Part D, step 2 (Head Agent rules and service steps; partly blocked)**
+
+I wrote the Head Agent's planning rules as plain code with no AI: it builds a fixed task list, checks any task list and names every problem it finds (circular steps, unknown agents, writing outside allowed folders, missing requirements and more), picks the next step in the right order, and decides what happens after a failure (refusals are never retried, a failed task gets one more try, a crash is not counted as a failure). I added the service steps that are not built yet as honest stand-ins that can only say "not done", and the real step that locks the approved specification after re-checking your approval. Following your new rule, nothing can use the fake AI, and that is now enforced by a check. I also listed every library's licence, as you asked for orjson, and found a second MPL-licensed library (certifi) that has been there since Part A. The ten stand-in agents were not built: your rule needs a real AI connection, and the platform has none until Part F, so this step is blocked until you decide how to proceed.
+
+**Run 22 — Part D, steps 2 to 5 (completed in one run)**
+
+Following your decision, I connected the platform to the AI model that runs on this laptop (Ollama), through the existing AI gateway only, and nowhere else: it refuses any address that is not this computer and ignores proxy settings. All ten agents now do a small but genuine job with the local AI. The analyst lists the BRD's requirements with their sources, the build agents write design notes, and the documenter writes run notes from the facts only, each labelled "not built, tested or verified". I then built the full workflow with its approval stops, the background worker that runs it (it survives being killed and carries on without redoing finished work), the controls to pause, resume and cancel, and the browser pages to start a run, approve each step, watch progress live, and see the trace and history. Full runs with the real AI completed several times; one long test was spoiled because the laptop went to sleep, and I reran it. The fake AI from Part C is still used only by Part C's own tests. Nothing was pushed to GitHub, and your real database was not changed (it will be backed up and updated the next time you start the app).
+
+**Run 23 — Part D upload and Part E plan**
+
+I uploaded the finished Part D work to GitHub as its own branch, separate from the main line, because you have not approved Part D yet, and checked that GitHub now holds exactly the same six commits and the same version tags as this laptop. I then read the specification, roadmap, working plan and trackers again and wrote the plan for Part E: the sealed, offline Docker room where generated code will be allowed to run, and the two starter kits every generated application will begin from. No Part E code was written; the plan waits for your decisions, starting with which Docker you can use under its licence terms.
+
+**Run 24 — Part E plan, second version**
+
+Following your choice of the free Docker Engine inside WSL instead of Docker Desktop, and your rule that everything must be free, I reworked the Part E plan. I looked (without changing anything) at the Ubuntu system already installed in WSL on this laptop: it is ready for Docker, but Docker is not installed yet. The plan now explains how Docker will be installed from Ubuntu's own free packages, how the platform will connect to it safely using private certificates so no other program can use it, and lists every tool and library with its free licence. No Part E code was written; the plan waits for your approval.
+
+**Run 25 — Part E plan, third version**
+
+Following your review, I corrected the Part E plan. Licences are now handled in sensible groups: the free operating-system parts inside the containers may carry GPL licences, while the libraries that end up in generated applications must be permissive, and all of it is checked automatically. Before anything depends on them, three small trial checks will prove that the secure connection to Docker works with the locked key, that the React starter kit builds without internet, and that files move in and out of containers safely; if any of them fails, I stop and ask you. PostgreSQL is moved to Part K. I also wrote down exactly what "free only" means and where every download comes from. I recorded your Docker decision in its decision document. No Part E code was written and nothing was installed; these changes are not yet committed.
+
+**Run 26 — Part D approved**
+
+You approved Part D. I marked it as version 0.4.0, joined it into the main line of the project on this laptop and labelled it, as was done for Parts A to C. Nothing was uploaded to GitHub.

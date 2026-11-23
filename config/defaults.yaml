@@ -28,6 +28,12 @@ logging:
 ollama:
   base_url: http://127.0.0.1:11434   # loopback only (Spec §9.1, roadmap P7)
   request_timeout_s: 600
+  keep_alive: 1m                     # unload the model soon after use (Spec §9.3; one model at a time)
+  models:                            # Part D (D-44): local models per slot, from the Part A benchmark
+    instruct: qwen2.5:3b
+    coder: qwen2.5-coder:3b
+    review: qwen2.5:3b
+    fallback: qwen2.5:1.5b
 
 resources:
   max_parallel_deterministic: 1      # D-27 (recommended default; LLM and sandbox work always sequential)
@@ -66,3 +72,11 @@ ratelimit:                           # HC-18 API limits, requests per minute
   upload_per_minute: 10
   mutation_per_minute: 60
   session_per_minute: 10
+
+orchestration:                       # HC-07/HC-19 run worker (Part D plan §3.6; D-40, D-41)
+  recursion_limit: 200               # LangGraph recursion backstop (LG-05)
+  poll_interval_s: 1                 # worker job polling
+  heartbeat_interval_s: 5
+  lease_ttl_s: 30                    # a worker lease older than this counts as dead
+  max_crash_resumes: 3               # D-40: more consecutive crash-interrupted attempts -> task Blocked
+  resource_wait_s: 60                # retry delay while WAITING_FOR_RESOURCES

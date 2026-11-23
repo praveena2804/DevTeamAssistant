@@ -157,6 +157,12 @@ class Run(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     heartbeat_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # Part D.1 (migration 0005): run control and display
+    mode: Mapped[str] = mapped_column(String(8), server_default="stub")  # D-38 RunMode
+    current_node: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    pending_gate: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    control_request: Mapped[str] = mapped_column(String(8), server_default="none")  # none | pause | cancel
+    trace_id: Mapped[str | None] = mapped_column(String(32), nullable=True)
 
 
 class AgentTaskRow(Base):
@@ -189,7 +195,7 @@ class TaskAttempt(Base):
     node: Mapped[str] = mapped_column(String(64))
     attempt: Mapped[int] = mapped_column(Integer)
     key: Mapped[str] = mapped_column(String(200), unique=True)
-    status: Mapped[str] = mapped_column(String(16))  # started | completed | failed
+    status: Mapped[str] = mapped_column(String(16))  # started | completed | failed | interrupted (D-40)
     error_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
@@ -263,21 +269,148 @@ class TraceSpanRow(Base):
     attributes: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
 
 
+# ------------------------------------------------------------------- Part D.1 (migration 0005_orchestration)
+
+
+class SpecVersionRow(Base):
+    """A specification version (D-39): ``draft`` until approved, then ``frozen`` by the Spec Freeze service.
+
+    The build-entry guard re-reads this row and recomputes the checksum (roadmap §6.5 layer 2). Database
+    triggers keep a frozen version immutable and forbid deletes; a draft may only be frozen.
+    """
+
+    __tablename__ = "spec_versions"
+    __table_args__ = (UniqueConstraint("project_id", "version", name="uq_spec_versions_project_version"),)
+
+    id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), index=True)
+    run_id: Mapped[str] = mapped_column(ForeignKey("runs.id"), index=True)
+    version: Mapped[int] = mapped_column(Integer)
+    status: Mapped[str] = mapped_column(String(8))  # draft | frozen
+    checksum: Mapped[str] = mapped_column(String(64))
+    payload: Mapped[dict[str, Any]] = mapped_column(JSON)  # references only (requirement keys, record IDs)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    frozen_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    approval_id: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    approved_by: Mapped[str | None] = mapped_column(String(40), nullable=True)
+
+
+class TaskPlanRow(Base):
+    """A validated Head Agent plan (``TaskPlan`` payload) and its validation report."""
+
+    __tablename__ = "task_plans"
+
+    id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), index=True)
+    run_id: Mapped[str] = mapped_column(ForeignKey("runs.id", ondelete="CASCADE"), index=True)
+    spec_version_id: Mapped[str] = mapped_column(ForeignKey("spec_versions.id"))
+    source: Mapped[str] = mapped_column(String(16))  # template | model
+    payload: Mapped[dict[str, Any]] = mapped_column(JSON)
+    report: Mapped[dict[str, Any]] = mapped_column(JSON)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class RunJob(Base):
+    """Worker queue (LG-07): the API writes jobs, the single worker executes them (D-41)."""
+
+    __tablename__ = "run_jobs"
+
+    id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), index=True)
+    run_id: Mapped[str] = mapped_column(ForeignKey("runs.id", ondelete="CASCADE"), index=True)
+    kind: Mapped[str] = mapped_column(String(16))  # start | resume | gate_decision
+    payload: Mapped[dict[str, Any]] = mapped_column(JSON)  # references only (e.g. approval ID)
+    status: Mapped[str] = mapped_column(
+        String(12), index=True
+    )  # queued | running | done | failed | cancelled
+    available_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    attempts: Mapped[int] = mapped_column(Integer, default=0)
+    error_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class WorkerLease(Base):
+    """The single-worker lease (D-41). Exactly one row may exist (``id`` = 1, CHECK constraint)."""
+
+    __tablename__ = "worker_lease"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    owner: Mapped[str] = mapped_column(String(40))
+    pid: Mapped[int] = mapped_column(Integer)
+    acquired_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    heartbeat_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class RunEventRow(Base):
+    """A progress event (HC-10) for SSE replay; ``seq`` is strictly increasing per run."""
+
+    __tablename__ = "run_events"
+    __table_args__ = (UniqueConstraint("run_id", "seq", name="uq_run_events_run_seq"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), index=True)
+    run_id: Mapped[str] = mapped_column(ForeignKey("runs.id", ondelete="CASCADE"), index=True)
+    seq: Mapped[int] = mapped_column(Integer)
+    kind: Mapped[str] = mapped_column(String(32))
+    payload: Mapped[dict[str, Any]] = mapped_column(JSON)  # a validated Event contract (metadata only)
+    ts: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class NodeEffect(Base):
+    """Two-phase idempotency ledger for service-node side effects (roadmap §6.7; plan §3.5).
+
+    ``key`` = ``run_id:node:scope:seq``; ``phase`` only moves forward: intent → performed → confirmed.
+    """
+
+    __tablename__ = "node_effects"
+
+    id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), index=True)
+    run_id: Mapped[str] = mapped_column(ForeignKey("runs.id", ondelete="CASCADE"), index=True)
+    node: Mapped[str] = mapped_column(String(40))
+    key: Mapped[str] = mapped_column(String(200), unique=True)
+    phase: Mapped[str] = mapped_column(String(10))  # intent | performed | confirmed
+    result_ref: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class AgentOutputRow(Base):
+    """A validated agent output contract, keyed by its task (D.2, migration 0006). Never edited."""
+
+    __tablename__ = "agent_outputs"
+
+    task_id: Mapped[str] = mapped_column(ForeignKey("agent_tasks.id", ondelete="CASCADE"), primary_key=True)
+    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"), index=True)
+    run_id: Mapped[str] = mapped_column(ForeignKey("runs.id", ondelete="CASCADE"), index=True)
+    agent_type: Mapped[str] = mapped_column(String(32))
+    payload: Mapped[dict[str, Any]] = mapped_column(JSON)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
 __all__ = [
     "NAMING_CONVENTION",
+    "AgentOutputRow",
     "AgentTaskRow",
     "ApprovalRow",
     "AuditChainHead",
     "AuditEvent",
     "Base",
     "DocumentChunk",
+    "NodeEffect",
     "Principal",
     "PrincipalRole",
     "Project",
     "Run",
+    "RunEventRow",
+    "RunJob",
     "SecretReferenceRow",
     "SourceDocument",
+    "SpecVersionRow",
     "TaskAttempt",
+    "TaskPlanRow",
     "TraceSpanRow",
     "UsageCounter",
+    "WorkerLease",
 ]

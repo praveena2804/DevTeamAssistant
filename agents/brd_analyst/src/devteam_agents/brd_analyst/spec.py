@@ -12,7 +12,7 @@ SPEC = AgentSpec(
     role=AgentRole.BRD_ANALYST,
     kind=AgentKind.DISCOVERY,
     default_slot=ModelSlot.INSTRUCT,
-    operations=(OperationSpec(operation_id="brd_analyst.analyse_section"),),
+    operations=(OperationSpec(operation_id="brd_analyst.analyse_section", output_schema="AnalysisDraft"),),
     prompt_id="brd_analyst.system",
     prompt_version=1,
     input_model=BrdAnalystInput,

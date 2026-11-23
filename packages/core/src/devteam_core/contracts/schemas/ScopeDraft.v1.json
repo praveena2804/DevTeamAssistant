@@ -1,0 +1,33 @@
+{
+  "additionalProperties": false,
+  "description": "Requirements Finalizer ``consolidate``: requirement keys to leave out of scope, with reasons.",
+  "properties": {
+    "excluded": {
+      "default": [],
+      "items": {
+        "pattern": "^(FR|NFR|BR)-[0-9]{3,4}$",
+        "type": "string"
+      },
+      "maxItems": 100,
+      "title": "Excluded",
+      "type": "array"
+    },
+    "note": {
+      "maxLength": 400,
+      "minLength": 1,
+      "title": "Note",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "note"
+  ],
+  "title": "ScopeDraft",
+  "type": "object"
+}

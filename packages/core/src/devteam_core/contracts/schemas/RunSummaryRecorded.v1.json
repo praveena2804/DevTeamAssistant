@@ -1,0 +1,143 @@
+{
+  "$defs": {
+    "RunMode": {
+      "description": "How a run is labelled (D-38, as revised by the owner on 2026-11-23).\n\nA stub run is labelled everywhere and can never produce a test result or a project verification\nstatus. Its agents never receive fake, mocked or prepared AI output: AI work goes only through the\nreal LLM Gateway and a genuinely configured provider, and where none is available the agent step\nis reported as blocked rather than simulated.",
+      "enum": [
+        "stub"
+      ],
+      "title": "RunMode",
+      "type": "string"
+    },
+    "RunStatus": {
+      "description": "Run lifecycle (roadmap §6.4). Transitions are enforced by ``devteam_state.machines`` (C.3).",
+      "enum": [
+        "created",
+        "running",
+        "paused",
+        "waiting_for_human",
+        "waiting_for_resources",
+        "completed",
+        "cancelled",
+        "failed",
+        "blocked"
+      ],
+      "title": "RunStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The final report of a run (Part D). A Part D run can never be reported as verified.",
+  "properties": {
+    "actor": {
+      "pattern": "(^agent:(brd_analyst|requirements_finalizer|head|architect|database_developer|backend_developer|frontend_developer|tester|debugger_reviewer|documenter):tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$)|(^service:[a-z][a-z0-9_]{1,40}$)|(^prn_[0-7][0-9A-HJKMNP-TV-Z]{25}$)",
+      "title": "Actor",
+      "type": "string"
+    },
+    "completed_tasks": {
+      "minimum": 0,
+      "title": "Completed Tasks",
+      "type": "integer"
+    },
+    "event_id": {
+      "pattern": "^evt_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Event Id",
+      "type": "string"
+    },
+    "kind": {
+      "const": "run.summary",
+      "default": "run.summary",
+      "title": "Kind",
+      "type": "string"
+    },
+    "model_calls": {
+      "minimum": 0,
+      "title": "Model Calls",
+      "type": "integer"
+    },
+    "project_id": {
+      "anyOf": [
+        {
+          "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Project Id"
+    },
+    "run_id": {
+      "anyOf": [
+        {
+          "pattern": "^run_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Run Id"
+    },
+    "run_mode": {
+      "$ref": "#/$defs/RunMode"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "stand_in_steps": {
+      "minimum": 0,
+      "title": "Stand In Steps",
+      "type": "integer"
+    },
+    "status": {
+      "$ref": "#/$defs/RunStatus"
+    },
+    "task_id": {
+      "anyOf": [
+        {
+          "pattern": "^tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Task Id"
+    },
+    "total_tasks": {
+      "minimum": 0,
+      "title": "Total Tasks",
+      "type": "integer"
+    },
+    "ts": {
+      "format": "date-time",
+      "title": "Ts",
+      "type": "string"
+    },
+    "verified": {
+      "const": false,
+      "default": false,
+      "title": "Verified",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "event_id",
+    "ts",
+    "actor",
+    "status",
+    "run_mode",
+    "completed_tasks",
+    "total_tasks",
+    "model_calls",
+    "stand_in_steps"
+  ],
+  "title": "RunSummaryRecorded",
+  "type": "object"
+}

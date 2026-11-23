@@ -4,8 +4,8 @@ Roadmap ref: §13 Part D, §4.3, §6 · Milestone: M1 · Gate: **G-D** · Workin
 
 | Field | Value |
 |---|---|
-| Status | **Draft: awaiting owner approval.** Nothing in this plan is implemented |
-| Preconditions | G-C approved (**done**, AP-013, v0.3.0). D-27 to be confirmed (§2). D-38…D-43 to be ruled (§2) |
+| Status | **Approved** (AP-015). D.1 approved (AP-016). **D.1–D.5 implemented** (AP-017: D-44 (a), real local Ollama brought forward; all checkpoints in one run). Awaiting the owner's review of the whole of Part D (G-D) |
+| Preconditions | G-C approved (**done**, AP-013, v0.3.0). D-27 (b), D-38…D-42 approved; **D-43 deferred** (AP-015) |
 | Harness components | Implements HC-07; HC-19 checkpointing; HC-12 resume and crash recovery; HC-13 interrupt mechanics; HC-10 progress, events and metrics; HC-11 graph spans and trace viewer; HC-21 run history. Integrates every Part C component |
 | Agents | All 10 as **stubs**. Agent 3 (Head) also gets its **deterministic core**: plan validator, scheduler, dispatcher, failure router and template planner |
 | Branch | `part/d-orchestration` (local), one local commit per checkpoint D.1–D.5. Push only with your separate approval |
@@ -51,7 +51,7 @@ When it is done:
 | Checkpoint | Working Plan steps | What |
 |---|---|---|
 | **D.1 Foundations** | LG-01 completion, LG-05 (part), LG-06 (tables) | Add LangGraph to the project and check its licences and security. Add the missing contracts: `NodeName`, `NodeKind` and the allowed-transition table (LG-01 listed these for C, but they were not built; see §4). Migration `0005_orchestration`. Settings section `orchestration`. Import rules for the new packages. A guard that LangSmith tracing (cloud telemetry) is off |
-| **D.2 Head core and stubs** | Head core; stubs | Head Agent deterministic core: validator, scheduler, dispatcher, failure router, template planner (pure functions, no I/O). Stub behaviour for all 10 agents. Fixture responder for the fake provider. Stub services: feasibility, spec freeze, integration/build, test runner, completion gate, packager, deployer |
+| **D.2 Head core and stubs** | Head core; stubs | Head Agent deterministic core: validator, scheduler, dispatcher, failure router, template planner (pure functions, no I/O). Stub behaviour for all 10 agents. ~~Fixture responder for the fake provider~~ (withdrawn, §12). Stub services: feasibility, spec freeze, integration/build, test runner, completion gate, packager, deployer |
 | **D.3 Graph** | LG-02, LG-03, LG-04, LG-05, LG-06, LG-09, LG-10, LG-13 | Node wrappers (agent, service, gate, guard, router). Four subgraphs plus the parent graph. `build_entry_guard`. Gate nodes using `interrupt()`. SqliteSaver checkpointer on `data/checkpoints.db`. Attempt ledger and two-phase action helper. `Send` fan-out for deterministic nodes (D-27). Topology tests. Generated diagram in `docs/architecture/orchestration.md` |
 | **D.4 Worker and run control** | LG-07, LG-08, LG-11, HS-17 | `apps/worker`: job table, single-worker lease, heartbeat, startup recovery. Run control API: start, pause, resume, cancel, gate decision. Kill-and-restart recovery test |
 | **D.5 Progress, observability, UI** | HS-18, E2E-2 | Progress events delivered live over SSE. Metrics. Graph spans and the trace viewer. Run history. UI: Build Progress page, minimal gate pages, trace viewer, run history. OpenAPI and web types regenerated |
@@ -162,10 +162,10 @@ Every routing function is pure and returns a `NodeName`. A wrapper checks each a
 | `intake` | `brd_analyst` |
 | `brd_analyst` | `feasibility` |
 | `feasibility` | `feasibility_decision` |
-| `feasibility_decision` | `requirements_finalizer`, `route_after_discovery` (cancel) |
+| `feasibility_decision` | `requirements_finalizer`, `finalize_run` (cancel) |
 | `requirements_finalizer` | `clarification_form` (first pass, critical gaps, round unused), `project_approval` |
 | `clarification_form` | `requirements_finalizer` (merge pass) |
-| `project_approval` | `freeze_spec`, `route_after_discovery` (cancel) |
+| `project_approval` | `freeze_spec`, `finalize_run` (cancel) |
 | `freeze_spec` | `route_after_discovery` |
 | `route_after_discovery` | `build_entry_guard`, `finalize_run` |
 | `build_entry_guard` | `head`, `finalize_run` (blocked) |
@@ -179,7 +179,9 @@ Every routing function is pure and returns a `NodeName`. A wrapper checks each a
 | `publish_approval` | `github_deployer`, `final_report` (declined) |
 | `github_deployer` | `final_report` |
 | `final_report` | `finalize_run` |
-| `change_intake` → `change_impact` → `change_approval` → `freeze_change_spec` | then `build_entry_guard`; cancel → `finalize_run` |
+| `change_intake` → `change_impact` → `change_approval` → `freeze_change_spec` → `route_after_change` | then `build_entry_guard`; cancel (at `change_approval`) → `finalize_run` |
+
+**Correction made in D.1 (2026-11-23):** the first draft of this table sent a gate **cancel** to `route_after_discovery`. That router can also continue to `build_entry_guard`, so on paper a path into Build existed that skipped the spec freeze, held shut only by the router's runtime choice. The D.1 topology test found it. Every cancel now goes straight to `finalize_run`, so `route_after_discovery` and the new `route_after_change` are entered **only** from a spec-freeze node (tested, with the old edge kept as a negative control).
 
 **Topology guarantee (AC-D-03, scenario #7):** no path exists from `route_entry` to any build node (`head`, the build agents, the build services) that avoids `freeze_spec` (or `freeze_change_spec`) **and** `build_entry_guard`. This is checked on the compiled graph.
 
@@ -500,4 +502,61 @@ A checkpoint is not done with any failing test, any skip without a recorded reas
 
 ---
 
-## Owner confirmation: ☐ D-27 · ☐ D-38 · ☐ D-39 · ☐ D-40 · ☐ D-41 · ☐ D-42 · ☐ D-43 · ☐ start implementation
+## Owner confirmation: ☑ D-27 (b) · ☑ D-38 · ☑ D-39 · ☑ D-40 (block after more than 3 consecutive crashes) · ☑ D-41 · ☑ D-42 · ☒ D-43 **deferred** · ☑ start implementation, D.1 only first (AP-015, 2026-11-23)
+
+---
+
+## 12. Changes after the D.1 review (AP-016, 2026-11-23)
+
+### 12.1 Owner rulings
+
+- **D-38 revised:** "Use real AI providers only. Do not use fake providers, mock AI providers, deterministic fake responses, prepared answers, or simulated agent outputs. All AI agent execution must go through the real AI gateway and a genuinely configured provider. If real-provider configuration or safe execution is not available, stop and report the blocker. Do not silently substitute a fake provider."
+- **KI-023 (`orjson`):** accepted conditionally: verify the exact version and licence expression, keep every licence notice, document the MPL-2.0 obligations in a third-party licence inventory, never modify orjson's source. Done in D.2: `docs/THIRD_PARTY_LICENSES.md`, checked by `tests/contract/test_third_party_licences.py`.
+
+### 12.2 What this changes in the plan
+
+| Plan item | Before | Now |
+|---|---|---|
+| §0 point 2, §2.2 D-38, §5 `providers/fixture.py`, D.2 step 3 "fixture responder" | Stub agents answer from prepared fixture outputs through the gateway's fake provider | **Withdrawn.** No fixture responder is built. Orchestration, the worker, the API and the agents are forbidden by an import-linter contract from importing the fake provider (`runs never use the fake model provider (D-38)`, planted-violation tested). The Part C fake provider stays for the Part C unit tests and `scripts/demo_part_c.py` only; whether it must be removed entirely is an open question to the owner |
+| D.2 step 4: ten `stub.py` behaviours "through the real executor + gateway (fake provider)" | Built in D.2 | **Blocked.** Real AI execution needs a real provider in the LLM Gateway. Only the `fake` provider exists; the direct Ollama provider is Part F scope (roadmap §13 Part F, PART-D-PLAN §1 "Out of scope"). Ollama itself runs locally (0.40.16, loopback, 9 models), so the blocker is the missing gateway adapter, not the machine. Recorded as KI-025; options are in the D.2 report |
+| §3.2 `feasibility` "all fixture technologies supported" | Stub reports "supported" | Stand-in reports **"not evaluated"** (a stand-in can no longer state any result) |
+| Stub services | Stub outputs | `ServiceOutcome` contract: a stand-in can only report "not run / not evaluated / not built / not published" and must name the part delivering the real service; "performed" only for a real effect with a reference (Spec Freeze) |
+| §5 `agents/head/tests/` | Tests next to the Head package | `tests/agents/`. The agent AST rules (`scripts/check_agent_rules.py`, Part C) scan every `.py` file under `agents/` and refuse `pytest`/`hypothesis` imports; changing a Part C rule was not necessary |
+| §3.1 Head uses `graphlib` | Standard-library `graphlib` | Own iterative cycle search: `graphlib` is not on the Part C agent standard-library allowlist |
+| §5 `devteam_orchestration/services/` | A package | One module, `devteam_orchestration/services.py` |
+
+### 12.3 What D.2 delivered
+
+- Head Agent deterministic core (`agents/head/src/devteam_agents/head/`): `validator.py`, `template_planner.py`, `scheduler.py`, `dispatcher.py`, `failure_router.py`. Pure functions; no I/O, no model. Every AC-D-04 case reports its own code.
+- Stand-in services and the real Spec Freeze service (`devteam_orchestration/services.py`).
+- `ServiceOutcome` contract; three plan-issue codes (`foreign_task`, `task_not_new`, `unknown_requirement`); `RunMode` wording corrected to the revised D-38.
+- Import contract against the fake provider; third-party licence inventory and its test.
+
+**Not delivered (blocked):** the ten agent stub behaviours (D.2 step 4) and the exit criterion "each stub returns a schema-valid output via the executor". D.3 builds the graph around agent nodes, so D.3 also depends on the ruling.
+
+---
+
+## 13. Owner rulings after the D.2 report (AP-017, 2026-11-23) and what changed
+
+### 13.1 Rulings
+
+- **D-44 (a):** bring a minimal local Ollama integration forward into Part D, through the existing AI gateway; genuine local model calls only; no fake providers, prepared responses, simulated agent execution, cloud AI or LiteLLM.
+- **KI-026 (`certifi`):** accepted conditionally on the same terms as orjson (done: `docs/THIRD_PARTY_LICENSES.md`, licence test).
+- **Part C fake provider:** kept only for Part C's tests and `scripts/demo_part_c.py`; unreachable from workflow execution, the worker, the API and agents (import contract, runtime and subprocess checks).
+- **Complete D.2–D.5 in one run**; checkpoints are internal milestones with their own commits; no push.
+
+### 13.2 What was built differently from §1–§11
+
+| Plan item | Now | Reason |
+|---|---|---|
+| §1 out of scope: "Any real model call; the Ollama adapter" (Part F) | `llm_gateway/providers/ollama.py`: direct loopback-only adapter (no LiteLLM, no proxies, no redirects, never pulls a model). Routing, RAG and fallback stay in Part F | D-44 (a) |
+| §0, §3.2: stub agents with prepared answers | Ten agent behaviours (`agents/*/behaviour.py`) with **minimal real behaviour**: each makes a genuine local model call through the executor and the gateway, constrained by an answer contract (`contracts/drafts.py`) sent as Ollama's JSON Schema format. Build agents write design notes (not code) under an honest header. Real behaviour arrives in Parts H–O | D-38 revised, D-44 |
+| §5 `agents/<x>/stub.py` | `agents/<x>/behaviour.py` | Not stubs any more |
+| §3.2 Head plan | The plan is built by the Head's deterministic template planner and validator (orchestration calls them); the Head agent's model call writes the progress summary | HeadInput has no write scopes; Part J adds the model planner |
+| §3.1 four LangGraph subgraphs | One compiled graph whose nodes carry `subgraph` metadata (the four groups); edges generated from the transition table | The D.1 table has edges that cross group boundaries (every cancel ends the run directly); one graph keeps "compiled edges = table" exact. Flagged in the completion report |
+| §3.9 data | Migration **0006** `agent_outputs` (validated outputs by task, append-only) | State is references only; outputs are needed after a restart |
+| §3.7 paths `/api/runs/{run_id}` | `/api/projects/{project_id}/runs/{run_id}/…` | Project-scoped like every Part B route (404 across projects) |
+| §3.4 gates | Clarification form and change approval are compiled but **fail closed** (no critical-gap producer before Part I; change requests in Part Q) | Nothing to submit yet |
+| §3.2 intake `Send` fan-out | Not used: uploads already extract (D-42 (a)), so nothing is pending; D-27 (b) limits parallel work to one on this laptop | No work to fan out |
+| §5 worker modules `queue/lease/heartbeat/recovery.py` | `devteam_worker/worker.py` + `main.py` | Small enough for one module |
+

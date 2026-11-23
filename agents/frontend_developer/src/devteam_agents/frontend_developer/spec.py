@@ -12,7 +12,9 @@ SPEC = AgentSpec(
     role=AgentRole.FRONTEND_DEVELOPER,
     kind=AgentKind.BUILD,
     default_slot=ModelSlot.CODER,
-    operations=(OperationSpec(operation_id="frontend_developer.generate_code"),),
+    operations=(
+        OperationSpec(operation_id="frontend_developer.generate_code", output_schema="DocumentDraft"),
+    ),
     prompt_id="frontend_developer.system",
     prompt_version=1,
     input_model=FrontendDeveloperInput,

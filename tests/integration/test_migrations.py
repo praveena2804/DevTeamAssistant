@@ -41,7 +41,7 @@ def test_upgrade_then_downgrade_round_trip(tmp_path: Path) -> None:
     db = tmp_path / "state.db"
     assert needs_upgrade(db)
     upgrade(db)
-    assert _revision(db) == head_revision() == "0004_execution"
+    assert _revision(db) == head_revision() == "0006_agent_outputs"
     assert not needs_upgrade(db)
     engine = create_sqlite_engine(db)
     try:

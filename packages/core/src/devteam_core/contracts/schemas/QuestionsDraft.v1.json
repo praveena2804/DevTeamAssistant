@@ -1,0 +1,25 @@
+{
+  "additionalProperties": false,
+  "description": "Requirements Finalizer ``draft_questions``: one question per critical gap, in the given order.",
+  "properties": {
+    "questions": {
+      "default": [],
+      "items": {
+        "maxLength": 400,
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 20,
+      "title": "Questions",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    }
+  },
+  "title": "QuestionsDraft",
+  "type": "object"
+}

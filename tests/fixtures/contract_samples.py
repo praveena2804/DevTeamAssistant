@@ -13,7 +13,9 @@ from typing import Any
 
 from devteam_core.contracts import Contract, llm
 from devteam_core.contracts import agents as a
+from devteam_core.contracts import drafts as dr
 from devteam_core.contracts import events as ev
+from devteam_core.contracts import orchestration as o
 from devteam_core.contracts import records as r
 from devteam_core.contracts import tools as t
 from devteam_core.contracts.base import Provenance, SourceRef
@@ -23,6 +25,7 @@ from devteam_core.contracts.statuses import (
     AgentRole,
     ApprovalType,
     FeasibilityStatus,
+    GateName,
     ModelSlot,
     RunStatus,
     Stage,
@@ -494,9 +497,108 @@ def _samples() -> dict[str, Callable[[], Contract]]:
             **_event_base(), path="backend/app.py", before_sha256=SHA, after_sha256=SHA_2, bytes_written=12
         ),
         "RunState": lambda: RunState(
-            project_id=PROJECT, run_id=RUN, run_kind="initial", stage=Stage.ANALYSIS, trace_id=TRACE
+            project_id=PROJECT,
+            run_id=RUN,
+            run_kind="initial",
+            stage=Stage.ANALYSIS,
+            trace_id=TRACE,
+            run_mode=o.RunMode.STUB,
+        ),
+        # ---- Part D.1 orchestration contracts and progress events
+        "NodeStarted": lambda: ev.NodeStarted(
+            **_event_base(), node=o.NodeName.BRD_ANALYST, node_kind=o.NodeKind.AGENT, run_mode=o.RunMode.STUB
+        ),
+        "NodeFinished": lambda: ev.NodeFinished(
+            **_event_base(),
+            node=o.NodeName.FEASIBILITY,
+            node_kind=o.NodeKind.SERVICE,
+            outcome="ok",
+            duration_ms=4,
+        ),
+        "GateOpened": lambda: ev.GateOpened(**_event_base(), gate=GateName.PROJECT_APPROVAL),
+        "RunProgress": lambda: ev.RunProgress(
+            **_event_base(),
+            stage=Stage.BUILD,
+            status=RunStatus.RUNNING,
+            run_mode=o.RunMode.STUB,
+            current_node=o.NodeName.ARCHITECT,
+            completed_tasks=1,
+            total_tasks=5,
+        ),
+        "MetricSample": lambda: ev.MetricSample(**_event_base(), metric="free_ram_mb", value=2048),
+        "GateDecision": lambda: o.GateDecision(
+            run_id=RUN, gate=GateName.PROJECT_APPROVAL, decision=r.ApprovalDecision.APPROVED
+        ),
+        "GateResume": lambda: o.GateResume(
+            run_id=RUN, gate=GateName.PROJECT_APPROVAL, approval_id=new_id("apr")
+        ),
+        "DispatchRecord": _dispatch,
+        "PlanIssue": lambda: o.PlanIssue(code=o.PlanIssueCode.CYCLE, detail="tasks form a cycle"),
+        "PlanValidationReport": lambda: o.PlanValidationReport(
+            plan_id=new_id("pln"),
+            run_id=RUN,
+            ok=False,
+            issues=(o.PlanIssue(code=o.PlanIssueCode.UNCOVERED_REQUIREMENT, detail="FR-002 has no task"),),
+        ),
+        # ---- Part D.2
+        "ServiceStepRecorded": lambda: ev.ServiceStepRecorded(
+            **_event_base(),
+            node=o.NodeName.PACKAGER,
+            status=o.ServiceOutcomeStatus.NOT_BUILT,
+            stand_in=True,
+            available_in_part="O",
+        ),
+        "RunSummaryRecorded": lambda: ev.RunSummaryRecorded(
+            **_event_base(),
+            status=RunStatus.COMPLETED,
+            run_mode=o.RunMode.STUB,
+            completed_tasks=5,
+            total_tasks=5,
+            model_calls=9,
+            stand_in_steps=7,
+        ),
+        "ChecklistFinding": lambda: dr.ChecklistFinding(
+            category=r.GapCategory.GOAL, found=True, evidence=(1,)
+        ),
+        "RequirementDraft": lambda: dr.RequirementDraft(
+            kind="functional", description="Lend books", evidence=2
+        ),
+        "AnalysisDraft": lambda: dr.AnalysisDraft(
+            checklist=(dr.ChecklistFinding(category=r.GapCategory.GOAL, found=False),),
+            requirements=(dr.RequirementDraft(kind="non_functional", description="Fast", evidence=1),),
+        ),
+        "ScopeDraft": lambda: dr.ScopeDraft(note="All accepted keys stay in scope."),
+        "QuestionsDraft": lambda: dr.QuestionsDraft(questions=("Who may borrow books?",)),
+        "SummaryDraft": lambda: dr.SummaryDraft(summary="Build five components."),
+        "DocumentDraft": lambda: dr.DocumentDraft(title="Design", content="Notes."),
+        "RepairDraft": lambda: dr.RepairDraft(root_cause="A missing import.", content="Add it."),
+        "ServiceOutcome": lambda: o.ServiceOutcome(
+            project_id=PROJECT,
+            run_id=RUN,
+            node=o.NodeName.TEST_RUNNER,
+            status=o.ServiceOutcomeStatus.NOT_RUN,
+            stand_in=True,
+            reason="no sandbox yet: nothing was run",
+            available_in_part="M",
+            recorded_at=NOW,
         ),
     }
+
+
+def _dispatch() -> o.DispatchRecord:
+    task = new_id("tsk")
+    return o.DispatchRecord(
+        project_id=PROJECT,
+        run_id=RUN,
+        task_id=task,
+        agent_type=AgentRole.ARCHITECT,
+        node=o.NodeName.ARCHITECT,
+        attempt=1,
+        idempotency_key=o.attempt_key(RUN, "architect", task, 1),
+        permitted_paths=("generated/docs/",),
+        done_criteria=("architecture document written",),
+        dispatched_at=NOW,
+    )
 
 
 SAMPLES: dict[str, Callable[[], Contract]] = _samples()

@@ -1,7 +1,9 @@
 """Model providers behind the LLM Gateway (HC-02). The only package allowed to import HTTP clients.
 
-Part C ships the ``fake`` provider only (scripted answers for tests). The direct Ollama adapter (loopback
-only, no LiteLLM, D-35) comes in Part F.
+* ``fake``: scripted answers for the Part C tests and ``scripts/demo_part_c.py`` only. Workflow runs, the
+  worker, the API and agents can never import it (import-linter contract, D-38 as revised).
+* ``ollama``: the direct local Ollama adapter (loopback only, no LiteLLM, D-35), brought forward from
+  Part F into Part D by owner decision D-44.
 """
 
 from __future__ import annotations

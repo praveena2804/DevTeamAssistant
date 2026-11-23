@@ -7,7 +7,7 @@ DevTeam AI is a local-first, BRD-driven software development platform.
 3. A supervised team of **exactly ten AI agents** then designs, generates, tests, repairs, documents and packages the requested application.
 4. The agents work inside a central security and execution **harness**. Models run locally on Ollama; no paid service is used.
 
-> **Current state: Parts A, B and C approved (v0.3.0). Part D has not started.**
+> **Current state: Parts A, B, C and D approved (v0.4.0). Part D runs the ten agents on the local Ollama; building, testing and publishing are still stand-ins.**
 > What exists:
 > - configuration, logging, trace context and secret redaction (Part A);
 > - a SQLite state database with migrations and automatic backups (Part A);
@@ -16,7 +16,10 @@ DevTeam AI is a local-first, BRD-driven software development platform.
 > - local sign-in key, rate limits and an append-only activity log (Part B; harness HC-15, HC-18, HC-20, HC-21
 >   foundations).
 >
-> **No AI agents and no model calls exist yet.** See `docs/IMPLEMENTATION_TRACKER.md` for the authoritative
+> - Part D: trial runs. The ten agents make real calls to the local Ollama model; building, testing, packaging
+>   and publishing are stand-ins that run nothing, so **nothing is built, tested or verified yet**.
+>
+> See `docs/IMPLEMENTATION_TRACKER.md` for the authoritative
 > status and `docs/PROJECT_PROGRESS_TRACKER.md` for a plain-English run history.
 
 ## Documentation
@@ -31,6 +34,9 @@ DevTeam AI is a local-first, BRD-driven software development platform.
 | `docs/architecture/MODEL_ROUTING.md` | Model-routing audit and proposed design (D-06, D-37) |
 | `docs/architecture/HARNESS_ASSESSMENT.md` | Agent and harness architecture assessment |
 | `docs/adr/` | Architecture decision records |
+| `docs/THIRD_PARTY_LICENSES.md` | Runtime dependency licences and the MPL-2.0 obligations |
+| `docs/architecture/orchestration.md` | The run graph (generated diagram) |
+| `docs/runbooks/worker.md` | Starting, stopping and recovering the run worker |
 | `CLAUDE.md` | Engineering rules for coding agents |
 
 ## Architecture
@@ -71,6 +77,9 @@ packages/state/  devteam_state: SQLite engine (WAL), models, repositories, Alemb
 packages/harness/ devteam_harness: HC-15 local IAM + token, HC-18 rate limits, HC-20 upload validation,
                  HC-21 audit (foundations only)
 packages/services/ devteam_services: workspace manager, document extraction + chunking, intake (not agents)
+packages/orchestration/ devteam_orchestration: LangGraph run graph, guards, gates, runtime (Ollama), run commands
+apps/worker/     devteam_worker: the run worker (lease, heartbeat, crash recovery)
+agents/          the ten agents: declaration (spec.py) + behaviour (behaviour.py)
 config/          defaults.yaml + profiles (low_memory, standard, test)
 scripts/         doctor, benchmark, agent-count check, backup, OpenAPI export, setup/dev PowerShell
 tests/           cross-package integration, contract and script tests
@@ -120,7 +129,7 @@ uv run python scripts/doctor.py
 ## Development
 
 ```powershell
-./scripts/dev.ps1                                   # API on http://127.0.0.1:8000, UI on http://127.0.0.1:5173;
+./scripts/dev.ps1                                   # API on http://127.0.0.1:8000, UI on http://127.0.0.1:5173, run worker;
                                                     # prints and opens the private sign-in link
 uv run python -m devteam_api.signin_link            # print the sign-in link again
 uv run python tests/fixtures/brds.py data/sample_brds  # write sample BRDs (good and broken) for a demo
@@ -151,6 +160,8 @@ gitleaks dir . --no-banner
 | API refuses to start: "A plaintext sign-in key file still exists" | Run `uv run python scripts/migrate_api_token.py` (or just `./scripts/dev.ps1`, which runs it). It moves the old `data/api_token` into Windows Credential Manager under four checks and deletes the file only if all pass |
 | API refuses to start: "no secure OS credential store is available" | The key can only live in Windows Credential Manager; there is no file fallback. Check that the `PYTHON_KEYRING_BACKEND` environment variable is not set |
 | UI says "You are not signed in" | Open the sign-in link printed by `scripts/dev.ps1` (or run `uv run python -m devteam_api.signin_link`). The key is stored in Windows Credential Manager (entry `devteam-ai`), never in a file; never share it |
+| A run waits with "waiting for resources" | Ollama is not running or memory is low. Start Ollama; the run continues by itself. See `docs/runbooks/worker.md` |
+| The worker refuses to start: "configured local models are not installed" | Install them, e.g. `ollama pull qwen2.5:3b` (models are listed in `config/defaults.yaml`); the platform never downloads models itself |
 | A large PDF takes a long time to upload | Expected for now: reading happens during the upload (≈40 s for 300 pages on this laptop). Background reading arrives with the worker (Part D) |
 | `npm test` fails with "Vitest failed to find the current suite" | Run it from PowerShell or a path that starts with an upper-case `C:`; a lower-case drive letter loads Vitest twice |
 | API reports `degraded` | The state DB schema is behind; restart the API (it backs up, then migrates), or run `uv run alembic -c packages/state/alembic.ini upgrade head` |

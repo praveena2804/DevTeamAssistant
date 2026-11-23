@@ -3,6 +3,11 @@
 It holds **references only** (IDs, checksums, enums). Domain facts live in SQLite. Approval
 enforcement layer: a run in the build or delivery stage must carry the approved spec version and
 checksum (the build-entry guard re-verifies them against SQLite in Part D/I).
+
+Version history:
+- v1 (Part C.1): roadmap §6.8 fields.
+- v2 (Part D.1): ``run_mode`` (D-38: a stub run is labelled in its state) and
+  ``clarification_round_used`` (Spec §5.4: one clarification round only, remembered across restarts).
 """
 
 from __future__ import annotations
@@ -24,10 +29,14 @@ from devteam_core.contracts._base import (
     TraceIdHex,
 )
 from devteam_core.contracts.errors import ErrorRef
+from devteam_core.contracts.orchestration import RunMode
 from devteam_core.contracts.statuses import SPEC_BOUND_STAGES, GateName, Stage
+
+RUN_STATE_SCHEMA_VERSION: Literal[2] = 2
 
 
 class RunState(Contract):
+    schema_version: Literal[2] = RUN_STATE_SCHEMA_VERSION  # type: ignore[assignment]  # v2, see docstring
     project_id: ProjectId
     run_id: RunId
     run_kind: Literal["initial", "change_request"]
@@ -41,6 +50,9 @@ class RunState(Contract):
     blocker_ids: tuple[RecordRef, ...] = Field(default=(), max_length=200)
     last_error: ErrorRef | None = None
     trace_id: TraceIdHex
+    run_mode: RunMode
+    # Set when the clarification submission is accepted; from then on the form can never reopen.
+    clarification_round_used: bool = False
 
     @model_validator(mode="after")
     def _approval_bound(self) -> Self:
@@ -52,4 +64,6 @@ class RunState(Contract):
             raise ValueError("a change request runs against an existing frozen spec")
         if self.stage is Stage.INTAKE and self.plan_id is not None:
             raise ValueError("no plan can exist during intake")
+        if self.pending_gate is GateName.CLARIFICATION_FORM and self.clarification_round_used:
+            raise ValueError("the clarification form can be opened only once per run (Spec §5.4)")
         return self

@@ -4,6 +4,70 @@ One section per approved part (roadmap §8). Entries are added at gate approval;
 
 **Versioning:** SemVer, pre-1.0. Each approved part bumps the minor version (Part A = 0.1.0, B = 0.2.0, …, R = 0.18.0); fixes to an approved part bump the patch version. The accepted MVP is `1.0.0-mvp`. Git tags: `vX.Y.Z` plus `part-<letter>-approved` (roadmap §16.2).
 
+## 0.4.0 — Part D: LangGraph Orchestration, Ten Agents & Head Agent Deterministic Core (G-D approved 2026-11-23)
+
+### Added (checkpoint D.1)
+
+- New workspace packages `devteam-orchestration` (LangGraph; local-only tracing guard) and
+  `devteam-worker` (skeleton; the worker is built in D.4). Dependencies `langgraph` 1.2.x and
+  `langgraph-checkpoint-sqlite` 3.1.x (orchestration only)
+- Orchestration contracts: closed `NodeName` list with kinds and subgraphs, exactly one agent node per
+  role, the static allowed-transition table, `GateResume` (IDs only), `DispatchRecord`,
+  `PlanValidationReport`, `RunMode` (stub runs, D-38); progress events (node started/finished, gate
+  opened, run progress, metric sample); 81 exported JSON Schemas
+- Migration `0005_orchestration`: run-control columns on `runs`; `spec_versions` (draft → frozen, guarded
+  by triggers, D-39), `task_plans`, `run_jobs`, `worker_lease` (single row), `run_events`, `node_effects`
+  (two-phase idempotency); repositories for each
+- Settings section `orchestration` (recursion limit, worker polling, heartbeat, lease, crash-resume cap
+  D-40, resource wait)
+- Four new import-linter contracts (11 in total) and Ruff bans keeping LangGraph and orchestration out of
+  agents and lower layers, each with a planted-violation test
+
+### Added (checkpoint D.2)
+
+- Head Agent deterministic core (no model): plan validator reporting every problem with a code,
+  template planner, sequential scheduler, dispatcher with attempt-ledger keys, failure router rules table
+  (F-10c refusals never retried, F-10d re-attempt bound, crash rule D-40)
+- Service steps: honest stand-ins that can only report "not run / not evaluated / not built / not
+  published" (`ServiceOutcome` contract), and the real Spec Freeze service (re-verifies the approval,
+  freezes the spec version, audited, safe to repeat)
+- Import contract: orchestration, the worker, the API and agents can never use the fake model provider
+  (revised D-38: real AI providers only)
+- `docs/THIRD_PARTY_LICENSES.md`: runtime licence inventory with MPL-2.0 obligations (`orjson`, `certifi`),
+  checked by a test
+
+### Added (D.2 completion; D-44)
+
+- Direct local Ollama provider in the LLM Gateway: loopback only, proxies ignored, no redirects, answers
+  constrained by JSON Schema, honest failures (unreachable or missing model = waiting for resources). No
+  LiteLLM. Models per slot in `config/defaults.yaml` (`qwen2.5:3b`, `qwen2.5-coder:3b`, `qwen2.5:1.5b`)
+- The ten agents' behaviours: each runs a genuine local model call through the executor and the gateway
+  (minimal behaviour; real behaviour arrives in Parts H–O); model answer contracts (`contracts.drafts`)
+- Migration `0006_agent_outputs` (validated outputs by task, append-only); certifi licence ruling recorded
+
+### Added (checkpoint D.3)
+
+- The `project_run` LangGraph graph: 37 nodes, edges generated from the transition table, three layers
+  keeping Build behind approval (topology, build-entry guard, spec re-check in every Build/Delivery
+  node), gates with `interrupt()`, SQLite checkpoints without pickle, effects ledger, diagram document
+
+### Added (checkpoint D.4)
+
+- `python -m devteam_worker`: single-worker lease, heartbeat with metrics, recovery after a crash (D-40),
+  pause/resume/cancel at node boundaries, waiting for resources; started by `scripts/dev.ps1`
+- Run-control API: start, list, read, pause, resume, cancel, gate view and decision (through the Approval
+  Service), tasks, events (JSON and server-sent events), trace, history, metrics
+
+### Added (checkpoint D.5)
+
+- UI: runs on the project page, live Build Progress page with gate decisions, trace viewer, run history
+- End-to-end test through the API and a real worker process in a loopback-only network jail
+
+### Changed (checkpoint D.1)
+
+- `RunState` contract v1 → **v2** (`run_mode`, `clarification_round_used`); schema files are now named
+  by each model's own version (`RunState.v2.json`)
+
 ## 0.3.0 — Part C: Shared Contracts & Harness Core (G-C approved 2026-11-23)
 
 ### Added (checkpoint C.1)

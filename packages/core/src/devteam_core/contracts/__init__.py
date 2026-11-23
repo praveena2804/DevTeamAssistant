@@ -27,6 +27,7 @@ from devteam_core.contracts.agents import (
     check_output_against_input,
 )
 from devteam_core.contracts.base import SourceRef
+from devteam_core.contracts.drafts import DRAFT_MODELS
 from devteam_core.contracts.errors import ErrorCategory, ErrorRef, is_auto_retryable
 from devteam_core.contracts.events import EVENT_ADAPTER, EVENT_TYPES
 from devteam_core.contracts.llm import (
@@ -36,6 +37,14 @@ from devteam_core.contracts.llm import (
     ModelResponse,
     ModelUsage,
     OutputValidation,
+)
+from devteam_core.contracts.orchestration import (
+    DispatchRecord,
+    GateDecision,
+    GateResume,
+    PlanIssue,
+    PlanValidationReport,
+    ServiceOutcome,
 )
 from devteam_core.contracts.records import DOMAIN_RECORDS, EntityAttribute, EntityRelationship
 from devteam_core.contracts.state import RunState
@@ -72,14 +81,29 @@ _REGISTERED: tuple[type[Contract], ...] = (
     OutputValidation,
     *EVENT_TYPES,
     RunState,
+    GateDecision,
+    GateResume,
+    DispatchRecord,
+    PlanIssue,
+    PlanValidationReport,
+    ServiceOutcome,
+    *DRAFT_MODELS,
 )
 CONTRACT_MODELS: dict[str, type[Contract]] = {model.__name__: model for model in _REGISTERED}
+
+
+def contract_version(model: type[Contract]) -> int:
+    """The model's own ``schema_version`` (1 unless the contract has been bumped, e.g. ``RunState`` v2)."""
+    version = model.model_fields["schema_version"].default
+    if not isinstance(version, int) or version < SCHEMA_VERSION:
+        raise TypeError(f"{model.__name__} has no valid schema_version")
+    return version
 
 
 def export_json_schemas() -> dict[str, dict[str, Any]]:
     """JSON Schema of every registered contract, keyed by file name ``<Model>.v<version>.json``."""
     return {
-        f"{name}.v{SCHEMA_VERSION}.json": model.model_json_schema(mode="validation")
+        f"{name}.v{contract_version(model)}.json": model.model_json_schema(mode="validation")
         for name, model in sorted(CONTRACT_MODELS.items())
     }
 
@@ -100,6 +124,7 @@ __all__ = [
     "ContractViolationError",
     "ErrorCategory",
     "check_output_against_input",
+    "contract_version",
     "export_json_schemas",
     "is_auto_retryable",
     "render_schema",

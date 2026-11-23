@@ -1,0 +1,46 @@
+[project]
+name = "devteam-orchestration"
+version = "0.4.0"
+description = "DevTeam AI LangGraph orchestration (HC-07): graph, routing, guards, checkpointing. Part D"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "devteam-core",
+    "devteam-state",
+    "devteam-harness",
+    "devteam-services",
+    "devteam-agent-brd-analyst",
+    "devteam-agent-requirements-finalizer",
+    "devteam-agent-head",
+    "devteam-agent-architect",
+    "devteam-agent-database-developer",
+    "devteam-agent-backend-developer",
+    "devteam-agent-frontend-developer",
+    "devteam-agent-tester",
+    "devteam-agent-debugger-reviewer",
+    "devteam-agent-documenter",
+    "langgraph>=1.2.24,<1.3",
+    "langgraph-checkpoint-sqlite>=3.1.3,<3.2",
+]
+
+[tool.uv.sources]
+devteam-core = { workspace = true }
+devteam-state = { workspace = true }
+devteam-harness = { workspace = true }
+devteam-services = { workspace = true }
+devteam-agent-brd-analyst = { workspace = true }
+devteam-agent-requirements-finalizer = { workspace = true }
+devteam-agent-head = { workspace = true }
+devteam-agent-architect = { workspace = true }
+devteam-agent-database-developer = { workspace = true }
+devteam-agent-backend-developer = { workspace = true }
+devteam-agent-frontend-developer = { workspace = true }
+devteam-agent-tester = { workspace = true }
+devteam-agent-debugger-reviewer = { workspace = true }
+devteam-agent-documenter = { workspace = true }
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/devteam_orchestration"]

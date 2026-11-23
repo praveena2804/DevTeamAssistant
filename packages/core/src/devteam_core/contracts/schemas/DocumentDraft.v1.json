@@ -1,0 +1,30 @@
+{
+  "additionalProperties": false,
+  "description": "Build agents, Debugger and Documenter: one Markdown document written by the model.",
+  "properties": {
+    "content": {
+      "maxLength": 4000,
+      "minLength": 1,
+      "title": "Content",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "title": {
+      "maxLength": 400,
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "content"
+  ],
+  "title": "DocumentDraft",
+  "type": "object"
+}

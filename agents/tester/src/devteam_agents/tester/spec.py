@@ -12,7 +12,7 @@ SPEC = AgentSpec(
     role=AgentRole.TESTER,
     kind=AgentKind.BUILD,
     default_slot=ModelSlot.CODER,
-    operations=(OperationSpec(operation_id="tester.generate_tests"),),
+    operations=(OperationSpec(operation_id="tester.generate_tests", output_schema="DocumentDraft"),),
     prompt_id="tester.system",
     prompt_version=1,
     input_model=TesterInput,

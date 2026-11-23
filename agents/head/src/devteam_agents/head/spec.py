@@ -13,8 +13,8 @@ SPEC = AgentSpec(
     kind=AgentKind.ORCHESTRATION,
     default_slot=ModelSlot.INSTRUCT,
     operations=(
-        OperationSpec(operation_id="head.plan"),
-        OperationSpec(operation_id="head.classify_failure"),
+        OperationSpec(operation_id="head.plan", output_schema="SummaryDraft"),
+        OperationSpec(operation_id="head.classify_failure", output_schema="SummaryDraft"),
     ),
     prompt_id="head.system",
     prompt_version=1,

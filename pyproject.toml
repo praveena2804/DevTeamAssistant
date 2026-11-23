@@ -4,7 +4,7 @@
 
 [project]
 name = "devteam-ai"
-version = "0.3.0"
+version = "0.4.0"
 description = "DevTeam AI platform — local-first, BRD-driven software development platform (workspace root)"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
@@ -14,6 +14,8 @@ dependencies = [
     "devteam-harness",
     "devteam-services",
     "devteam-api",
+    "devteam-orchestration",
+    "devteam-worker",
     "devteam-agent-brd-analyst",
     "devteam-agent-requirements-finalizer",
     "devteam-agent-head",
@@ -36,6 +38,8 @@ members = [
     "packages/harness",
     "packages/services",
     "apps/api",
+    "packages/orchestration",
+    "apps/worker",
     "agents/brd_analyst",
     "agents/requirements_finalizer",
     "agents/head",
@@ -54,6 +58,8 @@ devteam-state = { workspace = true }
 devteam-harness = { workspace = true }
 devteam-services = { workspace = true }
 devteam-api = { workspace = true }
+devteam-orchestration = { workspace = true }
+devteam-worker = { workspace = true }
 devteam-agent-brd-analyst = { workspace = true }
 devteam-agent-requirements-finalizer = { workspace = true }
 devteam-agent-head = { workspace = true }
@@ -100,7 +106,10 @@ ignore = [
 "**/migrations/versions/*.py" = ["N999"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["devteam_core", "devteam_state", "devteam_harness", "devteam_services", "devteam_api", "devteam_agents"]
+known-first-party = [
+    "devteam_core", "devteam_state", "devteam_harness", "devteam_services", "devteam_api", "devteam_agents",
+    "devteam_orchestration", "devteam_worker",
+]
 
 [tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "parents"
@@ -113,6 +122,7 @@ strict = true
 warn_unreachable = true
 mypy_path = [
     "packages/core/src", "packages/state/src", "packages/harness/src", "packages/services/src", "apps/api/src",
+    "packages/orchestration/src", "apps/worker/src",
     "agents/brd_analyst/src",
     "agents/requirements_finalizer/src",
     "agents/head/src",
@@ -137,7 +147,7 @@ ignore_missing_imports = true
 [tool.pytest.ini_options]
 minversion = "8.0"
 addopts = "-ra --strict-markers --import-mode=importlib"
-testpaths = ["packages", "apps/api", "tests"]
+testpaths = ["packages", "apps/api", "apps/worker", "tests"]
 pythonpath = ["."]
 markers = [
     "integration: cross-module tests using temp SQLite and fakes",
@@ -153,7 +163,10 @@ filterwarnings = ["error::DeprecationWarning:devteam_.*"]
 
 [tool.coverage.run]
 branch = true
-source = ["devteam_core", "devteam_state", "devteam_harness", "devteam_services", "devteam_api", "devteam_agents"]
+source = [
+    "devteam_core", "devteam_state", "devteam_harness", "devteam_services", "devteam_api", "devteam_agents",
+    "devteam_orchestration", "devteam_worker",
+]
 omit = ["*/migrations/*"]
 
 [tool.coverage.report]
@@ -162,7 +175,10 @@ skip_covered = false
 
 # ---------------------------------------------------------------- import-linter (roadmap §7.1)
 [tool.importlinter]
-root_packages = ["devteam_core", "devteam_state", "devteam_harness", "devteam_services", "devteam_api", "devteam_agents"]
+root_packages = [
+    "devteam_core", "devteam_state", "devteam_harness", "devteam_services", "devteam_api", "devteam_agents",
+    "devteam_orchestration", "devteam_worker",
+]
 include_external_packages = true  # needed to forbid HTTP clients and SQL libraries (Part C)
 
 [[tool.importlinter.contracts]]
@@ -235,7 +251,44 @@ modules = [
 [[tool.importlinter.contracts]]
 name = "only llm_gateway.providers may import HTTP clients (HC-02)"
 type = "forbidden"
-source_modules = ["devteam_core", "devteam_state", "devteam_harness", "devteam_services", "devteam_agents"]
+source_modules = [
+    "devteam_core", "devteam_state", "devteam_harness", "devteam_services", "devteam_agents",
+    "devteam_orchestration", "devteam_worker",
+]
 forbidden_modules = ["httpx"]
 ignore_imports = ["devteam_harness.llm_gateway.providers.** -> httpx"]
 unmatched_ignore_imports_alerting = "none"
+
+# ---- Part D.1: orchestration and worker boundaries (roadmap 7.1, Part D plan 3.1)
+
+[[tool.importlinter.contracts]]
+name = "no orchestration, worker or LangGraph below the orchestration layer"
+type = "forbidden"
+source_modules = ["devteam_core", "devteam_state", "devteam_harness", "devteam_services", "devteam_agents"]
+forbidden_modules = ["devteam_orchestration", "devteam_worker", "langgraph", "langchain_core", "langsmith"]
+
+[[tool.importlinter.contracts]]
+name = "orchestration must not depend on apps"
+type = "forbidden"
+source_modules = ["devteam_orchestration"]
+forbidden_modules = ["devteam_api", "devteam_worker"]
+
+[[tool.importlinter.contracts]]
+name = "the API never runs graphs or agents directly"
+type = "forbidden"
+source_modules = ["devteam_api"]
+forbidden_modules = ["devteam_agents", "devteam_worker", "langgraph", "langchain_core", "langsmith"]
+allow_indirect_imports = true  # D.4: the API may call the orchestration run-command interface only
+
+[[tool.importlinter.contracts]]
+name = "the worker reaches agents only through orchestration"
+type = "forbidden"
+source_modules = ["devteam_worker"]
+forbidden_modules = ["devteam_agents", "devteam_api"]
+allow_indirect_imports = true
+
+[[tool.importlinter.contracts]]
+name = "runs never use the fake model provider (D-38)"
+type = "forbidden"
+source_modules = ["devteam_orchestration", "devteam_worker", "devteam_api", "devteam_agents"]
+forbidden_modules = ["devteam_harness.llm_gateway.providers.fake"]

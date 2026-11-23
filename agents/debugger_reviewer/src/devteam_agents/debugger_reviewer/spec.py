@@ -13,8 +13,10 @@ SPEC = AgentSpec(
     kind=AgentKind.BUILD,
     default_slot=ModelSlot.CODER,
     operations=(
-        OperationSpec(operation_id="debugger_reviewer.repair"),
-        OperationSpec(operation_id="debugger_reviewer.review_code", slot=ModelSlot.REVIEW),
+        OperationSpec(operation_id="debugger_reviewer.repair", output_schema="RepairDraft"),
+        OperationSpec(
+            operation_id="debugger_reviewer.review_code", slot=ModelSlot.REVIEW, output_schema="DocumentDraft"
+        ),
     ),
     prompt_id="debugger_reviewer.system",
     prompt_version=1,

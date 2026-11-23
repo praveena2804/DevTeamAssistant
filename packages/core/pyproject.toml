@@ -1,6 +1,6 @@
 [project]
 name = "devteam-core"
-version = "0.3.0"
+version = "0.4.0"
 description = "DevTeam AI shared foundation: configuration, logging, trace context, IDs, errors, paths (no internal dependencies)"
 requires-python = ">=3.12,<3.13"
 dependencies = [

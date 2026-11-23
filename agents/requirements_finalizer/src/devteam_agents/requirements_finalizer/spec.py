@@ -13,8 +13,8 @@ SPEC = AgentSpec(
     kind=AgentKind.DISCOVERY,
     default_slot=ModelSlot.INSTRUCT,
     operations=(
-        OperationSpec(operation_id="requirements_finalizer.draft_questions"),
-        OperationSpec(operation_id="requirements_finalizer.consolidate"),
+        OperationSpec(operation_id="requirements_finalizer.draft_questions", output_schema="QuestionsDraft"),
+        OperationSpec(operation_id="requirements_finalizer.consolidate", output_schema="ScopeDraft"),
     ),
     prompt_id="requirements_finalizer.system",
     prompt_version=1,
