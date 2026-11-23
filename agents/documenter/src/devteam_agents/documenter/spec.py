@@ -12,7 +12,7 @@ SPEC = AgentSpec(
     role=AgentRole.DOCUMENTER,
     kind=AgentKind.DELIVERY,
     default_slot=ModelSlot.INSTRUCT,
-    operations=(OperationSpec(operation_id="documenter.write_section"),),
+    operations=(OperationSpec(operation_id="documenter.write_section", output_schema="DocumentDraft"),),
     prompt_id="documenter.system",
     prompt_version=1,
     input_model=DocumenterInput,

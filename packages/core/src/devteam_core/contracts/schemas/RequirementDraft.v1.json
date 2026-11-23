@@ -1,0 +1,38 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "description": {
+      "maxLength": 400,
+      "minLength": 1,
+      "title": "Description",
+      "type": "string"
+    },
+    "evidence": {
+      "maximum": 500,
+      "minimum": 1,
+      "title": "Evidence",
+      "type": "integer"
+    },
+    "kind": {
+      "enum": [
+        "functional",
+        "non_functional"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "kind",
+    "description",
+    "evidence"
+  ],
+  "title": "RequirementDraft",
+  "type": "object"
+}

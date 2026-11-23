@@ -13,6 +13,7 @@ from typing import Any
 
 from devteam_core.contracts import Contract, llm
 from devteam_core.contracts import agents as a
+from devteam_core.contracts import drafts as dr
 from devteam_core.contracts import events as ev
 from devteam_core.contracts import orchestration as o
 from devteam_core.contracts import records as r
@@ -540,6 +541,37 @@ def _samples() -> dict[str, Callable[[], Contract]]:
             issues=(o.PlanIssue(code=o.PlanIssueCode.UNCOVERED_REQUIREMENT, detail="FR-002 has no task"),),
         ),
         # ---- Part D.2
+        "ServiceStepRecorded": lambda: ev.ServiceStepRecorded(
+            **_event_base(),
+            node=o.NodeName.PACKAGER,
+            status=o.ServiceOutcomeStatus.NOT_BUILT,
+            stand_in=True,
+            available_in_part="O",
+        ),
+        "RunSummaryRecorded": lambda: ev.RunSummaryRecorded(
+            **_event_base(),
+            status=RunStatus.COMPLETED,
+            run_mode=o.RunMode.STUB,
+            completed_tasks=5,
+            total_tasks=5,
+            model_calls=9,
+            stand_in_steps=7,
+        ),
+        "ChecklistFinding": lambda: dr.ChecklistFinding(
+            category=r.GapCategory.GOAL, found=True, evidence=(1,)
+        ),
+        "RequirementDraft": lambda: dr.RequirementDraft(
+            kind="functional", description="Lend books", evidence=2
+        ),
+        "AnalysisDraft": lambda: dr.AnalysisDraft(
+            checklist=(dr.ChecklistFinding(category=r.GapCategory.GOAL, found=False),),
+            requirements=(dr.RequirementDraft(kind="non_functional", description="Fast", evidence=1),),
+        ),
+        "ScopeDraft": lambda: dr.ScopeDraft(note="All accepted keys stay in scope."),
+        "QuestionsDraft": lambda: dr.QuestionsDraft(questions=("Who may borrow books?",)),
+        "SummaryDraft": lambda: dr.SummaryDraft(summary="Build five components."),
+        "DocumentDraft": lambda: dr.DocumentDraft(title="Design", content="Notes."),
+        "RepairDraft": lambda: dr.RepairDraft(root_cause="A missing import.", content="Add it."),
         "ServiceOutcome": lambda: o.ServiceOutcome(
             project_id=PROJECT,
             run_id=RUN,

@@ -1,6 +1,6 @@
 # Third-Party Licence Inventory
 
-Scope: the platform's **runtime** Python dependencies (`uv export --no-dev --all-packages`), as pinned in `uv.lock`. Licences are read from each installed package's own metadata (`License-Expression`, otherwise its licence classifiers). Last checked: 2026-11-23, Part D.2.
+Scope: the platform's **runtime** Python dependencies (`uv export --no-dev --all-packages`), as pinned in `uv.lock`. Licences are read from each installed package's own metadata (`License-Expression`, otherwise its licence classifiers). Last checked: 2026-11-23, Part D.
 
 The generated target applications are not covered here; their dependencies come from the Capability Catalog (Part G).
 
@@ -16,7 +16,7 @@ The generated target applications are not covered here; their dependencies come 
 | Package | Version | Licence expression | Pulled in by | Ruling |
 |---|---|---|---|---|
 | `orjson` | 3.13.0 | `MPL-2.0 AND (Apache-2.0 OR MIT)` | `langgraph-sdk` (LangGraph) and `langsmith` (via `langchain-core`); D.1 | **Accepted conditionally** by the owner on 2026-11-23 (KI-023): obligations below; source never modified |
-| `certifi` | 2026.10.23 | MPL-2.0 (classifier) | `httpx` / `httpcore` and `requests`; in the lockfile since Part A (v0.1.0) | **Not yet ruled.** Found during the D.2 licence review; reported to the owner (KI-026) |
+| `certifi` | 2026.10.23 | `MPL-2.0` (metadata `License` field and classifier) | `httpx` / `httpcore` and `requests`; in the lockfile since Part A (v0.1.0) | **Accepted conditionally** by the owner on 2026-11-23 (KI-026), on the same terms as orjson: obligations below; source never modified |
 
 Development-only tools, which are never part of a runtime install or a distribution:
 - `hypothesis` 6.170.15 (MPL-2.0), the test framework;
@@ -28,7 +28,7 @@ MPL-2.0 is a file-level copyleft licence. Its conditions attach to the MPL-licen
 
 | Obligation (MPL-2.0 section) | How this project meets it |
 |---|---|
-| Do not remove or alter the licence notices (§3.4) | The packages are installed unchanged from PyPI with hash-pinned wheels (`uv.lock`). Their notices stay in their `dist-info/licenses/` folders: for orjson, `LICENSE-MPL-2.0`, `LICENSE-APACHE` and `LICENSE-MIT`; for certifi, `LICENSE`. The test above checks that orjson's three files are present |
+| Do not remove or alter the licence notices (§3.4) | The packages are installed unchanged from PyPI with hash-pinned wheels (`uv.lock`). Their notices stay in their `dist-info/licenses/` folders: for orjson, `LICENSE-MPL-2.0`, `LICENSE-APACHE` and `LICENSE-MIT`; for certifi, `LICENSE`. The test above checks that these files are present |
 | Modified MPL files must stay under MPL-2.0 and their source must be published (§3.1-§3.2) | **No MPL file is modified.** The packages are used as published: no fork, no patch, no vendored copy in this repository |
 | If the software is distributed in executable form, recipients must be told how to get the MPL source (§3.2(a)) | Today the platform is **not distributed**: it runs locally from source, installed by `uv sync`, which downloads the packages from PyPI. **If an installer, container image or other bundle of the platform is ever distributed**, it must include these notices and a pointer to the unmodified upstream source: the orjson source distribution on PyPI (`orjson-3.13.0.tar.gz`, hash in `uv.lock`) and https://github.com/ijl/orjson, and likewise for certifi |
 | The executable form may be distributed under other terms only if those terms do not limit the recipient's rights to the MPL source (§3.2(b)) | Nothing in this project restricts them |

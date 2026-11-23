@@ -71,7 +71,7 @@ def _chain_ok(stack: Stack) -> None:
 
 
 def test_allowed_work_completes_and_is_fully_recorded(stack: Stack) -> None:
-    stack.provider.add(json.dumps({"summary": "ok"}))
+    stack.provider.add(json.dumps({"title": "Orders", "content": "Ship in 2 days."}))  # D.2 answer contract
     task = stack.add_task()
 
     def behaviour(ctx: AgentContext, given: AgentIO) -> dict[str, Any]:

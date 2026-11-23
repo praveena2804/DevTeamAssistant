@@ -25,7 +25,13 @@ from devteam_core.contracts._base import (
     TaskId,
 )
 from devteam_core.contracts.llm import Provider
-from devteam_core.contracts.orchestration import NodeKind, NodeName, RunMode
+from devteam_core.contracts.orchestration import (
+    NodeKind,
+    NodeName,
+    RunMode,
+    ServiceOutcomeStatus,
+    ServicePart,
+)
 from devteam_core.contracts.records import ApprovalDecision
 from devteam_core.contracts.statuses import ApprovalType, GateName, RunStatus, Stage, TaskStatus
 from devteam_core.contracts.tools import ActorRef, PolicyRuleId, ToolName, ToolOutcome
@@ -174,6 +180,35 @@ class MetricSample(_RunEvent):
     value: int = Field(ge=0)
 
 
+class ServiceStepRecorded(_RunEvent):
+    """A service step's outcome (D.2 ``ServiceOutcome``). Stand-ins can only report non-results."""
+
+    kind: Literal["service.recorded"] = "service.recorded"
+    node: NodeName
+    status: ServiceOutcomeStatus
+    stand_in: bool
+    available_in_part: ServicePart | None = None
+
+
+class RunSummaryRecorded(_RunEvent):
+    """The final report of a run (Part D). A Part D run can never be reported as verified."""
+
+    kind: Literal["run.summary"] = "run.summary"
+    status: RunStatus
+    run_mode: RunMode
+    completed_tasks: int = Field(ge=0)
+    total_tasks: int = Field(ge=0)
+    model_calls: int = Field(ge=0)
+    stand_in_steps: int = Field(ge=0)
+    verified: Literal[False] = False
+
+    @model_validator(mode="after")
+    def _counts(self) -> Self:
+        if self.completed_tasks > self.total_tasks:
+            raise ValueError("completed_tasks cannot exceed total_tasks")
+        return self
+
+
 Event = Annotated[
     RunTransitioned
     | TaskTransitioned
@@ -185,7 +220,9 @@ Event = Annotated[
     | NodeFinished
     | GateOpened
     | RunProgress
-    | MetricSample,
+    | MetricSample
+    | ServiceStepRecorded
+    | RunSummaryRecorded,
     Field(discriminator="kind"),
 ]
 EVENT_ADAPTER: TypeAdapter[Event] = TypeAdapter(Event)
@@ -201,4 +238,6 @@ EVENT_TYPES: tuple[type[EventBase], ...] = (
     GateOpened,
     RunProgress,
     MetricSample,
+    ServiceStepRecorded,
+    RunSummaryRecorded,
 )

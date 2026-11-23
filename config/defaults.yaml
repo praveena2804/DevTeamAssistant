@@ -28,6 +28,12 @@ logging:
 ollama:
   base_url: http://127.0.0.1:11434   # loopback only (Spec §9.1, roadmap P7)
   request_timeout_s: 600
+  keep_alive: 1m                     # unload the model soon after use (Spec §9.3; one model at a time)
+  models:                            # Part D (D-44): local models per slot, from the Part A benchmark
+    instruct: qwen2.5:3b
+    coder: qwen2.5-coder:3b
+    review: qwen2.5:3b
+    fallback: qwen2.5:1.5b
 
 resources:
   max_parallel_deterministic: 1      # D-27 (recommended default; LLM and sandbox work always sequential)

@@ -595,6 +595,16 @@ name = "devteam-orchestration"
 version = "0.3.0"
 source = { editable = "packages/orchestration" }
 dependencies = [
+    { name = "devteam-agent-architect" },
+    { name = "devteam-agent-backend-developer" },
+    { name = "devteam-agent-brd-analyst" },
+    { name = "devteam-agent-database-developer" },
+    { name = "devteam-agent-debugger-reviewer" },
+    { name = "devteam-agent-documenter" },
+    { name = "devteam-agent-frontend-developer" },
+    { name = "devteam-agent-head" },
+    { name = "devteam-agent-requirements-finalizer" },
+    { name = "devteam-agent-tester" },
     { name = "devteam-core" },
     { name = "devteam-harness" },
     { name = "devteam-services" },
@@ -605,6 +615,16 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "devteam-agent-architect", editable = "agents/architect" },
+    { name = "devteam-agent-backend-developer", editable = "agents/backend_developer" },
+    { name = "devteam-agent-brd-analyst", editable = "agents/brd_analyst" },
+    { name = "devteam-agent-database-developer", editable = "agents/database_developer" },
+    { name = "devteam-agent-debugger-reviewer", editable = "agents/debugger_reviewer" },
+    { name = "devteam-agent-documenter", editable = "agents/documenter" },
+    { name = "devteam-agent-frontend-developer", editable = "agents/frontend_developer" },
+    { name = "devteam-agent-head", editable = "agents/head" },
+    { name = "devteam-agent-requirements-finalizer", editable = "agents/requirements_finalizer" },
+    { name = "devteam-agent-tester", editable = "agents/tester" },
     { name = "devteam-core", editable = "packages/core" },
     { name = "devteam-harness", editable = "packages/harness" },
     { name = "devteam-services", editable = "packages/services" },
@@ -664,6 +684,7 @@ dependencies = [
     { name = "devteam-harness" },
     { name = "devteam-orchestration" },
     { name = "devteam-state" },
+    { name = "psutil" },
 ]
 
 [package.metadata]
@@ -672,6 +693,7 @@ requires-dist = [
     { name = "devteam-harness", editable = "packages/harness" },
     { name = "devteam-orchestration", editable = "packages/orchestration" },
     { name = "devteam-state", editable = "packages/state" },
+    { name = "psutil", specifier = ">=6.1,<8" },
 ]
 
 [[package]]

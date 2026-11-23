@@ -1,0 +1,171 @@
+{
+  "$defs": {
+    "NodeName": {
+      "description": "Every node of the ``project_run`` graph and its four subgraphs (Part D plan §3.2).",
+      "enum": [
+        "route_entry",
+        "route_after_discovery",
+        "route_after_change",
+        "route_after_build",
+        "finalize_run",
+        "intake",
+        "brd_analyst",
+        "feasibility",
+        "feasibility_decision",
+        "requirements_finalizer",
+        "clarification_form",
+        "project_approval",
+        "freeze_spec",
+        "build_entry_guard",
+        "head",
+        "schedule",
+        "architect",
+        "database_developer",
+        "backend_developer",
+        "frontend_developer",
+        "tester",
+        "debugger_reviewer",
+        "integration_build",
+        "test_runner",
+        "verify_task",
+        "failure_router",
+        "completion_gate_1",
+        "documenter",
+        "packager",
+        "completion_gate_2",
+        "publish_approval",
+        "github_deployer",
+        "final_report",
+        "change_intake",
+        "change_impact",
+        "change_approval",
+        "freeze_change_spec"
+      ],
+      "title": "NodeName",
+      "type": "string"
+    },
+    "ServiceOutcomeStatus": {
+      "description": "What a deterministic service step did (D.2).\n\nThere is deliberately no value for \"passed\", \"supported\", \"built\" or \"verified\": until the real\nservice exists (the part named in ``ServiceOutcome.available_in_part``), a step can only say that\nit did **not** do its job. Real results come from the real services (E, G, M, N, O, P).",
+      "enum": [
+        "performed",
+        "not_run",
+        "not_evaluated",
+        "not_built",
+        "not_published"
+      ],
+      "title": "ServiceOutcomeStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A service step's outcome (D.2 ``ServiceOutcome``). Stand-ins can only report non-results.",
+  "properties": {
+    "actor": {
+      "pattern": "(^agent:(brd_analyst|requirements_finalizer|head|architect|database_developer|backend_developer|frontend_developer|tester|debugger_reviewer|documenter):tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$)|(^service:[a-z][a-z0-9_]{1,40}$)|(^prn_[0-7][0-9A-HJKMNP-TV-Z]{25}$)",
+      "title": "Actor",
+      "type": "string"
+    },
+    "available_in_part": {
+      "anyOf": [
+        {
+          "enum": [
+            "E",
+            "G",
+            "M",
+            "N",
+            "O",
+            "P",
+            "Q"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Available In Part"
+    },
+    "event_id": {
+      "pattern": "^evt_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Event Id",
+      "type": "string"
+    },
+    "kind": {
+      "const": "service.recorded",
+      "default": "service.recorded",
+      "title": "Kind",
+      "type": "string"
+    },
+    "node": {
+      "$ref": "#/$defs/NodeName"
+    },
+    "project_id": {
+      "anyOf": [
+        {
+          "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Project Id"
+    },
+    "run_id": {
+      "anyOf": [
+        {
+          "pattern": "^run_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Run Id"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "stand_in": {
+      "title": "Stand In",
+      "type": "boolean"
+    },
+    "status": {
+      "$ref": "#/$defs/ServiceOutcomeStatus"
+    },
+    "task_id": {
+      "anyOf": [
+        {
+          "pattern": "^tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Task Id"
+    },
+    "ts": {
+      "format": "date-time",
+      "title": "Ts",
+      "type": "string"
+    }
+  },
+  "required": [
+    "event_id",
+    "ts",
+    "actor",
+    "node",
+    "status",
+    "stand_in"
+  ],
+  "title": "ServiceStepRecorded",
+  "type": "object"
+}

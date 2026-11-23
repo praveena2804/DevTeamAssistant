@@ -23,7 +23,15 @@ from sqlalchemy.orm import Session
 from devteam_core.clock import Clock, system_clock
 from devteam_core.contracts.events import EventBase
 from devteam_core.ids import new_id
-from devteam_state.models import NodeEffect, Run, RunEventRow, RunJob, TaskPlanRow, WorkerLease
+from devteam_state.models import (
+    AgentOutputRow,
+    NodeEffect,
+    Run,
+    RunEventRow,
+    RunJob,
+    TaskPlanRow,
+    WorkerLease,
+)
 
 ControlRequest = Literal["none", "pause", "cancel"]
 JobKind = Literal["start", "resume", "gate_decision"]
@@ -348,3 +356,41 @@ def latest_plan(session: Session, project_id: str, run_id: str) -> TaskPlanRow |
         .where(TaskPlanRow.project_id == project_id, TaskPlanRow.run_id == run_id)
         .order_by(TaskPlanRow.created_at.desc(), TaskPlanRow.id.desc())
     ).first()
+
+
+# --------------------------------------------------------------------------------- agent outputs
+
+
+def save_agent_output(
+    session: Session,
+    *,
+    project_id: str,
+    run_id: str,
+    task_id: str,
+    agent_type: str,
+    payload: dict[str, Any],
+    clock: Clock = system_clock,
+) -> AgentOutputRow:
+    """Store a task's validated output once. A repeat (resume after a crash) returns the stored row."""
+    _run(session, project_id, run_id)
+    existing = session.get(AgentOutputRow, task_id)
+    if existing is not None:
+        if existing.project_id != project_id or existing.run_id != run_id:
+            raise OrchestrationStateError("the output belongs to another project or run")
+        return existing
+    row = AgentOutputRow(
+        task_id=task_id,
+        project_id=project_id,
+        run_id=run_id,
+        agent_type=agent_type,
+        payload=payload,
+        created_at=clock.now(),
+    )
+    session.add(row)
+    session.flush()
+    return row
+
+
+def get_agent_output(session: Session, project_id: str, task_id: str) -> AgentOutputRow | None:
+    row = session.get(AgentOutputRow, task_id)
+    return row if row is not None and row.project_id == project_id else None

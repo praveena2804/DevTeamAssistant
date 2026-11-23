@@ -1,0 +1,127 @@
+{
+  "$defs": {
+    "ChecklistFinding": {
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "$ref": "#/$defs/GapCategory"
+        },
+        "evidence": {
+          "default": [],
+          "items": {
+            "maximum": 500,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "maxItems": 5,
+          "title": "Evidence",
+          "type": "array"
+        },
+        "found": {
+          "title": "Found",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "category",
+        "found"
+      ],
+      "title": "ChecklistFinding",
+      "type": "object"
+    },
+    "GapCategory": {
+      "description": "The 13 mandatory completeness-checklist categories (Spec §6.2).",
+      "enum": [
+        "goal",
+        "actors",
+        "features",
+        "workflows",
+        "data",
+        "rules",
+        "permissions",
+        "login",
+        "technology",
+        "integrations",
+        "deployment",
+        "acceptance_criteria",
+        "non_functional"
+      ],
+      "title": "GapCategory",
+      "type": "string"
+    },
+    "RequirementDraft": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "maxLength": 400,
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "evidence": {
+          "maximum": 500,
+          "minimum": 1,
+          "title": "Evidence",
+          "type": "integer"
+        },
+        "kind": {
+          "enum": [
+            "functional",
+            "non_functional"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "description",
+        "evidence"
+      ],
+      "title": "RequirementDraft",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "BRD Analyst ``analyse_section``: completeness checklist and requirements, with cited pieces.",
+  "properties": {
+    "checklist": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ChecklistFinding"
+      },
+      "maxItems": 13,
+      "title": "Checklist",
+      "type": "array"
+    },
+    "requirements": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/RequirementDraft"
+      },
+      "maxItems": 10,
+      "title": "Requirements",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    }
+  },
+  "title": "AnalysisDraft",
+  "type": "object"
+}

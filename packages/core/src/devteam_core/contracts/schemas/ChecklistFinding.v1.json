@@ -1,0 +1,57 @@
+{
+  "$defs": {
+    "GapCategory": {
+      "description": "The 13 mandatory completeness-checklist categories (Spec §6.2).",
+      "enum": [
+        "goal",
+        "actors",
+        "features",
+        "workflows",
+        "data",
+        "rules",
+        "permissions",
+        "login",
+        "technology",
+        "integrations",
+        "deployment",
+        "acceptance_criteria",
+        "non_functional"
+      ],
+      "title": "GapCategory",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "category": {
+      "$ref": "#/$defs/GapCategory"
+    },
+    "evidence": {
+      "default": [],
+      "items": {
+        "maximum": 500,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "maxItems": 5,
+      "title": "Evidence",
+      "type": "array"
+    },
+    "found": {
+      "title": "Found",
+      "type": "boolean"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "category",
+    "found"
+  ],
+  "title": "ChecklistFinding",
+  "type": "object"
+}

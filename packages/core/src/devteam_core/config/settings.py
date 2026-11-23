@@ -63,9 +63,23 @@ def is_loopback_host(host: str) -> bool:
         return False
 
 
+_MODEL_TAG = r"^[a-z0-9][a-z0-9._-]{0,80}(:[A-Za-z0-9._-]{1,40})?$"
+
+
+class OllamaModels(_Section):
+    """Local model per slot (Part D, D-44; Part A benchmark recommendation, docs/benchmarks)."""
+
+    instruct: str = Field(default="qwen2.5:3b", pattern=_MODEL_TAG)
+    coder: str = Field(default="qwen2.5-coder:3b", pattern=_MODEL_TAG)
+    review: str = Field(default="qwen2.5:3b", pattern=_MODEL_TAG)
+    fallback: str = Field(default="qwen2.5:1.5b", pattern=_MODEL_TAG)
+
+
 class OllamaSettings(_Section):
     base_url: str = "http://127.0.0.1:11434"
     request_timeout_s: float = Field(default=600, gt=0, le=7200)
+    models: OllamaModels = Field(default_factory=OllamaModels)
+    keep_alive: str = Field(default="1m", pattern=r"^[0-9]{1,4}[smh]$")  # unload soon after use (Spec §9.3)
 
     @field_validator("base_url")
     @classmethod

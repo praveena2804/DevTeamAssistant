@@ -38,7 +38,7 @@ def test_version_reports_platform_and_schema(client: TestClient) -> None:
     assert body["name"] == "DevTeam AI"
     assert body["api_version"] == "v1"
     assert body["profile"] == "test"
-    assert body["schema_revision"] == body["schema_head"] == "0005_orchestration"
+    assert body["schema_revision"] == body["schema_head"] == "0006_agent_outputs"
     assert re.fullmatch(r"3\.12\.\d+", body["python_version"])
 
 

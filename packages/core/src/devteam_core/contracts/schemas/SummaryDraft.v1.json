@@ -1,0 +1,23 @@
+{
+  "additionalProperties": false,
+  "description": "Head Agent ``plan`` / ``classify_failure``: a short progress summary of facts it was given.",
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "summary": {
+      "maxLength": 400,
+      "minLength": 1,
+      "title": "Summary",
+      "type": "string"
+    }
+  },
+  "required": [
+    "summary"
+  ],
+  "title": "SummaryDraft",
+  "type": "object"
+}

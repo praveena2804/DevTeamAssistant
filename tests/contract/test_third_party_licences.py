@@ -106,3 +106,18 @@ def test_orjson_source_is_not_vendored_into_the_repository() -> None:
     ).stdout.splitlines()
     assert len(listed) > 100  # negative control: the listing works
     assert [p for p in listed if "orjson" in p.lower()] == []
+
+
+def test_certifi_is_the_ruled_version_with_its_notice_intact() -> None:
+    """KI-026 conditions (owner ruling 2026-11-23): exact version and licence; notice present; unmodified."""
+    lock = tomllib.loads((REPO_ROOT / "uv.lock").read_text(encoding="utf-8"))
+    [locked] = [p["version"] for p in lock["package"] if p["name"] == "certifi"]
+    installed = distribution("certifi")
+    assert locked == installed.version == "2026.10.23"
+    assert installed.metadata["License"] == "MPL-2.0"
+    files = {str(f).replace("\\", "/").rsplit("/", 1)[-1] for f in installed.files or ()}
+    assert "LICENSE" in files
+    section_1 = INVENTORY.read_text(encoding="utf-8").split("## 2.", 1)[0]
+    assert "| `certifi` | 2026.10.23 |" in section_1
+    certifi_row = section_1.split("| `certifi`", 1)[1].splitlines()[0]
+    assert "Accepted conditionally" in certifi_row

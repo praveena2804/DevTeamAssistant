@@ -12,7 +12,7 @@ SPEC = AgentSpec(
     role=AgentRole.ARCHITECT,
     kind=AgentKind.BUILD,
     default_slot=ModelSlot.INSTRUCT,
-    operations=(OperationSpec(operation_id="architect.design"),),
+    operations=(OperationSpec(operation_id="architect.design", output_schema="DocumentDraft"),),
     prompt_id="architect.system",
     prompt_version=1,
     input_model=ArchitectInput,

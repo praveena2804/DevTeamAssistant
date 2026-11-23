@@ -27,6 +27,7 @@ from devteam_core.contracts.agents import (
     check_output_against_input,
 )
 from devteam_core.contracts.base import SourceRef
+from devteam_core.contracts.drafts import DRAFT_MODELS
 from devteam_core.contracts.errors import ErrorCategory, ErrorRef, is_auto_retryable
 from devteam_core.contracts.events import EVENT_ADAPTER, EVENT_TYPES
 from devteam_core.contracts.llm import (
@@ -86,6 +87,7 @@ _REGISTERED: tuple[type[Contract], ...] = (
     PlanIssue,
     PlanValidationReport,
     ServiceOutcome,
+    *DRAFT_MODELS,
 )
 CONTRACT_MODELS: dict[str, type[Contract]] = {model.__name__: model for model in _REGISTERED}
 
