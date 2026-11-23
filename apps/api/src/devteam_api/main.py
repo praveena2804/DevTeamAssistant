@@ -13,10 +13,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from devteam_api.middleware.body_limit import UploadBodyLimitMiddleware
 from devteam_api.middleware.request_context import RequestContextMiddleware
-from devteam_api.routers import audit, documents, projects, session, system
+from devteam_api.routers import audit, documents, projects, runs, session, system
 from devteam_core import __version__
 from devteam_core.config import Settings, load_settings
 from devteam_core.logging import configure_logging, get_logger, secret_registry
+from devteam_harness.approvals import ApprovalService, load_approval_rules
 from devteam_harness.iam import LOCAL_HUMAN_ROLES, Principal, load_api_token, session_value
 from devteam_harness.ratelimit import RateLimiter
 from devteam_harness.secrets import secrets_manager_from_settings
@@ -77,6 +78,9 @@ def create_app(
         }
         app.state.workspaces = WorkspaceManager(resolved.workspaces_dir)
         app.state.intake = IntakeService(resolved.uploads, app.state.workspaces)
+        # Part D: gate decisions are recorded through the Approval Service (HC-13)
+        app.state.approval_rules = load_approval_rules(resolved.root / "config")
+        app.state.approvals = ApprovalService(app.state.approval_rules, app.state.session_factory)
         _log.info("api_started", profile=resolved.profile, version=__version__)
         try:
             yield
@@ -110,4 +114,5 @@ def create_app(
     app.include_router(projects.router)
     app.include_router(documents.router)
     app.include_router(audit.router)
+    app.include_router(runs.router)
     return app

@@ -1,11 +1,13 @@
 <#
 .SYNOPSIS
-  Start the DevTeam AI API and web UI for local development (both bound to 127.0.0.1).
+  Start the DevTeam AI API, the run worker and the web UI for local development (bound to 127.0.0.1).
 
 .DESCRIPTION
   API:  http://127.0.0.1:8000  (uv run python -m devteam_api)
   UI:   http://127.0.0.1:5173  (Vite dev server; proxies /health, /version and /api to the API)
-  Press Ctrl+C to stop both processes.
+  Worker: uv run python -m devteam_worker (D-41: runs execute here, never in the API). It starts after the
+  API has migrated the database, uses the local Ollama only, and refuses to start if a second worker runs.
+  Press Ctrl+C to stop all processes.
 
 .PARAMETER Smoke
   Start both processes, verify /health directly and through the UI proxy, verify that /api refuses requests
@@ -28,6 +30,7 @@ $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 $api = $null
 $web = $null
+$worker = $null
 
 function Wait-Http([string]$Url, [int]$TimeoutSeconds = 60) {
     $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
@@ -61,6 +64,13 @@ try {
     $proxied = Wait-Http "http://127.0.0.1:5173/health"
     Write-Host "UI proxy health: $($proxied.status)"
 
+    # The worker starts once the API has migrated the state database (it refuses an unmigrated one).
+    $worker = Start-Process -FilePath "uv" -ArgumentList @("run", "python", "-m", "devteam_worker") `
+        -WorkingDirectory $root -PassThru -NoNewWindow
+    Start-Sleep -Seconds 5
+    if ($worker.HasExited) { throw "the run worker stopped at start (exit $($worker.ExitCode)); see the messages above" }
+    Write-Host "Run worker: started (process $($worker.Id))"
+
     $link = (& uv run python -m devteam_api.signin_link).Trim()
 
     if ($Smoke) {
@@ -80,15 +90,16 @@ try {
         Write-Host "SMOKE OK"
         return
     }
-    Write-Host "DevTeam AI running: UI http://127.0.0.1:5173  API http://127.0.0.1:8000  (Ctrl+C to stop)"
+    Write-Host "DevTeam AI running: UI http://127.0.0.1:5173  API http://127.0.0.1:8000  worker  (Ctrl+C to stop)"
     Write-Host "Sign in with this link (keep it private): $link"
     if (-not $NoBrowser) { Start-Process $link }
     Wait-Process -Id $api.Id
 }
 finally {
-    foreach ($proc in @($web, $api)) {
+    foreach ($proc in @($worker, $web, $api)) {
         if ($null -ne $proc -and -not $proc.HasExited) {
-            # /T stops the whole process tree (uv -> python, npm -> node).
+            # /T stops the whole process tree (uv -> python, npm -> node). A killed worker is safe:
+            # the next one recovers the run from its last checkpoint (D-40).
             & taskkill.exe /PID $proc.Id /T /F | Out-Null
         }
     }
