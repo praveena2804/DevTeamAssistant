@@ -1,0 +1,136 @@
+{
+  "$defs": {
+    "ErrorCategory": {
+      "enum": [
+        "retryable",
+        "invalid_output",
+        "budget_exhausted",
+        "policy_denied",
+        "resource_unavailable",
+        "fatal"
+      ],
+      "title": "ErrorCategory",
+      "type": "string"
+    },
+    "ErrorRef": {
+      "additionalProperties": false,
+      "description": "A short, already-redacted description of an error. Never contains secrets or document text.",
+      "properties": {
+        "category": {
+          "$ref": "#/$defs/ErrorCategory"
+        },
+        "code": {
+          "maxLength": 64,
+          "pattern": "^[a-z][a-z0-9_]*(\\.[a-z0-9_]+)*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "message": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "task_id": {
+          "anyOf": [
+            {
+              "pattern": "^tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Task Id"
+        }
+      },
+      "required": [
+        "category",
+        "code",
+        "message",
+        "occurred_at"
+      ],
+      "title": "ErrorRef",
+      "type": "object"
+    },
+    "JsonValue": {},
+    "ToolOutcome": {
+      "enum": [
+        "ok",
+        "denied",
+        "error"
+      ],
+      "title": "ToolOutcome",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "audit_event_id": {
+      "pattern": "^aud_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Audit Event Id",
+      "type": "string"
+    },
+    "call_id": {
+      "pattern": "^tcl_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Call Id",
+      "type": "string"
+    },
+    "error": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ErrorRef"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "outcome": {
+      "$ref": "#/$defs/ToolOutcome"
+    },
+    "policy_rule_id": {
+      "anyOf": [
+        {
+          "pattern": "^[a-z][a-z0-9_.-]{1,80}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Policy Rule Id"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "value": {
+      "$ref": "#/$defs/JsonValue",
+      "default": null
+    }
+  },
+  "required": [
+    "call_id",
+    "outcome",
+    "audit_event_id"
+  ],
+  "title": "ToolResult",
+  "type": "object"
+}

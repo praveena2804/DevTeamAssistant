@@ -1,0 +1,33 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "requirement_ids": {
+      "items": {
+        "pattern": "^(FR|NFR|BR)-[0-9]{3,4}$",
+        "type": "string"
+      },
+      "maxItems": 50,
+      "minItems": 1,
+      "title": "Requirement Ids",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "test_id": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Test Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "test_id",
+    "requirement_ids"
+  ],
+  "title": "TestMapping",
+  "type": "object"
+}

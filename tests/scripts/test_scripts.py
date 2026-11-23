@@ -40,6 +40,9 @@ def _make_agents(root: Path, names: list[str]) -> None:
     for name in names:
         (root / "agents" / name).mkdir(parents=True)
         (root / "agents" / name / "pyproject.toml").write_text("", encoding="utf-8")
+        spec = root / "agents" / name / "src" / "devteam_agents" / name / "spec.py"
+        spec.parent.mkdir(parents=True)
+        spec.write_text("", encoding="utf-8")
 
 
 def test_canonical_list_has_exactly_ten_unique_agents() -> None:
@@ -48,7 +51,7 @@ def test_canonical_list_has_exactly_ten_unique_agents() -> None:
 
 
 def test_skeleton_mode_passes_without_agents_dir(tmp_path: Path) -> None:
-    errors, notes = agent_count.check(_root(tmp_path, ["packages/core"]))
+    errors, notes = agent_count.check(_root(tmp_path, ["packages/core"]), strict=False)
     assert errors == []
     assert any("skeleton" in n for n in notes)
 
@@ -56,6 +59,22 @@ def test_skeleton_mode_passes_without_agents_dir(tmp_path: Path) -> None:
 def test_strict_mode_requires_agents_dir(tmp_path: Path) -> None:
     errors, _ = agent_count.check(_root(tmp_path, []), strict=True)
     assert errors
+
+
+def test_strict_is_the_default_since_part_c(tmp_path: Path) -> None:
+    errors, _ = agent_count.check(_root(tmp_path, []))
+    assert any("agents/ directory is missing" in e for e in errors)
+    assert agent_count.main(["--root", str(_root(tmp_path, []))]) == 1
+    assert agent_count.main(["--root", str(tmp_path), "--skeleton"]) == 0
+
+
+def test_agent_without_spec_module_is_rejected(tmp_path: Path) -> None:
+    names = list(agent_count.CANONICAL_AGENTS)
+    root = _root(tmp_path, [f"agents/{n}" for n in names])
+    _make_agents(root, names)
+    (root / "agents" / "tester" / "src" / "devteam_agents" / "tester" / "spec.py").unlink()
+    errors, _ = agent_count.check(root)
+    assert errors == ["agents/tester has no AgentSpec module (src/devteam_agents/tester/spec.py)"]
 
 
 def test_exactly_ten_agents_pass(tmp_path: Path) -> None:
@@ -91,6 +110,7 @@ def test_members_without_agents_dir_rejected(tmp_path: Path) -> None:
 
 def test_real_repository_passes() -> None:
     assert agent_count.main(["--root", str(REPO_ROOT)]) == 0
+    assert agent_count.main(["--root", str(REPO_ROOT), "--strict"]) == 0
 
 
 # ------------------------------------------------------------------ doctor
@@ -186,15 +206,21 @@ def test_version_parsing(text: str, expected: tuple[int, ...] | None) -> None:
     assert doctor._version(text) == expected
 
 
-def test_doctor_api_token_states_never_print_the_key(isolated_settings: Settings) -> None:
-    from devteam_harness.iam import load_or_create_token  # noqa: PLC0415
-
-    assert doctor.check_api_token(isolated_settings).status == "warn"  # not created yet
-    token = load_or_create_token(isolated_settings.api_token_path)
+def test_doctor_api_token_states_never_print_the_key(
+    isolated_settings: Settings, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    token = "K" * 43
+    monkeypatch.setenv("DTTEST_SECRET__API_TOKEN", token)
     check = doctor.check_api_token(isolated_settings)
-    assert check.status == "ok" and token not in check.detail
-    isolated_settings.api_token_path.write_text("short", encoding="utf-8")
+    assert check.status == "ok" and token not in check.detail and "memory" in check.detail
+    monkeypatch.delenv("DTTEST_SECRET__API_TOKEN")
+    assert doctor.check_api_token(isolated_settings).status == "warn"  # not created yet
+    monkeypatch.setenv("DTTEST_SECRET__API_TOKEN", "short-token")
     assert doctor.check_api_token(isolated_settings).status == "fail"
+    isolated_settings.api_token_path.parent.mkdir(parents=True, exist_ok=True)
+    isolated_settings.api_token_path.write_text(token, encoding="utf-8")
+    legacy = doctor.check_api_token(isolated_settings)
+    assert legacy.status == "warn" and "migrate_api_token" in legacy.detail and token not in legacy.detail
 
 
 def test_signin_link_puts_the_key_only_in_the_fragment(
@@ -204,8 +230,10 @@ def test_signin_link_puts_the_key_only_in_the_fragment(
 
     monkeypatch.setenv("DEVTEAM_ROOT", str(isolated_settings.root))
     monkeypatch.setenv("DEVTEAM_PROFILE", "test")
+    token = "L" * 43
+    monkeypatch.setenv("DTTEST_SECRET__API_TOKEN", token)  # test-profile memory keyring seed
     assert signin_link.main() == 0
     link = capsys.readouterr().out.strip()
-    token = isolated_settings.api_token_path.read_text(encoding="utf-8").strip()
+    assert not isolated_settings.api_token_path.exists()
     assert link == f"http://127.0.0.1:5173/signin#token={token}"
     assert token not in link.split("#", 1)[0]  # never in the part a browser sends to a server

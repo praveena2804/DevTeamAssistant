@@ -30,10 +30,14 @@ def test_api_process_boots_on_fresh_database_and_binds_loopback(isolated_setting
         "DEVTEAM_API__PORT": str(port),
     }
     assert not isolated_settings.state_db_path.exists()
+    # The server's output goes to a file, never an unread pipe: once a pipe buffer fills, the server blocks
+    # on its next log write and stops answering (seen in C.4 when the extra migration added DEBUG lines).
+    log_path = isolated_settings.root / "api-boot.log"
+    log_file = log_path.open("w", encoding="utf-8")
     proc = subprocess.Popen(
         [sys.executable, "-m", "devteam_api"],
         env=env,
-        stdout=subprocess.PIPE,
+        stdout=log_file,
         stderr=subprocess.STDOUT,
         text=True,
     )
@@ -48,19 +52,19 @@ def test_api_process_boots_on_fresh_database_and_binds_loopback(isolated_setting
                 if proc.poll() is not None:
                     break
                 time.sleep(0.3)
-        assert response is not None, (
-            f"API did not start: {proc.stdout.read() if proc.poll() is not None else ''}"
-        )
+        assert response is not None, f"API did not start: {log_path.read_text(encoding='utf-8')[-2000:]}"
         assert response.status_code == 200
         assert response.json()["status"] == "ok"
         assert isolated_settings.state_db_path.is_file()
     finally:
         proc.terminate()
         try:
-            output, _ = proc.communicate(timeout=15)
+            proc.wait(timeout=15)
         except subprocess.TimeoutExpired:
             proc.kill()
-            output, _ = proc.communicate()
+            proc.wait()
+        log_file.close()
+    output = log_path.read_text(encoding="utf-8")
     assert '"event": "api_started"' in output
     assert '"event": "http_request"' in output
     assert Path(isolated_settings.state_db_path).exists()

@@ -42,6 +42,14 @@ function Wait-Http([string]$Url, [int]$TimeoutSeconds = 60) {
     throw "Timed out waiting for $Url"
 }
 
+# D-18a: a Part B plaintext key file is moved into Windows Credential Manager first (four checks; the file
+# is deleted only if all pass). The API refuses to start while the file exists.
+if (Test-Path (Join-Path $root "data/api_token")) {
+    Write-Host "Moving the sign-in key into Windows Credential Manager (one-time)..."
+    & uv run python (Join-Path $root "scripts/migrate_api_token.py")
+    if ($LASTEXITCODE -ne 0) { throw "Key migration stopped; the original key file was kept. See the messages above." }
+}
+
 try {
     $api = Start-Process -FilePath "uv" -ArgumentList @("run", "python", "-m", "devteam_api") `
         -WorkingDirectory $root -PassThru -NoNewWindow

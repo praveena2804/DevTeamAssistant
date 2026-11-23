@@ -1,0 +1,55 @@
+{
+  "$defs": {
+    "ExecutionKind": {
+      "description": "What an agent may *request*; the harness decides and runs it (Spec §11.2).",
+      "enum": [
+        "build",
+        "test_run",
+        "migration_check",
+        "static_check"
+      ],
+      "title": "ExecutionKind",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "kind": {
+      "$ref": "#/$defs/ExecutionKind"
+    },
+    "requirement_ids": {
+      "default": [],
+      "items": {
+        "pattern": "^(FR|NFR|BR)-[0-9]{3,4}$",
+        "type": "string"
+      },
+      "maxItems": 500,
+      "title": "Requirement Ids",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "target": {
+      "anyOf": [
+        {
+          "maxLength": 240,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Target"
+    }
+  },
+  "required": [
+    "kind"
+  ],
+  "title": "ExecutionRequest",
+  "type": "object"
+}

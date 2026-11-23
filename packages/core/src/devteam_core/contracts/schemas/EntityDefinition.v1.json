@@ -1,0 +1,336 @@
+{
+  "$defs": {
+    "EntityAttribute": {
+      "additionalProperties": false,
+      "properties": {
+        "data_type": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Data Type"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "maxLength": 2000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "name": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Required"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "unique": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unique"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "EntityAttribute",
+      "type": "object"
+    },
+    "EntityRelationship": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "anyOf": [
+            {
+              "maxLength": 2000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "kind": {
+          "$ref": "#/$defs/RelationshipKind"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "target_entity": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Target Entity",
+          "type": "string"
+        }
+      },
+      "required": [
+        "target_entity",
+        "kind"
+      ],
+      "title": "EntityRelationship",
+      "type": "object"
+    },
+    "Provenance": {
+      "enum": [
+        "brd_fact",
+        "user_answer",
+        "assumption",
+        "recommendation"
+      ],
+      "title": "Provenance",
+      "type": "string"
+    },
+    "RelationshipKind": {
+      "enum": [
+        "one_to_one",
+        "one_to_many",
+        "many_to_one",
+        "many_to_many"
+      ],
+      "title": "RelationshipKind",
+      "type": "string"
+    },
+    "SourceRef": {
+      "additionalProperties": false,
+      "description": "Points at one extracted chunk (Part B). Page/section/paragraph are filled in by code.",
+      "properties": {
+        "chunk_id": {
+          "pattern": "^chk_[0-9a-f]{26}$",
+          "title": "Chunk Id",
+          "type": "string"
+        },
+        "document_id": {
+          "pattern": "^doc_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "title": "Document Id",
+          "type": "string"
+        },
+        "page_end": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Page End"
+        },
+        "page_start": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Page Start"
+        },
+        "paragraph_end": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Paragraph End"
+        },
+        "paragraph_start": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Paragraph Start"
+        },
+        "quote": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quote"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "section": {
+          "anyOf": [
+            {
+              "maxLength": 2000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Section"
+        }
+      },
+      "required": [
+        "document_id",
+        "chunk_id"
+      ],
+      "title": "SourceRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "answer_id": {
+      "anyOf": [
+        {
+          "pattern": "^ca_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Answer Id"
+    },
+    "attributes": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/EntityAttribute"
+      },
+      "maxItems": 500,
+      "title": "Attributes",
+      "type": "array"
+    },
+    "entity_id": {
+      "pattern": "^ent_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Entity Id",
+      "type": "string"
+    },
+    "name": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "project_id": {
+      "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Project Id",
+      "type": "string"
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+    "rationale": {
+      "anyOf": [
+        {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Rationale"
+    },
+    "relationships": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/EntityRelationship"
+      },
+      "maxItems": 500,
+      "title": "Relationships",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "source_refs": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/SourceRef"
+      },
+      "maxItems": 50,
+      "title": "Source Refs",
+      "type": "array"
+    }
+  },
+  "required": [
+    "provenance",
+    "entity_id",
+    "project_id",
+    "name"
+  ],
+  "title": "EntityDefinition",
+  "type": "object"
+}

@@ -1,0 +1,24 @@
+# HC-01 input guardrails: applied before any model call (Working Plan §10.1).
+#
+# Untrusted content (BRD text, retrieved chunks, tool output, other agents' artefacts) is wrapped in
+# delimiters with a random per-message nonce and labelled as data. The patterns below only FLAG likely
+# injection attempts (recorded as warnings); they never execute anything and never replace the
+# structural defences, which hold even if a pattern misses.
+version: 1
+max_untrusted_chars: 24000          # ~ the F-9b input budget (3,072 tokens) with generous headroom
+
+injection_patterns:
+  - id: ignore_instructions
+    pattern: '(?i)\b(ignore|disregard|forget|override)\b.{0,40}\b(previous|prior|above|earlier|all|any)\b.{0,20}\b(instructions?|rules?|prompts?|guidelines?)\b'
+  - id: role_override
+    pattern: '(?i)\byou are now\b|\bact as (the |an? )?(system|admin(istrator)?|developer|root)\b|\bnew (system )?instructions?\s*:'
+  - id: fake_system_marker
+    pattern: '(?i)<\|?\s*(im_start|im_end|system|endoftext)\s*\|?>|^\s*#{2,}\s*system\b|\[\s*/?\s*(system|inst)\s*\]'
+  - id: approval_or_status_claim
+    pattern: '(?i)\b(approve|approved|mark|set)\b.{0,30}\b(spec(ification)?|project|requirements?|build)\b.{0,20}\b(approved|verified|complete|passed)\b'
+  - id: tool_or_shell_request
+    pattern: '(?i)\b(run|execute|call|invoke)\b.{0,20}\b(shell|command|powershell|bash|cmd(\.exe)?|subprocess|curl|wget)\b'
+  - id: secret_exfiltration
+    pattern: '(?i)\b(reveal|print|show|send|post|leak|output)\b.{0,40}\b(api[_ ]?keys?|tokens?|passwords?|credentials?|secrets?)\b'
+  - id: delimiter_forgery
+    pattern: '(?i)</?\s*untrusted-data\b'

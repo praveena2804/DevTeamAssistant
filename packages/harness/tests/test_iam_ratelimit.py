@@ -6,39 +6,45 @@ import pytest
 
 from devteam_core.logging import redact_value
 from devteam_harness.iam import (
+    API_TOKEN_REF,
     LOCAL_HUMAN_ROLES,
     Principal,
     Role,
-    load_or_create_token,
+    load_api_token,
     session_value,
     token_matches,
 )
 from devteam_harness.ratelimit import RateLimiter
+from devteam_harness.secrets import MemoryBackend, SecretsManager, SecretsUnavailableError
 
 pytestmark = pytest.mark.security
 
 
-def test_token_is_created_once_and_reused(tmp_path: Path) -> None:
-    path = tmp_path / "data" / "api_token"
-    first = load_or_create_token(path)
+def _store() -> SecretsManager:
+    return SecretsManager(MemoryBackend())
+
+
+def test_token_is_created_once_in_the_credential_store_and_reused(tmp_path: Path) -> None:
+    store = _store()
+    first = load_api_token(store, tmp_path / "data" / "api_token")
     assert len(first) >= 40
-    assert load_or_create_token(path) == first
-    assert path.read_text(encoding="utf-8") == first
+    assert load_api_token(store, tmp_path / "data" / "api_token") == first
+    assert store.require(API_TOKEN_REF).reveal() == first
+    assert not (tmp_path / "data" / "api_token").exists()  # D-18: never written to a file
 
 
 def test_tokens_differ_per_install(tmp_path: Path) -> None:
-    assert load_or_create_token(tmp_path / "a") != load_or_create_token(tmp_path / "b")
+    assert load_api_token(_store(), tmp_path / "a") != load_api_token(_store(), tmp_path / "b")
 
 
-def test_short_token_file_is_refused(tmp_path: Path) -> None:
-    path = tmp_path / "api_token"
-    path.write_text("short", encoding="utf-8")
-    with pytest.raises(ValueError, match="too short"):
-        load_or_create_token(path)
+def test_short_stored_token_is_refused(tmp_path: Path) -> None:
+    store = SecretsManager(MemoryBackend({"platform/api_token": "short-token"}))
+    with pytest.raises(SecretsUnavailableError, match="too short"):
+        load_api_token(store, tmp_path / "api_token")
 
 
 def test_token_and_session_value_are_redacted_from_logs(tmp_path: Path) -> None:
-    token = load_or_create_token(tmp_path / "api_token")
+    token = load_api_token(_store(), tmp_path / "api_token")
     cookie = session_value(token)
     assert cookie != token and token not in cookie
     text = str(redact_value(f"value {token} cookie {cookie}"))  # the same path every log line takes

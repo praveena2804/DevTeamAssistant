@@ -1,0 +1,135 @@
+{
+  "$defs": {
+    "ToolOutcome": {
+      "enum": [
+        "ok",
+        "denied",
+        "error"
+      ],
+      "title": "ToolOutcome",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "actor": {
+      "pattern": "(^agent:(brd_analyst|requirements_finalizer|head|architect|database_developer|backend_developer|frontend_developer|tester|debugger_reviewer|documenter):tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$)|(^service:[a-z][a-z0-9_]{1,40}$)|(^prn_[0-7][0-9A-HJKMNP-TV-Z]{25}$)",
+      "title": "Actor",
+      "type": "string"
+    },
+    "args_summary": {
+      "additionalProperties": {
+        "maxLength": 200,
+        "type": "string"
+      },
+      "propertyNames": {
+        "maxLength": 40
+      },
+      "title": "Args Summary",
+      "type": "object"
+    },
+    "duration_ms": {
+      "minimum": 0,
+      "title": "Duration Ms",
+      "type": "integer"
+    },
+    "event_id": {
+      "pattern": "^evt_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Event Id",
+      "type": "string"
+    },
+    "kind": {
+      "const": "tool.called",
+      "default": "tool.called",
+      "title": "Kind",
+      "type": "string"
+    },
+    "outcome": {
+      "$ref": "#/$defs/ToolOutcome"
+    },
+    "policy_rule_id": {
+      "anyOf": [
+        {
+          "pattern": "^[a-z][a-z0-9_.-]{1,80}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Policy Rule Id"
+    },
+    "project_id": {
+      "anyOf": [
+        {
+          "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Project Id"
+    },
+    "run_id": {
+      "anyOf": [
+        {
+          "pattern": "^run_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Run Id"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "task_id": {
+      "anyOf": [
+        {
+          "pattern": "^tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Task Id"
+    },
+    "tool": {
+      "pattern": "^[a-z][a-z0-9_]{2,63}$",
+      "title": "Tool",
+      "type": "string"
+    },
+    "tool_version": {
+      "minimum": 1,
+      "title": "Tool Version",
+      "type": "integer"
+    },
+    "ts": {
+      "format": "date-time",
+      "title": "Ts",
+      "type": "string"
+    }
+  },
+  "required": [
+    "event_id",
+    "ts",
+    "actor",
+    "tool",
+    "tool_version",
+    "outcome",
+    "duration_ms"
+  ],
+  "title": "ToolCallRecorded",
+  "type": "object"
+}

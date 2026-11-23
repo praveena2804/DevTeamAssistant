@@ -4,3 +4,5 @@ database:
 logging:
   level: DEBUG
   file_enabled: false
+secrets:
+  backend: memory                    # in-process only; rejected outside the test profile

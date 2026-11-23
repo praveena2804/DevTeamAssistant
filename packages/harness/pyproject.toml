@@ -1,11 +1,15 @@
 [project]
 name = "devteam-harness"
-version = "0.2.0"
+version = "0.3.0"
 description = "DevTeam AI shared agent harness (HC-01...HC-21). Part B: human IAM, audit store, API rate limits, upload validation"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "devteam-core",
     "devteam-state",
+    "keyring>=25,<26",
+    "opentelemetry-api>=1.27,<2",
+    "opentelemetry-sdk>=1.27,<2",
+    "psutil>=6.1,<8",
 ]
 
 [tool.uv.sources]

@@ -22,6 +22,7 @@ export type UploadResponse = Schemas["UploadResponse"];
 export type FileResult = Schemas["FileResult"];
 export type AuditPage = Schemas["AuditPage"];
 export type AuditEvent = Schemas["AuditEventOut"];
+export type AuditIntegrity = Schemas["AuditIntegrity"];
 
 export class ApiError extends Error {
   readonly status: number;
@@ -123,6 +124,8 @@ export const listChunks = (projectId: string, documentId: string, offset: number
   );
 
 // ---------------------------------------------------------------- audit
+export const verifyAudit = (signal?: AbortSignal) => request<AuditIntegrity>("/api/audit/verify", opt(signal));
+
 export const listAudit = (projectId: string | null, offset: number, limit: number, signal?: AbortSignal) =>
   request<AuditPage>(
     projectId

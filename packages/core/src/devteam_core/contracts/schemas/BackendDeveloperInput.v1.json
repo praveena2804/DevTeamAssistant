@@ -1,0 +1,297 @@
+{
+  "$defs": {
+    "AgentRole": {
+      "description": "The ten agents, exactly (roadmap §4.1, ADR-0002). Adding an eleventh is prohibited.",
+      "enum": [
+        "brd_analyst",
+        "requirements_finalizer",
+        "head",
+        "architect",
+        "database_developer",
+        "backend_developer",
+        "frontend_developer",
+        "tester",
+        "debugger_reviewer",
+        "documenter"
+      ],
+      "title": "AgentRole",
+      "type": "string"
+    },
+    "AgentTask": {
+      "additionalProperties": false,
+      "properties": {
+        "agent_type": {
+          "$ref": "#/$defs/AgentRole"
+        },
+        "attempt_count": {
+          "default": 0,
+          "maximum": 4,
+          "minimum": 0,
+          "title": "Attempt Count",
+          "type": "integer"
+        },
+        "blocker_reason": {
+          "anyOf": [
+            {
+              "maxLength": 2000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Blocker Reason"
+        },
+        "budget_profile": {
+          "default": "default",
+          "pattern": "^[a-z][a-z0-9_]{0,40}$",
+          "title": "Budget Profile",
+          "type": "string"
+        },
+        "completed_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Completed At"
+        },
+        "depends_on": {
+          "default": [],
+          "items": {
+            "pattern": "^tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+            "type": "string"
+          },
+          "maxItems": 200,
+          "title": "Depends On",
+          "type": "array"
+        },
+        "done_criteria": {
+          "items": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 50,
+          "minItems": 1,
+          "title": "Done Criteria",
+          "type": "array"
+        },
+        "expected_artifacts": {
+          "default": [],
+          "items": {
+            "maxLength": 240,
+            "type": "string"
+          },
+          "maxItems": 200,
+          "title": "Expected Artifacts",
+          "type": "array"
+        },
+        "input_artifact_refs": {
+          "default": [],
+          "items": {
+            "pattern": "^([a-z][a-z0-9]{1,11}_[0-7][0-9A-HJKMNP-TV-Z]{25}|chk_[0-9a-f]{26}|(FR|NFR|BR)-[0-9]{3,4})$",
+            "type": "string"
+          },
+          "maxItems": 200,
+          "title": "Input Artifact Refs",
+          "type": "array"
+        },
+        "max_attempts": {
+          "default": 2,
+          "maximum": 4,
+          "minimum": 1,
+          "title": "Max Attempts",
+          "type": "integer"
+        },
+        "objective": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Objective",
+          "type": "string"
+        },
+        "operation_id": {
+          "pattern": "^[a-z][a-z_]{1,40}\\.[a-z][a-z0-9_]{1,60}$",
+          "title": "Operation Id",
+          "type": "string"
+        },
+        "permitted_paths": {
+          "default": [],
+          "items": {
+            "maxLength": 240,
+            "type": "string"
+          },
+          "maxItems": 50,
+          "title": "Permitted Paths",
+          "type": "array"
+        },
+        "project_id": {
+          "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "title": "Project Id",
+          "type": "string"
+        },
+        "requirement_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^(FR|NFR|BR)-[0-9]{3,4}$",
+            "type": "string"
+          },
+          "maxItems": 200,
+          "title": "Requirement Ids",
+          "type": "array"
+        },
+        "result_ref": {
+          "anyOf": [
+            {
+              "pattern": "^([a-z][a-z0-9]{1,11}_[0-7][0-9A-HJKMNP-TV-Z]{25}|chk_[0-9a-f]{26}|(FR|NFR|BR)-[0-9]{3,4})$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Result Ref"
+        },
+        "run_id": {
+          "pattern": "^run_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "spec_version_id": {
+          "anyOf": [
+            {
+              "pattern": "^spv_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Spec Version Id"
+        },
+        "started_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Started At"
+        },
+        "status": {
+          "$ref": "#/$defs/TaskStatus",
+          "default": "pending"
+        },
+        "task_id": {
+          "pattern": "^tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "title": "Task Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "task_id",
+        "project_id",
+        "run_id",
+        "agent_type",
+        "operation_id",
+        "objective",
+        "done_criteria"
+      ],
+      "title": "AgentTask",
+      "type": "object"
+    },
+    "TaskStatus": {
+      "description": "Task statuses (Spec §20.2, nine values).",
+      "enum": [
+        "pending",
+        "ready",
+        "running",
+        "completed",
+        "partially_completed",
+        "blocked",
+        "failed",
+        "skipped",
+        "cancelled"
+      ],
+      "title": "TaskStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "context_refs": {
+      "default": [],
+      "items": {
+        "pattern": "^([a-z][a-z0-9]{1,11}_[0-7][0-9A-HJKMNP-TV-Z]{25}|chk_[0-9a-f]{26}|(FR|NFR|BR)-[0-9]{3,4})$",
+        "type": "string"
+      },
+      "maxItems": 500,
+      "title": "Context Refs",
+      "type": "array"
+    },
+    "contract_artifact_id": {
+      "anyOf": [
+        {
+          "pattern": "^art_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Contract Artifact Id"
+    },
+    "project_id": {
+      "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Project Id",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^run_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "spec_version_id": {
+      "pattern": "^spv_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Spec Version Id",
+      "type": "string"
+    },
+    "task": {
+      "$ref": "#/$defs/AgentTask"
+    }
+  },
+  "required": [
+    "project_id",
+    "run_id",
+    "task",
+    "spec_version_id"
+  ],
+  "title": "BackendDeveloperInput",
+  "type": "object"
+}

@@ -5,7 +5,7 @@ Part B: ``/api/*`` — every route requires the local token or session cookie (H
 routes are rate limited (HC-18) and audited (HC-21), uploads are validated (HC-20).
 """
 
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -16,9 +16,10 @@ from devteam_api.middleware.request_context import RequestContextMiddleware
 from devteam_api.routers import audit, documents, projects, session, system
 from devteam_core import __version__
 from devteam_core.config import Settings, load_settings
-from devteam_core.logging import configure_logging, get_logger
-from devteam_harness.iam import LOCAL_HUMAN_ROLES, Principal, load_or_create_token, session_value
+from devteam_core.logging import configure_logging, get_logger, secret_registry
+from devteam_harness.iam import LOCAL_HUMAN_ROLES, Principal, load_api_token, session_value
 from devteam_harness.ratelimit import RateLimiter
+from devteam_harness.secrets import secrets_manager_from_settings
 from devteam_services.intake import IntakeService
 from devteam_services.workspace import WorkspaceManager
 from devteam_state import create_sqlite_engine, ensure_state_schema, session_factory
@@ -34,7 +35,18 @@ def _bootstrap_principal(app: FastAPI) -> Principal:
     return Principal(id=record.id, kind=record.kind, display_name=record.display_name, roles=record.roles)
 
 
-def create_app(settings: Settings | None = None, *, configure_logs: bool = True) -> FastAPI:
+def create_app(
+    settings: Settings | None = None,
+    *,
+    configure_logs: bool = True,
+    token_provider: Callable[[], str] | None = None,
+) -> FastAPI:
+    """Build the API.
+
+    The install token comes from the OS credential store (HC-17, D-18); startup fails closed if the
+    store is unavailable or a legacy plaintext key file still exists. ``token_provider`` lets the
+    D-18a migration verify a candidate key in-process without touching the store's normal path.
+    """
     resolved = settings or load_settings()
 
     @asynccontextmanager
@@ -48,7 +60,13 @@ def create_app(settings: Settings | None = None, *, configure_logs: bool = True)
         )
         app.state.engine = engine
         app.state.session_factory = session_factory(engine)
-        app.state.api_token = load_or_create_token(resolved.api_token_path)
+        if token_provider is not None:
+            app.state.api_token = token_provider()
+            secret_registry.register(app.state.api_token)
+        else:
+            app.state.api_token = load_api_token(
+                secrets_manager_from_settings(resolved), resolved.api_token_path
+            )
         app.state.session_cookie_value = session_value(app.state.api_token)
         app.state.principal = _bootstrap_principal(app)
         limits = resolved.ratelimit

@@ -4,6 +4,7 @@ Upload a complete supported BRD; extraction preserves source references.
 """
 
 import os
+import secrets
 import socket
 import subprocess
 import sys
@@ -18,6 +19,8 @@ from tests.conftest import UI_ORIGIN
 from tests.fixtures import brds
 
 pytestmark = pytest.mark.integration
+
+E2E_TOKEN = secrets.token_urlsafe(32)
 
 
 def _free_port() -> int:
@@ -34,6 +37,7 @@ def server(isolated_settings: Settings) -> Iterator[str]:
         "DEVTEAM_ROOT": str(isolated_settings.root),
         "DEVTEAM_PROFILE": "test",
         "DEVTEAM_API__PORT": str(port),
+        "DTTEST_SECRET__API_TOKEN": E2E_TOKEN,  # test-profile memory keyring seed (D-18; no file)
     }
     log = (isolated_settings.root / "server.log").open("w", encoding="utf-8")  # a pipe would fill and block
     proc = subprocess.Popen(
@@ -65,7 +69,8 @@ def server(isolated_settings: Settings) -> Iterator[str]:
 def test_scenario_1_upload_complete_brd_and_navigate_references(
     server: str, isolated_settings: Settings
 ) -> None:
-    token = isolated_settings.api_token_path.read_text(encoding="utf-8").strip()
+    token = E2E_TOKEN
+    assert not isolated_settings.api_token_path.exists()  # D-18: no plaintext key file
     with httpx.Client(base_url=server, timeout=60) as anonymous:
         assert anonymous.post("/api/projects", json={"name": "x"}).status_code == 401  # demo step 6
 

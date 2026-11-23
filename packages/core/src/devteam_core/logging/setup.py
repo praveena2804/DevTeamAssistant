@@ -93,7 +93,13 @@ def configure_logging(settings: Settings, *, stream: IO[str] | None = None) -> P
 
     root.setLevel(level)
     structlog.configure(
-        processors=[*_shared_processors(), structlog.stdlib.ProcessorFormatter.wrap_for_formatter],
+        # Redact at the source as well (C.2, AC-C-05): handlers that are not ours (libraries, test capture)
+        # receive the event dict already redacted; our formatters redact again for foreign stdlib records.
+        processors=[
+            *_shared_processors(),
+            redact_event,
+            structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+        ],
         logger_factory=structlog.stdlib.LoggerFactory(),
         wrapper_class=structlog.stdlib.BoundLogger,
         cache_logger_on_first_use=False,

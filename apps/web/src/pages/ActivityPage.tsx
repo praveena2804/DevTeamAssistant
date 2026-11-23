@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { type AuditEvent, listAudit } from "../api/client";
+import { type AuditEvent, type AuditIntegrity, listAudit, verifyAudit } from "../api/client";
 import { useLoad } from "../api/useLoad";
 import { ErrorNotice } from "../components/ErrorNotice";
 
@@ -19,11 +19,28 @@ function describe(event: AuditEvent): string {
   return parts.join(" · ");
 }
 
+/** Hash-chain check (HC-21): shows whether any entry was changed, removed or inserted. */
+export function IntegrityBadge({ report }: { report: AuditIntegrity }) {
+  if (report.ok) {
+    return (
+      <p className="integrity ok" role="status">
+        ✓ Log intact: {report.checked + report.pre_chain_rows} entries checked, none changed or removed.
+      </p>
+    );
+  }
+  return (
+    <p className="integrity broken" role="alert">
+      ⚠ Log integrity broken at entry {report.broken_at}: {report.reason}.
+    </p>
+  );
+}
+
 /** Read-only audit trail (HC-21). Rows can never be edited or deleted. */
 export function ActivityPage() {
   const { projectId = null } = useParams();
   const [offset, setOffset] = useState(0);
   const [state] = useLoad((signal) => listAudit(projectId, offset, PAGE_SIZE, signal), [projectId, offset]);
+  const [integrity] = useLoad((signal) => verifyAudit(signal), [offset]);
 
   return (
     <section>
@@ -34,6 +51,7 @@ export function ActivityPage() {
       )}
       <h1>{projectId ? "Project activity" : "All activity"}</h1>
       <p className="muted">A permanent record of every change and every refused request.</p>
+      {integrity.kind === "loaded" && <IntegrityBadge report={integrity.data} />}
       {state.kind === "loading" && <p role="status">Loading activity…</p>}
       {state.kind === "error" && <ErrorNotice error={state.error} />}
       {state.kind === "loaded" && (

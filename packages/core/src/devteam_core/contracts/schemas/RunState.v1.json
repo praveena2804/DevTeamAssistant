@@ -1,0 +1,238 @@
+{
+  "$defs": {
+    "ErrorCategory": {
+      "enum": [
+        "retryable",
+        "invalid_output",
+        "budget_exhausted",
+        "policy_denied",
+        "resource_unavailable",
+        "fatal"
+      ],
+      "title": "ErrorCategory",
+      "type": "string"
+    },
+    "ErrorRef": {
+      "additionalProperties": false,
+      "description": "A short, already-redacted description of an error. Never contains secrets or document text.",
+      "properties": {
+        "category": {
+          "$ref": "#/$defs/ErrorCategory"
+        },
+        "code": {
+          "maxLength": 64,
+          "pattern": "^[a-z][a-z0-9_]*(\\.[a-z0-9_]+)*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "message": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "task_id": {
+          "anyOf": [
+            {
+              "pattern": "^tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Task Id"
+        }
+      },
+      "required": [
+        "category",
+        "code",
+        "message",
+        "occurred_at"
+      ],
+      "title": "ErrorRef",
+      "type": "object"
+    },
+    "GateName": {
+      "description": "Human gate nodes (roadmap §6.5).",
+      "enum": [
+        "feasibility_decision",
+        "clarification_form",
+        "project_approval",
+        "test_maintenance_approval",
+        "publish_approval",
+        "change_approval",
+        "db_switch_approval"
+      ],
+      "title": "GateName",
+      "type": "string"
+    },
+    "Stage": {
+      "description": "Workflow stages (Spec §5.1-§5.7).",
+      "enum": [
+        "intake",
+        "analysis",
+        "feasibility",
+        "requirements",
+        "build",
+        "delivery",
+        "change_request"
+      ],
+      "title": "Stage",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "blocker_ids": {
+      "default": [],
+      "items": {
+        "pattern": "^([a-z][a-z0-9]{1,11}_[0-7][0-9A-HJKMNP-TV-Z]{25}|chk_[0-9a-f]{26}|(FR|NFR|BR)-[0-9]{3,4})$",
+        "type": "string"
+      },
+      "maxItems": 200,
+      "title": "Blocker Ids",
+      "type": "array"
+    },
+    "contract_version_id": {
+      "anyOf": [
+        {
+          "pattern": "^art_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Contract Version Id"
+    },
+    "current_task_id": {
+      "anyOf": [
+        {
+          "pattern": "^tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Current Task Id"
+    },
+    "last_error": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ErrorRef"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "pending_gate": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/GateName"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "plan_id": {
+      "anyOf": [
+        {
+          "pattern": "^pln_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Plan Id"
+    },
+    "project_id": {
+      "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Project Id",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^run_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "run_kind": {
+      "enum": [
+        "initial",
+        "change_request"
+      ],
+      "title": "Run Kind",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "spec_checksum": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Spec Checksum"
+    },
+    "spec_version_id": {
+      "anyOf": [
+        {
+          "pattern": "^spv_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Spec Version Id"
+    },
+    "stage": {
+      "$ref": "#/$defs/Stage"
+    },
+    "trace_id": {
+      "pattern": "^[0-9a-f]{32}$",
+      "title": "Trace Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "project_id",
+    "run_id",
+    "run_kind",
+    "stage",
+    "trace_id"
+  ],
+  "title": "RunState",
+  "type": "object"
+}

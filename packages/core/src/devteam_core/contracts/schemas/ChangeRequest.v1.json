@@ -1,0 +1,70 @@
+{
+  "$defs": {
+    "ChangeRequestStatus": {
+      "description": "F-8 (provisional until Part Q).",
+      "enum": [
+        "submitted",
+        "analysing",
+        "awaiting_approval",
+        "approved",
+        "rejected",
+        "applied",
+        "failed"
+      ],
+      "title": "ChangeRequestStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "change_id": {
+      "pattern": "^chg_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Change Id",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "description": {
+      "maxLength": 20000,
+      "minLength": 1,
+      "title": "Description",
+      "type": "string"
+    },
+    "impact_scope": {
+      "default": [],
+      "items": {
+        "pattern": "^([a-z][a-z0-9]{1,11}_[0-7][0-9A-HJKMNP-TV-Z]{25}|chk_[0-9a-f]{26}|(FR|NFR|BR)-[0-9]{3,4})$",
+        "type": "string"
+      },
+      "maxItems": 500,
+      "title": "Impact Scope",
+      "type": "array"
+    },
+    "project_id": {
+      "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Project Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "status": {
+      "$ref": "#/$defs/ChangeRequestStatus",
+      "default": "submitted"
+    }
+  },
+  "required": [
+    "change_id",
+    "project_id",
+    "description",
+    "created_at"
+  ],
+  "title": "ChangeRequest",
+  "type": "object"
+}

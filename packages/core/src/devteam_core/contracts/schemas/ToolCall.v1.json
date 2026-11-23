@@ -1,0 +1,62 @@
+{
+  "$defs": {
+    "JsonValue": {}
+  },
+  "additionalProperties": false,
+  "properties": {
+    "args": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "title": "Args",
+      "type": "object"
+    },
+    "call_id": {
+      "pattern": "^tcl_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Call Id",
+      "type": "string"
+    },
+    "principal": {
+      "pattern": "(^agent:(brd_analyst|requirements_finalizer|head|architect|database_developer|backend_developer|frontend_developer|tester|debugger_reviewer|documenter):tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$)|(^service:[a-z][a-z0-9_]{1,40}$)|(^prn_[0-7][0-9A-HJKMNP-TV-Z]{25}$)",
+      "title": "Principal",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "task_id": {
+      "anyOf": [
+        {
+          "pattern": "^tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Task Id"
+    },
+    "tool": {
+      "pattern": "^[a-z][a-z0-9_]{2,63}$",
+      "title": "Tool",
+      "type": "string"
+    },
+    "tool_version": {
+      "minimum": 1,
+      "title": "Tool Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "call_id",
+    "tool",
+    "tool_version",
+    "principal"
+  ],
+  "title": "ToolCall",
+  "type": "object"
+}

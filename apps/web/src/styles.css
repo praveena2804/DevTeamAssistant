@@ -182,3 +182,7 @@ tr.bad td {
   display: flex;
   gap: 0.5rem;
 }
+
+.integrity { padding: 0.5rem 0.75rem; border-radius: 6px; font-weight: 600; }
+.integrity.ok { background: #e7f6ec; color: #1b5e20; }
+.integrity.broken { background: #fdecea; color: #8a1c13; }

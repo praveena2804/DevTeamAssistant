@@ -1,0 +1,105 @@
+{
+  "$defs": {
+    "ApprovalDecision": {
+      "description": "F-4. 'Edit' is not a decision: it returns the draft for changes.",
+      "enum": [
+        "approved",
+        "rejected",
+        "cancelled"
+      ],
+      "title": "ApprovalDecision",
+      "type": "string"
+    },
+    "ApprovalType": {
+      "description": "Approval types (roadmap §5.1 HC-13).",
+      "enum": [
+        "feasibility_decision",
+        "spec_approval",
+        "substitution",
+        "test_maintenance",
+        "publish_github",
+        "destructive_db",
+        "db_switch"
+      ],
+      "title": "ApprovalType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "approval_id": {
+      "pattern": "^apr_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Approval Id",
+      "type": "string"
+    },
+    "approval_type": {
+      "$ref": "#/$defs/ApprovalType"
+    },
+    "decided_at": {
+      "format": "date-time",
+      "title": "Decided At",
+      "type": "string"
+    },
+    "decided_by": {
+      "pattern": "^prn_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Decided By",
+      "type": "string"
+    },
+    "decision": {
+      "$ref": "#/$defs/ApprovalDecision"
+    },
+    "project_id": {
+      "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Project Id",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^run_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "spec_checksum": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Spec Checksum"
+    },
+    "spec_version_id": {
+      "anyOf": [
+        {
+          "pattern": "^spv_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Spec Version Id"
+    }
+  },
+  "required": [
+    "approval_id",
+    "project_id",
+    "run_id",
+    "approval_type",
+    "decision",
+    "decided_by",
+    "decided_at"
+  ],
+  "title": "Approval",
+  "type": "object"
+}

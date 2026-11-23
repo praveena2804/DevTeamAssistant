@@ -1,0 +1,69 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "answer_id": {
+      "pattern": "^ca_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Answer Id",
+      "type": "string"
+    },
+    "answer_text": {
+      "anyOf": [
+        {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Answer Text"
+    },
+    "not_needed": {
+      "default": false,
+      "title": "Not Needed",
+      "type": "boolean"
+    },
+    "project_id": {
+      "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Project Id",
+      "type": "string"
+    },
+    "question_id": {
+      "pattern": "^cq_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Question Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "selected_options": {
+      "default": [],
+      "items": {
+        "maxLength": 200,
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 20,
+      "title": "Selected Options",
+      "type": "array"
+    },
+    "source_user": {
+      "pattern": "^prn_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Source User",
+      "type": "string"
+    }
+  },
+  "required": [
+    "answer_id",
+    "question_id",
+    "project_id",
+    "source_user"
+  ],
+  "title": "ClarificationAnswer",
+  "type": "object"
+}

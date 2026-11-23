@@ -1,0 +1,125 @@
+{
+  "$defs": {
+    "TestResult": {
+      "description": "Outcome of one executed test run (recorded by the Test Runner only).",
+      "enum": [
+        "passed",
+        "failed",
+        "error"
+      ],
+      "title": "TestResult",
+      "type": "string"
+    },
+    "TestType": {
+      "description": "F-6.",
+      "enum": [
+        "unit",
+        "api",
+        "database",
+        "integration",
+        "ui",
+        "build",
+        "lint",
+        "typecheck",
+        "security"
+      ],
+      "title": "TestType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Written by the Test Runner only (Spec §6.9: agents cannot record results).",
+  "properties": {
+    "command": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Command",
+      "type": "string"
+    },
+    "errors": {
+      "minimum": 0,
+      "title": "Errors",
+      "type": "integer"
+    },
+    "exit_code": {
+      "title": "Exit Code",
+      "type": "integer"
+    },
+    "failed": {
+      "minimum": 0,
+      "title": "Failed",
+      "type": "integer"
+    },
+    "logs_ref": {
+      "anyOf": [
+        {
+          "maxLength": 240,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Logs Ref"
+    },
+    "passed": {
+      "minimum": 0,
+      "title": "Passed",
+      "type": "integer"
+    },
+    "project_id": {
+      "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Project Id",
+      "type": "string"
+    },
+    "result": {
+      "$ref": "#/$defs/TestResult"
+    },
+    "run_id": {
+      "pattern": "^run_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "skipped": {
+      "minimum": 0,
+      "title": "Skipped",
+      "type": "integer"
+    },
+    "test_run_id": {
+      "pattern": "^trn_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Test Run Id",
+      "type": "string"
+    },
+    "test_type": {
+      "$ref": "#/$defs/TestType"
+    },
+    "timestamp": {
+      "format": "date-time",
+      "title": "Timestamp",
+      "type": "string"
+    }
+  },
+  "required": [
+    "test_run_id",
+    "project_id",
+    "run_id",
+    "test_type",
+    "command",
+    "result",
+    "exit_code",
+    "passed",
+    "failed",
+    "skipped",
+    "errors",
+    "timestamp"
+  ],
+  "title": "TestRun",
+  "type": "object"
+}

@@ -1,0 +1,57 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "approval_id": {
+      "pattern": "^apr_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Approval Id",
+      "type": "string"
+    },
+    "approved_at": {
+      "format": "date-time",
+      "title": "Approved At",
+      "type": "string"
+    },
+    "approved_by": {
+      "pattern": "^prn_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Approved By",
+      "type": "string"
+    },
+    "checksum": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Checksum",
+      "type": "string"
+    },
+    "project_id": {
+      "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Project Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "version": {
+      "minimum": 1,
+      "title": "Version",
+      "type": "integer"
+    },
+    "version_id": {
+      "pattern": "^spv_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Version Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "version_id",
+    "project_id",
+    "version",
+    "checksum",
+    "approved_by",
+    "approved_at",
+    "approval_id"
+  ],
+  "title": "SpecVersion",
+  "type": "object"
+}

@@ -1,0 +1,205 @@
+{
+  "$defs": {
+    "Provenance": {
+      "enum": [
+        "brd_fact",
+        "user_answer",
+        "assumption",
+        "recommendation"
+      ],
+      "title": "Provenance",
+      "type": "string"
+    },
+    "SourceRef": {
+      "additionalProperties": false,
+      "description": "Points at one extracted chunk (Part B). Page/section/paragraph are filled in by code.",
+      "properties": {
+        "chunk_id": {
+          "pattern": "^chk_[0-9a-f]{26}$",
+          "title": "Chunk Id",
+          "type": "string"
+        },
+        "document_id": {
+          "pattern": "^doc_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "title": "Document Id",
+          "type": "string"
+        },
+        "page_end": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Page End"
+        },
+        "page_start": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Page Start"
+        },
+        "paragraph_end": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Paragraph End"
+        },
+        "paragraph_start": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Paragraph Start"
+        },
+        "quote": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quote"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "section": {
+          "anyOf": [
+            {
+              "maxLength": 2000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Section"
+        }
+      },
+      "required": [
+        "document_id",
+        "chunk_id"
+      ],
+      "title": "SourceRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "answer_id": {
+      "anyOf": [
+        {
+          "pattern": "^ca_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Answer Id"
+    },
+    "criterion_id": {
+      "pattern": "^acc_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Criterion Id",
+      "type": "string"
+    },
+    "description": {
+      "maxLength": 20000,
+      "minLength": 1,
+      "title": "Description",
+      "type": "string"
+    },
+    "project_id": {
+      "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Project Id",
+      "type": "string"
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+    "rationale": {
+      "anyOf": [
+        {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Rationale"
+    },
+    "requirement_ids": {
+      "items": {
+        "pattern": "^(FR|NFR)-[0-9]{3,4}$",
+        "type": "string"
+      },
+      "maxItems": 500,
+      "minItems": 1,
+      "title": "Requirement Ids",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "source_refs": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/SourceRef"
+      },
+      "maxItems": 50,
+      "title": "Source Refs",
+      "type": "array"
+    }
+  },
+  "required": [
+    "provenance",
+    "criterion_id",
+    "project_id",
+    "requirement_ids",
+    "description"
+  ],
+  "title": "AcceptanceCriterion",
+  "type": "object"
+}

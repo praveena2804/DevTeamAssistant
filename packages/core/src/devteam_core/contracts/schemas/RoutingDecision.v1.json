@@ -1,0 +1,69 @@
+{
+  "$defs": {
+    "AgentRole": {
+      "description": "The ten agents, exactly (roadmap §4.1, ADR-0002). Adding an eleventh is prohibited.",
+      "enum": [
+        "brd_analyst",
+        "requirements_finalizer",
+        "head",
+        "architect",
+        "database_developer",
+        "backend_developer",
+        "frontend_developer",
+        "tester",
+        "debugger_reviewer",
+        "documenter"
+      ],
+      "title": "AgentRole",
+      "type": "string"
+    },
+    "RoutingMethod": {
+      "enum": [
+        "rules",
+        "llm_classification"
+      ],
+      "title": "RoutingMethod",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "failure_ref": {
+      "pattern": "^([a-z][a-z0-9]{1,11}_[0-7][0-9A-HJKMNP-TV-Z]{25}|chk_[0-9a-f]{26}|(FR|NFR|BR)-[0-9]{3,4})$",
+      "title": "Failure Ref",
+      "type": "string"
+    },
+    "method": {
+      "$ref": "#/$defs/RoutingMethod"
+    },
+    "owner": {
+      "$ref": "#/$defs/AgentRole"
+    },
+    "reason": {
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "task_id": {
+      "pattern": "^tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Task Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "task_id",
+    "failure_ref",
+    "owner",
+    "method",
+    "reason"
+  ],
+  "title": "RoutingDecision",
+  "type": "object"
+}

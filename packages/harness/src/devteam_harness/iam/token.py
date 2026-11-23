@@ -1,39 +1,55 @@
-"""Per-install local API token (D-29 (a)).
+"""Per-install local API token (D-29 (a)), stored in the OS credential store (HC-17, D-18, AP-007).
 
-* 256 random bits, created on first start under ``data/`` (gitignored). Part C moves storage to the OS
-  keyring via ``SecretsManager`` (D-18).
-* Registered with the redaction registry so it can never appear in logs (HC-17).
+* 256 random bits, created on the API's first start **in the keyring** (Windows Credential Manager).
+  It is never written to a file. There is no plaintext fallback: if the keyring is unavailable the API
+  refuses to start.
+* The Part B location ``data/api_token`` is legacy. While that file exists the API refuses to start and
+  asks for the D-18a migration (``scripts/migrate_api_token.py``), which moves the key under the owner's
+  four checks and only then deletes the file.
+* Registered with the redaction registry so it can never appear in logs.
 * Browsers never hold the raw token in a cookie: the session cookie carries an HMAC derived from it, so a
   leaked cookie cannot be replayed as a bearer token, and rotating the token invalidates every session.
 """
 
 import hashlib
 import hmac
-import os
 import secrets
 from pathlib import Path
 
+from devteam_core.errors import DevTeamError
 from devteam_core.logging import secret_registry
+from devteam_harness.secrets import SecretsManager, SecretsUnavailableError
 
+API_TOKEN_REF = "secret://platform/api_token"  # noqa: S105 - a reference, not a secret
 _TOKEN_BYTES = 32
-_MIN_TOKEN_LENGTH = 40
+MIN_TOKEN_LENGTH = 40
 
 
-def load_or_create_token(path: Path) -> str:
-    """Return the install token, creating it atomically (exclusive create) if it does not exist."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-    if not path.exists():
-        token = secrets.token_urlsafe(_TOKEN_BYTES)
-        try:
-            fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
-        except FileExistsError:
-            pass  # another process created it first; fall through and read theirs
-        else:
-            with os.fdopen(fd, "w", encoding="utf-8") as handle:
-                handle.write(token)
-    token = path.read_text(encoding="utf-8").strip()
-    if len(token) < _MIN_TOKEN_LENGTH:
-        raise ValueError(f"API token in {path.name} is too short; delete the file to regenerate it")
+class TokenMigrationRequiredError(DevTeamError):
+    code = "auth.migration_required"
+
+
+def generate_token() -> str:
+    return secrets.token_urlsafe(_TOKEN_BYTES)
+
+
+def load_api_token(secret_store: SecretsManager, legacy_path: Path) -> str:
+    """Return the install token from the credential store, creating it there on first use."""
+    if legacy_path.exists():
+        raise TokenMigrationRequiredError(
+            f"A plaintext sign-in key file still exists ({legacy_path.name}). Move it into Windows "
+            "Credential Manager first: uv run python scripts/migrate_api_token.py"
+        )
+    stored = secret_store.get(API_TOKEN_REF)
+    if stored is None:
+        token = generate_token()
+        secret_store.put(API_TOKEN_REF, token)
+        stored = secret_store.require(API_TOKEN_REF)
+        if not stored.matches(token):
+            raise SecretsUnavailableError("the credential store did not return the key it was given")
+    token = stored.reveal()
+    if len(token) < MIN_TOKEN_LENGTH:
+        raise SecretsUnavailableError(f"the stored API token ({API_TOKEN_REF}) is too short")
     secret_registry.register(token)
     return token
 
