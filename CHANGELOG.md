@@ -4,7 +4,7 @@ One section per approved part (roadmap §8). Entries are added at gate approval;
 
 **Versioning:** SemVer, pre-1.0. Each approved part bumps the minor version (Part A = 0.1.0, B = 0.2.0, …, R = 0.18.0); fixes to an approved part bump the patch version. The accepted MVP is `1.0.0-mvp`. Git tags: `vX.Y.Z` plus `part-<letter>-approved` (roadmap §16.2).
 
-## Unreleased — Part E: Secure Docker Sandbox and Starter Kits (awaiting G-E)
+## 0.5.0 — Part E: Secure Docker Sandbox and Starter Kits (G-E approved 2026-11-24)
 
 ### Added (checkpoint E.1)
 

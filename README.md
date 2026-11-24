@@ -7,7 +7,7 @@ DevTeam AI is a local-first, BRD-driven software development platform.
 3. A supervised team of **exactly ten AI agents** then designs, generates, tests, repairs, documents and packages the requested application.
 4. The agents work inside a central security and execution **harness**. Models run locally on Ollama; no paid service is used.
 
-> **Current state: Parts A, B, C and D approved (v0.4.0). Part D runs the ten agents on the local Ollama; building, testing and publishing are still stand-ins.**
+> **Current state: Parts A–E approved (v0.5.0). Part E adds the secure Docker sandbox and two starter kits; project runs do not use the sandbox yet.**
 > What exists:
 > - configuration, logging, trace context and secret redaction (Part A);
 > - a SQLite state database with migrations and automatic backups (Part A);
@@ -18,7 +18,7 @@ DevTeam AI is a local-first, BRD-driven software development platform.
 >
 > - Part D: trial runs. The ten agents make real calls to the local Ollama model; building, testing, packaging
 >   and publishing are stand-ins that run nothing, so **nothing is built, tested or verified yet**.
-> - Part E (built, awaiting approval G-E): a secure Docker sandbox (Docker Engine inside WSL2, mutual TLS, no
+> - Part E (approved, v0.5.0): a secure Docker sandbox (Docker Engine inside WSL2, mutual TLS, no
 >   network, locked images) with ten fixed build and test recipes, and two starter kits checked in the sandbox.
 >   The run graph does not use the sandbox yet; project runs still use the Part D stand-ins.
 >

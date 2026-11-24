@@ -4,9 +4,9 @@ Secure Docker Sandbox and Starter Kits · Gate **G-E** · Date: 2026-11-24
 
 | Field | Value |
 |---|---|
-| Status | **Implemented, awaiting the owner's review (G-E).** Not approved, not merged, not tagged, not pushed |
-| Branch | `part/e-sandbox` (local only; based on `main` after the G-D merge, `556fde3`) |
-| Commits | `aab0205` E.1 · `5c06d3d` E.2 · `cc3fb9e` E.3 · `15e8f61` E.4 · E.5 + documentation: the commit that adds this report |
+| Status | **Approved (G-E, AP-022, 2026-11-24)** and released as `0.5.0` |
+| Branch | `part/e-sandbox` (based on `main` after the G-D merge, `556fde3`), merged into `main` with `--no-ff` |
+| Commits | `aab0205` E.1 · `5c06d3d` E.2 · `cc3fb9e` E.3 · `15e8f61` E.4 · `fc60c70` E.5 · release 0.5.0 and merge: see §10 |
 | Source of truth | `docs/parts/PART-E-PLAN.md` revision 3 |
 | Rulings applied | AP-019 (D-07 (b): Docker Engine inside WSL2, free only), AP-020 (G-D), AP-021 (Part E authorised; D-04, D-08, D-16, D-24, D-45…D-51 approved, D-50 conditional on S-1; D-52 still depends on D-21) |
 | Spikes | **S-1 passed** (E.1) · **S-2 passed** (E.2) · **S-3 passed** (E.2). No blocker; no control was weakened |
@@ -190,14 +190,16 @@ Deviations: DV-023…DV-028 in the tracker (§10), each minimal and explained.
 | E.2 Runner, Resource Guard, locked images, S-2, S-3 | `5c06d3d` |
 | E.3 Recipes, execute tools, execution service, runners | `cc3fb9e` |
 | E.4 Starter-kit verification (AC-E-01) | `15e8f61` |
-| E.5 Integration, E2E-3, docs, this report | the commit that adds this report |
+| E.5 Integration, E2E-3, fixes KI-040/KI-041, docs, this report | `fc60c70` |
+| Release 0.5.0 (version, CHANGELOG, trackers) | the release commit on `part/e-sandbox` (`git log --grep "release 0.5.0"`) |
+| Merge into `main` | the merge commit `merge: Part E sandbox into main (v0.5.0)` |
+| Final verification record | the commit on `main` that records the final run; tags `v0.5.0` and `part-e-approved` point to it |
 
 ## 11. Branch and push status
 
-- Branch `part/e-sandbox`, local only. **Nothing has been pushed**; no force-push; history not rewritten.
-- `main` holds Part D (`v0.4.0`, `part-d-approved`, local tags).
-- After G-E approval: merge into `main` locally, bump to `0.5.0`, tag `v0.5.0` and `part-e-approved`. A push
-  happens only with your separate approval.
+- G-E approved and push authorised by the owner (AP-022). Merged into `main` (`--no-ff`), version `0.5.0`,
+  annotated tags `v0.5.0` and `part-e-approved`. No force-push; history not rewritten.
+- The push to `origin` and the remote check are recorded in the tracker (TR-0132) after they happen.
 
 ## Acceptance criteria
 
