@@ -85,7 +85,7 @@ def main(argv: list[str] | None = None) -> int:
     _log.info("worker_started", owner=worker.owner, model_version=models.version)
     try:
         if args.once:
-            while worker.run_once() is not None and not worker.stopping:
+            while not worker.stopping and (worker.run_once() is not None or worker.run_verification_once()):
                 pass
         else:
             worker.run_forever()

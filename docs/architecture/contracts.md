@@ -27,6 +27,7 @@ Every interface that agents, harness and services exchange is a Pydantic v2 mode
 | `state` | `RunState` v2 (references only) | Roadmap §6.8 |
 | `drafts` | Model answer contracts (D-44): `AnalysisDraft` (+ `ChecklistFinding`, `RequirementDraft`), `ScopeDraft`, `QuestionsDraft`, `SummaryDraft`, `DocumentDraft`, `RepairDraft`. Small and flat; sent to Ollama as the required JSON Schema; the agent maps a valid answer onto its full v1 output contract. Material is numbered, so a model never returns record IDs it could invent | Part D plan §13 |
 | `orchestration` | `NodeName` (closed node list), `NodeKind`, `Subgraph`, `NODE_KIND`, `NODE_SUBGRAPH`, `AGENT_NODE_FOR_ROLE` (exactly one agent node per role), `GATE_FOR_NODE`, `ALLOWED_TRANSITIONS`, `reachable`, `RunMode`, `GateDecision`, `GateResume`, `DispatchRecord`, `PlanIssueCode`, `PlanIssue`, `PlanValidationReport`; `ServiceOutcomeStatus`, `ServiceOutcome` (D.2) | Roadmap §6.1–6.5; Part D plan §3 (LG-01), §12 |
+| `sandbox` | `SandboxExecutionStatus`, `TemplateVerificationStatus`, `ContainerLimits`, `TestCounts`, `RecipeSpec`, `SandboxExecution`, `RecipeOutcome`, `TemplateVerification`, `TemplateDependencies`, `TemplateManifest`, `MigrationCheckRequest` (Part E, HC-14) | Part E plan §3.3–§3.8 |
 
 ## Rules the contracts enforce
 
@@ -46,6 +47,7 @@ Every interface that agents, harness and services exchange is a Pydantic v2 mode
 | Build and delivery stages need a frozen spec version and checksum. The clarification form cannot reopen once its round is used | `state.RunState` |
 | Every graph transition is in a static table. No path reaches a build or delivery node without a spec-freeze node and the build-entry guard; a gate cancel ends the run directly. A gate resumes with one ID (approval or clarification submission), never with the decision itself. A dispatch names its own agent's node and the exact attempt key | `orchestration` |
 | A service stand-in can report only that it did **not** do its job (not run, not evaluated, not built, not published) and must name the part that delivers the real service; only a real effect is "performed", and it must reference what it produced. There is no value for passed, supported or verified (D-38) | `orchestration.ServiceOutcome` |
+| Sandbox honesty: `completed` needs exit code 0, `failed` a non-zero exit code; `blocked` means nothing ran (no exit code, no tests). Test counts must add up. A verification is `passed` only when every recipe succeeded, test recipes ran at least one test with no failures or errors, and the kit checksum and image digests are recorded; `failed` needs an unsuccessful recipe. Recipes never name a shell or package manager. An execution belongs to exactly one project or one verification. Kit dependencies are pinned `name==version` | `sandbox` |
 
 ## Not yet enforced (later checkpoints)
 

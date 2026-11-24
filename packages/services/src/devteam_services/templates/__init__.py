@@ -177,26 +177,6 @@ def refresh_stale(settings: Settings, sessions: sessionmaker[Session]) -> int:
     return changed
 
 
-def overview(settings: Settings, sessions: sessionmaker[Session]) -> list[dict[str, Any]]:
-    """Each kit with its manifest summary and latest verification (for the API and UI)."""
-    with sessions() as session:
-        latest = repo.latest_verifications(session)
-    rows: list[dict[str, Any]] = []
-    for template_id in template_ids():
-        manifest = load_manifest(template_id)
-        rows.append(
-            {
-                "template_id": template_id,
-                "version": manifest.version,
-                "description": manifest.description,
-                "frontend": manifest.frontend,
-                "self_test": list(manifest.self_test),
-                "latest": latest.get(template_id),
-            }
-        )
-    return rows
-
-
 def evidence_dir(settings: Settings, verification_id: str) -> Path:
     return settings.data_dir / "sandbox" / "verifications" / verification_id
 
@@ -207,7 +187,6 @@ __all__ = [
     "VerificationRefused",
     "current_fingerprint",
     "evidence_dir",
-    "overview",
     "refresh_stale",
     "request_verification",
     "run_verification",

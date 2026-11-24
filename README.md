@@ -18,6 +18,9 @@ DevTeam AI is a local-first, BRD-driven software development platform.
 >
 > - Part D: trial runs. The ten agents make real calls to the local Ollama model; building, testing, packaging
 >   and publishing are stand-ins that run nothing, so **nothing is built, tested or verified yet**.
+> - Part E (built, awaiting approval G-E): a secure Docker sandbox (Docker Engine inside WSL2, mutual TLS, no
+>   network, locked images) with ten fixed build and test recipes, and two starter kits checked in the sandbox.
+>   The run graph does not use the sandbox yet; project runs still use the Part D stand-ins.
 >
 > See `docs/IMPLEMENTATION_TRACKER.md` for the authoritative
 > status and `docs/PROJECT_PROGRESS_TRACKER.md` for a plain-English run history.
@@ -37,6 +40,8 @@ DevTeam AI is a local-first, BRD-driven software development platform.
 | `docs/THIRD_PARTY_LICENSES.md` | Runtime dependency licences and the MPL-2.0 obligations |
 | `docs/architecture/orchestration.md` | The run graph (generated diagram) |
 | `docs/runbooks/worker.md` | Starting, stopping and recovering the run worker |
+| `docs/runbooks/docker-setup.md` | Setting up the sandbox engine, certificates and images |
+| `docs/architecture/sandbox.md` | How sandbox runs work and which controls apply |
 | `CLAUDE.md` | Engineering rules for coding agents |
 
 ## Architecture
@@ -78,7 +83,10 @@ packages/harness/ devteam_harness: HC-15 local IAM + token, HC-18 rate limits, H
                  HC-21 audit (foundations only)
 packages/services/ devteam_services: workspace manager, document extraction + chunking, intake (not agents)
 packages/orchestration/ devteam_orchestration: LangGraph run graph, guards, gates, runtime (Ollama), run commands
-apps/worker/     devteam_worker: the run worker (lease, heartbeat, crash recovery)
+apps/worker/     devteam_worker: the run worker (lease, heartbeat, crash recovery, template verifications)
+packages/harness/.../sandbox/ the Docker sandbox: engine (mutual TLS), runner, resource guard, ten recipes
+sandbox/         locked sandbox images (Dockerfiles, dependency locks, licence policy) and in-container tools
+templates/target_apps/ starter kits react_fastapi_sqlite and html_fastapi_sqlite (target applications)
 agents/          the ten agents: declaration (spec.py) + behaviour (behaviour.py)
 config/          defaults.yaml + profiles (low_memory, standard, test)
 scripts/         doctor, benchmark, agent-count check, backup, OpenAPI export, setup/dev PowerShell
@@ -98,7 +106,7 @@ docs/            roadmap, plan, tracker, ADRs, part plans/reports, benchmarks
 | Git | any | |
 | Ollama | any | serves models on localhost only |
 | Gitleaks | any | secret scanning |
-| Docker | any | required from Part E; distribution choice pending decision D-07 |
+| WSL2 + Ubuntu 24.04 | — | Docker Engine runs inside WSL (D-07 (b)); never Docker Desktop. Set up with `docs/runbooks/docker-setup.md` |
 
 **Recommended Ollama settings** (user environment variables; restart Ollama afterwards, Spec §9.3):
 
@@ -113,6 +121,8 @@ docs/            roadmap, plan, tracker, ADRs, part plans/reports, benchmarks
 ```powershell
 ./scripts/setup.ps1            # uv sync --locked, npm ci, then runs the doctor
 uv run python scripts/doctor.py
+uv run python scripts/setup_wsl_docker.py      # once: sandbox engine + certificates (runbook docker-setup.md)
+uv run python scripts/build_sandbox_images.py  # once, and after image changes: the only step with network
 ```
 
 ## Configuration
@@ -147,6 +157,7 @@ uv run ruff check . ; uv run ruff format --check . ; uv run mypy packages apps s
 uv run lint-imports ; uv run python scripts/check_agent_count.py
 npm --prefix apps/web run lint ; npm --prefix apps/web run typecheck ; npm --prefix apps/web test ; npm --prefix apps/web run build
 gitleaks dir . --no-banner
+uv run pytest tests/sandbox -m docker   # real sandbox tests; needs the WSL engine (add -m "docker and slow" for the long ones)
 ```
 
 ## Troubleshooting
@@ -155,7 +166,8 @@ gitleaks dir . --no-banner
 |---|---|
 | `doctor` warns about low free RAM | Close applications; the platform runs one model at a time |
 | Ollama not reachable | Start Ollama; the URL must be `127.0.0.1`/`localhost` |
-| Docker engine not running | Needed only from Part E |
+| Sandbox work is Blocked: engine not reachable | Start `./scripts/dev.ps1` (it keeps WSL open) or run `wsl -d Ubuntu-24.04 --exec sleep infinity` in a separate window. Work never runs on the laptop instead. See `docs/runbooks/docker-setup.md` |
+| Sandbox work waits with `resource.low_memory` | WSL is holding file cache (KI-039); see the runbook's troubleshooting table |
 | `gitleaks` not found right after `winget install` | Open a new terminal so `PATH` refreshes |
 | API refuses to start: "A plaintext sign-in key file still exists" | Run `uv run python scripts/migrate_api_token.py` (or just `./scripts/dev.ps1`, which runs it). It moves the old `data/api_token` into Windows Credential Manager under four checks and deletes the file only if all pass |
 | API refuses to start: "no secure OS credential store is available" | The key can only live in Windows Credential Manager; there is no file fallback. Check that the `PYTHON_KEYRING_BACKEND` environment variable is not set |

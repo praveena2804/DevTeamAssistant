@@ -37,6 +37,7 @@ from devteam_harness.agent_sdk.registry import AgentRegistry
 from devteam_harness.approvals import ApprovalService, load_approval_rules
 from devteam_harness.audit import DatabaseAuditSink
 from devteam_harness.budgets import BudgetManager, Budgets, load_budgets
+from devteam_harness.budgets.resource_lease import ResourceLease
 from devteam_harness.errors import HarnessError
 from devteam_harness.executor import AgentExecutor, HarnessServices
 from devteam_harness.guardrails import PolicyEngine, load_guardrails
@@ -47,6 +48,8 @@ from devteam_harness.llm_gateway.providers.ollama import OllamaProvider
 from devteam_harness.observability import Tracer
 from devteam_harness.prompts import InMemorySkillRegistry
 from devteam_harness.resilience import RetryPolicy
+from devteam_harness.sandbox.service import SandboxService
+from devteam_harness.secrets import secrets_manager_from_settings
 from devteam_harness.tools import ToolLayer, build_default_registry
 from devteam_harness.tools.files import ControlledFileService, FileLimits
 from devteam_orchestration.prompts import build_prompt_registry
@@ -94,6 +97,7 @@ class Runtime:
     write_scopes: MappingProxyType[AgentRole, tuple[str, ...]] = field(
         default_factory=lambda: MappingProxyType({})
     )
+    sandbox: SandboxService | None = None  # Part E: reached through tools and verification jobs only
 
     def workspace(self, project_id: str) -> Path:
         root = self.settings.workspaces_dir.resolve()
@@ -123,10 +127,6 @@ def build_runtime(
     approvals = ApprovalService(load_approval_rules(config), sessions, clock=clock)
     sink = DatabaseAuditSink(sessions)
     tracer = Tracer(sessions)
-    tools = build_default_registry()
-    tools.check_consistency(guardrails)
-    tool_layer = ToolLayer(tools, PolicyEngine(guardrails), sink, sessions)
-
     models = settings.ollama.models
     timeout = min(
         settings.ollama.request_timeout_s,
@@ -144,8 +144,20 @@ def build_runtime(
         keep_alive=settings.ollama.keep_alive,
         schemas=_schema,
     )
+    # Part E: the sandbox (HC-14) and the cross-process LLM/sandbox lease (D-46) shared with the gateway.
+    sandbox = SandboxService(
+        settings, sessions, secrets_manager_from_settings(settings), models=provider, clock=clock
+    )
+    tools = build_default_registry(sandbox)
+    tools.check_consistency(guardrails)
+    tool_layer = ToolLayer(tools, PolicyEngine(guardrails), sink, sessions)
+    lease = ResourceLease(
+        sessions, ttl_s=settings.sandbox.lock_ttl_s, wait_s=settings.sandbox.lock_wait_s, clock=clock
+    )
     retry = RetryPolicy(budgets.retries)
-    gateway = LLMGateway(provider, InputGuard(guardrails.input), sink, tracer, retry, clock=clock)
+    gateway = LLMGateway(
+        provider, InputGuard(guardrails.input), sink, tracer, retry, clock=clock, resource_lease=lease
+    )
     registry, behaviours = _agents()
     try:
         registry.seal(guardrails)
@@ -186,6 +198,7 @@ def build_runtime(
         file_limits=file_limits,
         clock=clock,
         write_scopes=MappingProxyType({spec.role: tuple(spec.write_paths) for spec in registry}),
+        sandbox=sandbox,
     )
 
 

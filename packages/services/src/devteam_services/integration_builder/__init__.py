@@ -45,6 +45,8 @@ def templates_root() -> Path:
 
 def template_ids(root: Path | None = None) -> list[str]:
     base = root or templates_root()
+    if not base.is_dir():  # an installation without starter kits simply has none (never a crash)
+        return []
     return sorted(p.name for p in base.iterdir() if p.is_dir() and (p / "template.yaml").is_file())
 
 

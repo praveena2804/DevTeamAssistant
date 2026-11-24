@@ -289,6 +289,13 @@ source_modules = ["devteam_agents", "devteam_orchestration", "devteam_api", "dev
 forbidden_modules = ["devteam_harness.sandbox.engine", "devteam_harness.sandbox.tls"]
 allow_indirect_imports = true  # the sanctioned route is the sandbox service / tool layer; never a direct import
 
+[[tool.importlinter.contracts]]
+name = "the API never runs sandbox work (it only queues requests)"
+type = "forbidden"
+source_modules = ["devteam_api"]
+forbidden_modules = ["devteam_harness.sandbox.service", "devteam_harness.sandbox.runner", "devteam_harness.sandbox.guard"]
+allow_indirect_imports = true
+
 # ---- Part D.1: orchestration and worker boundaries (roadmap 7.1, Part D plan 3.1)
 
 [[tool.importlinter.contracts]]

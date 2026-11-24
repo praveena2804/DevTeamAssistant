@@ -329,3 +329,40 @@ def test_waiting_does_not_let_a_second_worker_take_a_live_lease(env: Env) -> Non
         assert not second.start(wait_s=3)
     finally:
         live.close()
+
+
+# ------------------------------------------------------------------------- sandbox housekeeping (Part E)
+
+
+def test_the_worker_starts_when_the_root_has_no_starter_kits(
+    env: Env, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Regression (found by E2E-2 in E.5): ``DEVTEAM_ROOT`` without ``templates/`` crashed the worker."""
+    bare = tmp_path / "bare_root"
+    (bare / "config").mkdir(parents=True)
+    (bare / "config" / "defaults.yaml").write_text("", encoding="utf-8")
+    (bare / "pyproject.toml").write_text("", encoding="utf-8")
+    monkeypatch.setenv("DEVTEAM_ROOT", str(bare))
+    worker = Worker(env.rt, env.graph, owner="no-kits")
+    assert worker.start()
+    try:
+        status = worker.refresh_sandbox(sweep=True)
+    finally:
+        worker.close()
+    assert status["stale_marked"] == 0
+
+
+def test_a_failing_stale_refresh_never_stops_the_worker(env: Env, monkeypatch: pytest.MonkeyPatch) -> None:
+    import devteam_worker.worker as worker_module  # noqa: PLC0415
+
+    def broken(*_args: object) -> int:
+        raise OSError("simulated")
+
+    monkeypatch.setattr(worker_module, "refresh_stale", broken)
+    worker = Worker(env.rt, env.graph, owner="broken-refresh")
+    assert worker.start()  # housekeeping failed, the run worker still runs
+    try:
+        status = worker.refresh_sandbox(sweep=True)
+    finally:
+        worker.close()
+    assert status["stale_marked"] is None

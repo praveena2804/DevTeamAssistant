@@ -156,3 +156,7 @@ def test_verification_request_queues_once(tmp_path: Path) -> None:
         request_verification(sessions, "react_fastapi_sqlite", requested_by="prn_test")
     with pytest.raises(VerificationRefused):
         request_verification(sessions, "unknown_kit", requested_by="prn_test")
+
+
+def test_a_root_without_starter_kits_has_none(tmp_path: Path) -> None:
+    assert template_ids(tmp_path / "missing") == []

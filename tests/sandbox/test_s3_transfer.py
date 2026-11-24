@@ -15,7 +15,7 @@ from devteam_harness.sandbox.errors import SandboxBlockedError
 from devteam_harness.sandbox.runner import SandboxRunner, build_tar
 from devteam_harness.sandbox.spec import ContainerSpec
 from devteam_harness.secrets import SecretsManager
-from tests.sandbox.conftest import limits, python_probe
+from tests.sandbox.conftest import limits, python_probe, restore_engine, wait_for_engine
 
 pytestmark = [pytest.mark.docker, pytest.mark.security]
 
@@ -77,8 +77,10 @@ def test_copy_in_works_on_a_read_only_container_with_only_the_volume_mounted(eng
 def test_engine_stays_reachable_with_keepalive_and_is_blocked_after_wsl_shutdown(
     live_settings: Settings, live_secrets: SecretsManager, wsl_keepalive: None
 ) -> None:
-    """S-3 #5. Duration from DEVTEAM_S3_IDLE_MINUTES (default 30). Ends with ``wsl --shutdown``: run last."""
-    minutes = float(os.environ.get("DEVTEAM_S3_IDLE_MINUTES", "30"))
+    """S-3 #5. Duration from S3_IDLE_MINUTES (default 30). Stops WSL with ``wsl --shutdown`` to
+    prove the engine is then Blocked, and afterwards restores it, so later tests still have an engine."""
+    wait_for_engine(live_settings, live_secrets)  # cold start: the window starts once the engine is up
+    minutes = float(os.environ.get("S3_IDLE_MINUTES", "30"))
     deadline = time.monotonic() + minutes * 60
     checks = 0
     while time.monotonic() < deadline:
@@ -88,7 +90,10 @@ def test_engine_stays_reachable_with_keepalive_and_is_blocked_after_wsl_shutdown
         time.sleep(min(60.0, max(deadline - time.monotonic(), 0)))
     assert checks >= max(1, int(minutes) - 1)
     subprocess.run(["wsl.exe", "--shutdown"], check=True, timeout=120)
-    time.sleep(5)
-    with pytest.raises(SandboxBlockedError) as info:
-        connect(live_settings, live_secrets, timeout=5)
-    assert info.value.code == "sandbox.docker_unavailable"
+    try:
+        time.sleep(5)
+        with pytest.raises(SandboxBlockedError) as info:
+            connect(live_settings, live_secrets, timeout=5)
+        assert info.value.code == "sandbox.docker_unavailable"
+    finally:
+        restore_engine(live_settings, live_secrets)

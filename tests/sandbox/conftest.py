@@ -36,24 +36,56 @@ def live_secrets(live_settings: Settings) -> SecretsManager:
     return secrets_manager_from_settings(live_settings)
 
 
+_KEEPALIVE_SESSIONS: list[subprocess.Popen[bytes]] = []
+
+
+def _start_keepalive(settings: Settings) -> None:
+    _KEEPALIVE_SESSIONS.append(
+        subprocess.Popen(
+            ["wsl.exe", "-d", settings.sandbox.wsl_distribution, "--exec", "sleep", "infinity"],
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    )
+
+
+def restore_engine(settings: Settings, secrets: SecretsManager, *, timeout_s: float = 120) -> None:
+    """After a test stops WSL on purpose (S-3 #5): open a new idle session and wait until the engine answers,
+    so later tests in the same session find the engine running again."""
+    _start_keepalive(settings)
+    wait_for_engine(settings, secrets, timeout_s=timeout_s)
+
+
+def wait_for_engine(settings: Settings, secrets: SecretsManager, *, timeout_s: float = 120) -> None:
+    """Wait until the engine answers (WSL needs a few seconds to start the engine after a cold start)."""
+    deadline = time.monotonic() + timeout_s
+    while True:
+        try:
+            with connect(settings, secrets, timeout=10) as eng:
+                if eng.client.ping():
+                    return
+        except Exception:
+            if time.monotonic() > deadline:
+                raise
+        time.sleep(3)
+
+
 @pytest.fixture(scope="session")
 def wsl_keepalive(live_settings: Settings) -> Iterator[None]:
     """WSL stops an idle distribution (and the engine with it); keep one idle session open (plan §3.10)."""
-    proc = subprocess.Popen(
-        ["wsl.exe", "-d", live_settings.sandbox.wsl_distribution, "--exec", "sleep", "infinity"],
-        stdin=subprocess.DEVNULL,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
+    _start_keepalive(live_settings)
     time.sleep(3)
     try:
         yield
     finally:
-        proc.terminate()
-        try:
-            proc.wait(timeout=10)
-        except subprocess.TimeoutExpired:
-            proc.kill()
+        for proc in _KEEPALIVE_SESSIONS:
+            proc.terminate()
+            try:
+                proc.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                proc.kill()
+        _KEEPALIVE_SESSIONS.clear()
 
 
 @pytest.fixture(scope="session")

@@ -55,6 +55,25 @@ clash. Uninstalling Docker Desktop is optional.
 | Doctor: "passphrase is not in the credential store" | Run `scripts/setup_wsl_docker.py --renew` |
 | "Docker Desktop is not used (D-07 (b))" | The connection reached Docker Desktop's engine. Close Docker Desktop; check `sandbox.docker_host` is `tcp://127.0.0.1:2376` |
 | `sandbox.wsl_memory` warning | Add the `.wslconfig` block above, then `wsl --shutdown` |
+| Sandbox work waits with `resource.low_memory` although nothing else is running | WSL keeps file cache and does not give memory back to Windows quickly (KI-039). Set `autoMemoryReclaim=gradual` in `.wslconfig` (block above), or free the cache now: `wsl -d Ubuntu-24.04 -u root -- sh -c "sync; echo 3 > /proc/sys/vm/drop_caches"`. The free-memory threshold (`sandbox.min_free_ram_mb`) is a safety control; do not lower it to get past this |
+| A run is Blocked with `sandbox.image_missing` or `sandbox.image_digest_mismatch` | Run `uv run python scripts/build_sandbox_images.py` (section below) |
+
+## Images
+
+| Image | Contents | Used by |
+|---|---|---|
+| `devteam-sandbox/python_api:1` | `python:3.12-slim` (pinned by digest); hash-pinned wheels from `sandbox/images/python_api/requirements.lock`; the platform's checking tools | `pytest_api`, `pytest_db`, `alembic_*`, `ruff_check`, `bandit_scan`, `static_validation` |
+| `devteam-sandbox/node_web:1` | `node:22-slim` (pinned by digest); `npm ci --ignore-scripts` from `sandbox/images/node_web/package-lock.json` | `tsc_check`, `vitest_run`, `npm_build` |
+
+- **Build or rebuild:** `uv run python scripts/build_sandbox_images.py`. This is the only sandbox step that uses the
+  network. It waits for the engine after a cold start, checks every package licence against
+  `sandbox/images/licence_policy.yaml`, runs `pip-audit` and `npm audit` on the locks, and records the image IDs in
+  `sandbox/images/images.lock.json`. A run refuses any image whose ID does not match the lock.
+- **Change a dependency:** edit `requirements.in` or `package.json`, regenerate the lock
+  (`--relock-node` for Node; the Node lock is made inside a Linux container), rebuild, and commit the lock files,
+  `images.lock.json` and `licence_report.json` together.
+- **Offline:** once built, nothing in a sandbox run downloads anything; React builds use the image's
+  `/node_modules` through Node's normal parent-folder lookup.
 
 ## Network use
 

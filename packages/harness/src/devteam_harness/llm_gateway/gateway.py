@@ -31,6 +31,7 @@ from devteam_core.contracts.llm import ModelRequest, ModelResponse, ModelUsage, 
 from devteam_core.ids import new_id
 from devteam_core.logging import redact_text, secret_registry
 from devteam_harness.budgets.manager import TaskBudget, estimate_tokens
+from devteam_harness.budgets.resource_lease import ResourceLease
 from devteam_harness.errors import HarnessError, PolicyDeniedError, TransientError
 from devteam_harness.guardrails.input import InputGuard, InputRejectedError
 from devteam_harness.guardrails.policy import AuditSink
@@ -77,6 +78,7 @@ class LLMGateway:
         *,
         clock: Clock = system_clock,
         sleep: Callable[[float], None] = time.sleep,
+        resource_lease: ResourceLease | None = None,
     ) -> None:
         self._provider = provider
         self._guard = input_guard
@@ -85,6 +87,8 @@ class LLMGateway:
         self._retry = retry_policy
         self._clock = clock
         self._sleep = sleep
+        # Part E (D-46): the cross-process LLM/sandbox lease; a sandbox run in any process makes calls wait.
+        self._lease = resource_lease
 
     def _audit(  # noqa: PLR0917 - private helper; every argument is required context
         self,
@@ -138,14 +142,26 @@ class LLMGateway:
         )
 
     def _call_once(self, request: ModelRequest, timeout_s: float) -> ProviderReply:
+        # D-46: never a model call while a sandbox run holds the machine (ResourceUnavailableError → wait).
+        lease = self._lease.acquire("llm") if self._lease is not None else None
         if not MODEL_LOCK.acquire(timeout=timeout_s):
+            if lease is not None:
+                lease.release()
             raise TransientError("model.busy", "another model call is still running")
         try:
             future = _CALLS.submit(self._provider.generate, request)
         except BaseException:
             MODEL_LOCK.release()
+            if lease is not None:
+                lease.release()
             raise
-        future.add_done_callback(lambda _f: MODEL_LOCK.release())  # released when the call really ends
+
+        def _done(_future: object) -> None:  # released only when the call really ends
+            MODEL_LOCK.release()
+            if lease is not None:
+                lease.release()
+
+        future.add_done_callback(_done)
         try:
             return future.result(timeout=timeout_s)
         except concurrent.futures.TimeoutError:

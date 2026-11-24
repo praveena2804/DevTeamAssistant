@@ -8,6 +8,7 @@ dependencies = [
     "devteam-state",
     "devteam-harness",
     "devteam-orchestration",
+    "devteam-services",
     "psutil>=6.1,<8",
 ]
 
@@ -16,6 +17,7 @@ devteam-core = { workspace = true }
 devteam-state = { workspace = true }
 devteam-harness = { workspace = true }
 devteam-orchestration = { workspace = true }
+devteam-services = { workspace = true }
 
 [build-system]
 requires = ["hatchling>=1.25"]

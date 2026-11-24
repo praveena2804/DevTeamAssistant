@@ -685,6 +685,7 @@ dependencies = [
     { name = "devteam-core" },
     { name = "devteam-harness" },
     { name = "devteam-orchestration" },
+    { name = "devteam-services" },
     { name = "devteam-state" },
     { name = "psutil" },
 ]
@@ -694,6 +695,7 @@ requires-dist = [
     { name = "devteam-core", editable = "packages/core" },
     { name = "devteam-harness", editable = "packages/harness" },
     { name = "devteam-orchestration", editable = "packages/orchestration" },
+    { name = "devteam-services", editable = "packages/services" },
     { name = "devteam-state", editable = "packages/state" },
     { name = "psutil", specifier = ">=6.1,<8" },
 ]

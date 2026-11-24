@@ -33,8 +33,9 @@ other local programs or web pages, and generated code must never see host folder
 3. **Only one module imports the SDK:** `devteam_harness.sandbox.engine` (import-linter contract).
 4. **Engine identity:** an engine that reports Docker Desktop, is not Linux, or does not support the pinned
    API version is refused (Blocked).
-5. **File transfer (D-48):** Docker archive API copy-in/copy-out into a per-execution anonymous volume;
-   no host bind mounts (verified by spike S-3 in E.2).
+5. **File transfer (D-48):** Docker archive API copy-in/copy-out into a per-execution named volume
+   (`devteam-sbx-<id>`, labelled `devteam.sandbox=1`, removed with the container); no host bind mounts
+   (verified by spike S-3 in E.2).
 6. **Availability:** WSL stops an idle distribution, and the engine with it. `scripts/dev.ps1` keeps one
    idle session (`wsl -d Ubuntu-24.04 --exec sleep infinity`) open while the platform runs. An unreachable
    engine means the work is Blocked, never run elsewhere.
@@ -51,6 +52,23 @@ other local programs or web pages, and generated code must never see host folder
 | 6 | Verification stays enabled | `CERT_REQUIRED`, `check_hostname` true, TLS ≥ 1.2 after real requests; exactly one CA in the store; a weakened context is refused; static AST scan finds no disabled verification in platform code |
 
 14 tests, all passed against the real engine (TR-0110).
+
+## Spike S-2 result (E.2, 2026-11-23): passed
+
+Offline React build in the `node_web` image (`tests/sandbox/test_s2_offline_react.py`, real engine, 6 tests
+passed, TR-0117): the type check, Vite build and Vitest run complete with `network=none`. Dependencies come
+from the image's `/node_modules` through Node's normal parent-folder lookup, nothing is downloaded, and
+`docker diff` shows the image unchanged. Two findings were solved without weakening any control: Vite and
+Vitest wrote a temporary config into `/node_modules` (read-only, as intended), so the recipes use
+`--configLoader runner`; and Vitest needs `NODE_ENV=test` (React's production build has no `act`).
+
+## Spike S-3 result (E.2, 2026-11-23): passed
+
+Archive transfer and availability (`tests/sandbox/test_s3_transfer.py`, TR-0118, TR-0119): files are copied in
+and out through the archive API, owned by the sandbox user, with no host bind mount; output names that escape
+the output folder are never collected. Over 30 minutes with the keep-alive session, the engine answered every
+one-minute check. After `wsl --shutdown` the connection was refused and reported as Blocked
+(`sandbox.docker_unavailable`), never run elsewhere.
 
 ## Consequences
 
