@@ -104,8 +104,19 @@ Full list with exact locations: `docs/IMPLEMENTATION_TRACKER.md` §5/§6, CH-011
 | E2E-3 (real API + real worker process + real engine, `low_memory`) | `pytest tests/sandbox/test_e2e_3_sandbox.py -m docker` | **1 passed** (141 s) |
 
 Coverage (first E.5 run): 92.4% total (branch). Some Part E failure branches were below target there, so I
-added 36 failure-path tests (hostile reports, engine errors, evidence paths, verification outcomes) and removed
-one unused function. The final run on `main` measures the result (see "Final verification" below).
+added failure-path tests (hostile reports, engine errors, evidence paths, verification outcomes) and removed
+one unused function. The final run on `main` measured the result.
+
+### Final verification on `main` (TR-0131)
+
+| Check | Result |
+|---|---|
+| Clean install from lock files | `uv sync --locked --all-packages` OK; `npm ci` OK, 0 vulnerabilities |
+| Web | lint and typecheck clean; 22 passed; build OK |
+| Full regression, every marker except `acceptance` (63 min) | **2 failed, 2,482 passed, 1 skipped** (KI-020) |
+| The 2 failures | Both real-model graph tests stopped with *waiting for resources* (834 / 763 MB free; the executor needs 1,024 MB). The memory guard worked; nothing ran unsafely |
+| Re-runs of those two tests alone | Two attempts without a keep-awake request were disturbed by the laptop's Modern Standby (Windows events 14:16–14:51 and 15:26–15:48): one full run blocked, and one restart run counted 8 model calls instead of 7 because a call timed out during standby and was retried as designed (KI-043). One diagnostic attempt hit the Windows 260-character path limit because of a long test folder (KI-044). With a short folder the full-run test passed (6 min 8 s). Final re-run of both **with** keep-awake: **2 passed** (10 min 18 s) |
+| Coverage | **92.6%** total. Part E harness modules 90.5–100% (`engine.py`, `results.py`, `images.py` 100%); services 93.3–100%; sandbox API 98.4%. `worker.py` 66.4% in that run (its loops run in subprocesses); 3 in-process worker tests added, 82% from the worker tests alone |
 
 ## 5. Adversarial results
 
@@ -175,6 +186,8 @@ removed must succeed, proving that the test detects the control.
 | KI-040 | **Fixed.** The worker crashed at start when its root had no `templates/` folder (found by Part D's E2E-2) |
 | KI-041 | **Fixed.** The S-3 test stopped WSL and left later tests without an engine; its duration variable was rejected by the strict configuration |
 | KI-042 | `mypy tests` (not a defined gate) reports 35 type errors in 9 older test files; none in Part E code |
+| KI-043 | Real-model tests run without a keep-awake request are disturbed when the laptop enters Modern Standby (a model call times out and is retried; the restart test's exact call count does not allow that retry). Cause found; run them with keep-awake |
+| KI-044 | Windows 260-character path limit: a workspace under a very long folder makes an agent's write fail (the run blocks, fail-closed). Existing Part C limit; seen only with a long test folder |
 | — | The run graph does not use the sandbox yet (D-47; no agent declares the execute tools). Project runs still use the Part D stand-ins and still report "not verified" |
 | — | PostgreSQL is not available in the sandbox (D-16, Part K). D-52 remains dependent on D-21 |
 | — | Images must be rebuilt by the owner (`build_sandbox_images.py`) when their dependencies change; this is the only step with network |
@@ -224,4 +237,4 @@ Deviations: DV-023…DV-028 in the tracker (§10), each minimal and explained.
 - **The real database** is untouched; the rehearsal on a copy shows that migration 0007 keeps every row and
   the audit chain intact.
 
-**Part F has not been started.** Waiting for your G-E decision.
+**Part E is approved (G-E, AP-022) and released as `0.5.0`. Part F has not been started**; it needs its own plan and approval.

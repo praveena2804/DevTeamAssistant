@@ -13,6 +13,7 @@ import sys
 from collections.abc import Iterator
 from datetime import timedelta
 from pathlib import Path
+from typing import Any
 
 import pytest
 from sqlalchemy import select
@@ -366,3 +367,100 @@ def test_a_failing_stale_refresh_never_stops_the_worker(env: Env, monkeypatch: p
     finally:
         worker.close()
     assert status["stale_marked"] is None
+
+
+class _FakeSandbox:
+    def __init__(self, swept: tuple[int, int] | None = (2, 1)) -> None:
+        self.swept = swept
+
+    def engine_status(self) -> dict[str, object]:
+        return {"reachable": True, "version": "29.1.3", "operating_system": "Ubuntu 24.04.4 LTS"}
+
+    def sweep(self) -> tuple[int, int] | None:
+        return self.swept
+
+
+def _with_sandbox(env: Env, sandbox: Any) -> Worker:
+    import dataclasses  # noqa: PLC0415
+
+    return Worker(dataclasses.replace(env.rt, sandbox=sandbox), env.graph, owner="sandbox-worker")
+
+
+def test_startup_sweep_removes_leftovers_and_is_audited(env: Env) -> None:
+    import json  # noqa: PLC0415
+
+    worker = _with_sandbox(env, _FakeSandbox())
+    assert worker.start()  # start() runs refresh_sandbox(sweep=True)
+    worker.close()
+    status = json.loads((env.settings.data_dir / "sandbox_status.json").read_text(encoding="utf-8"))
+    assert status["reachable"] is True and status["swept"] == [2, 1]
+    with env.sessions() as session:
+        swept = [
+            e.details for e in session.scalars(select(AuditEvent).where(AuditEvent.action == "sandbox.swept"))
+        ]
+    assert swept == [{"containers": 2, "volumes": 1}]
+
+
+def _queue_verification(env: Env, kit: str = "html_fastapi_sqlite") -> str:
+    from devteam_services import templates as kit_service  # noqa: PLC0415
+
+    return kit_service.request_verification(env.sessions, kit, requested_by="prn_test").verification_id
+
+
+def test_verification_jobs_run_after_runs_and_an_error_is_recorded_blocked(
+    env: Env, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import devteam_worker.worker as worker_module  # noqa: PLC0415
+    from devteam_core.contracts.sandbox import TemplateVerificationStatus  # noqa: PLC0415
+    from devteam_state.repositories import sandbox as sandbox_repo  # noqa: PLC0415
+
+    worker = _with_sandbox(env, _FakeSandbox(swept=None))
+    assert worker.run_verification_once() is False  # nothing queued
+    assert Worker(env.rt, env.graph).run_verification_once() is False  # no sandbox configured: nothing runs
+
+    first = _queue_verification(env)
+    seen: list[str] = []
+
+    def fake_run(verification: object, *_a: object, **_kw: object) -> object:
+        seen.append(verification.verification_id)  # type: ignore[attr-defined]
+        return verification
+
+    monkeypatch.setattr(worker_module, "run_verification", fake_run)
+    assert worker.run_verification_once() is True and seen == [first]
+
+    second = _queue_verification(env, "react_fastapi_sqlite")  # the first is still active (one per kit)
+
+    def crash(*_a: object, **_kw: object) -> object:
+        raise RuntimeError("unexpected")
+
+    monkeypatch.setattr(worker_module, "run_verification", crash)
+    assert worker.run_verification_once() is True
+    with env.sessions() as session:
+        stored = sandbox_repo.get_verification(session, second)
+    assert stored is not None and stored.status is TemplateVerificationStatus.BLOCKED
+    assert stored.reason == "the verification stopped with an error (RuntimeError)"
+
+
+def test_run_forever_serves_verifications_and_refreshes_status_when_idle(
+    env: Env, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import devteam_worker.worker as worker_module  # noqa: PLC0415
+
+    worker = _with_sandbox(env, _FakeSandbox())
+    calls: list[str] = []
+
+    def verify() -> bool:
+        calls.append("verify")
+        return False
+
+    monkeypatch.setattr(worker, "run_verification_once", verify)
+
+    def refresh(*, sweep: bool = False) -> dict[str, object]:
+        calls.append("refresh")
+        worker.stop()
+        return {}
+
+    monkeypatch.setattr(worker, "refresh_sandbox", refresh)
+    monkeypatch.setattr(worker_module, "SANDBOX_STATUS_INTERVAL_S", 0.0)
+    worker.run_forever()
+    assert calls == ["verify", "refresh"]
