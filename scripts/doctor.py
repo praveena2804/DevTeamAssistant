@@ -19,6 +19,7 @@ import subprocess
 import sys
 from collections.abc import Callable, Mapping
 from dataclasses import asdict, dataclass
+from pathlib import Path
 from typing import Literal
 from urllib.parse import urlsplit
 
@@ -134,16 +135,133 @@ def check_ollama_server(settings: Settings, client: httpx.Client) -> Check:
         )
 
 
-def check_docker(runner: Runner) -> list[Check]:
-    cli = runner(["docker", "--version"])
-    if cli is None:
-        return [Check("docker.cli", "warn", "not found (required from Part E; decision D-07 pending)")]
-    checks = [Check("docker.cli", "ok", cli.splitlines()[0])]
-    server = runner(["docker", "info", "--format", "{{.ServerVersion}}|{{.OperatingSystem}}"])
-    if server is None:
-        checks.append(Check("docker.engine", "warn", "engine not running (needed from Part E)"))
+@dataclass(frozen=True)
+class SandboxProbe:
+    """What the doctor learned about the WSL Docker Engine (Part E). Never contains key material."""
+
+    reachable: bool
+    detail: str
+    version: str = ""
+    operating_system: str = ""
+    certificate_not_after: str = ""
+
+
+SandboxProber = Callable[[Settings], SandboxProbe]
+WSL_MEMORY_CAP_GB = 4  # D-45
+
+
+def probe_sandbox(settings: Settings) -> SandboxProbe:
+    """Connect to the engine exactly as the platform does (mutual TLS, pinned CA). Read-only."""
+    import socket  # noqa: PLC0415
+    import ssl  # noqa: PLC0415
+
+    from devteam_harness.errors import HarnessError  # noqa: PLC0415
+    from devteam_harness.sandbox.engine import connect  # noqa: PLC0415
+    from devteam_harness.sandbox.tls import build_client_context  # noqa: PLC0415
+    from devteam_harness.secrets import SecretsUnavailableError, secrets_manager_from_settings  # noqa: PLC0415
+
+    try:
+        secrets = secrets_manager_from_settings(settings)
+        with connect(settings, secrets, timeout=15) as engine:
+            info = engine.info
+        context = build_client_context(settings.sandbox_tls_dir, secrets)
+        port = int(settings.sandbox.docker_host.rsplit(":", 1)[1])
+        with (
+            socket.create_connection(("127.0.0.1", port), timeout=10) as raw,
+            context.wrap_socket(raw, server_hostname="127.0.0.1") as tls,
+        ):
+            not_after = str((tls.getpeercert() or {}).get("notAfter", ""))
+    except (HarnessError, SecretsUnavailableError, OSError, ssl.SSLError) as exc:
+        message = getattr(exc, "message", None) or type(exc).__name__
+        return SandboxProbe(False, str(message))
+    return SandboxProbe(True, "ok", info.version, info.operating_system, not_after)
+
+
+def _wslconfig_memory_gb(path: Path) -> float | None:
+    if not path.is_file():
+        return None
+    in_wsl2 = False
+    for raw in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        line = raw.split("#", 1)[0].strip()
+        if line.startswith("["):
+            in_wsl2 = line.lower() == "[wsl2]"
+        elif in_wsl2 and line.lower().startswith("memory"):
+            match = re.fullmatch(r"memory\s*=\s*([0-9.]+)\s*(gb|mb)", line.lower())
+            if match:
+                value = float(match.group(1))
+                return value if match.group(2) == "gb" else value / 1024
+    return None
+
+
+def check_sandbox(settings: Settings, prober: SandboxProber, environ: Mapping[str, str]) -> list[Check]:
+    """Part E: the WSL Docker Engine over mutual TLS (D-07 (b), D-50), the WSL memory cap (D-45), images."""
+    import datetime as _dt  # noqa: PLC0415
+
+    checks: list[Check] = []
+    if not settings.sandbox.enabled:
+        return [Check("sandbox", "warn", "disabled in configuration; sandbox work is Blocked")]
+    probe = prober(settings)
+    if probe.reachable:
+        checks.append(
+            Check(
+                "sandbox.engine",
+                "ok",
+                f"Docker Engine {probe.version} on {probe.operating_system} (mutual TLS)",
+            )
+        )
+        status: Status = "ok"
+        detail = f"valid until {probe.certificate_not_after}"
+        try:
+            expires = _dt.datetime.strptime(probe.certificate_not_after, "%b %d %H:%M:%S %Y %Z").replace(
+                tzinfo=_dt.UTC
+            )
+            if expires - _dt.datetime.now(_dt.UTC) < _dt.timedelta(days=30):
+                status, detail = (
+                    "warn",
+                    f"expires {probe.certificate_not_after}; run setup_wsl_docker.py --renew",
+                )
+        except ValueError:
+            status, detail = "warn", "could not read the certificate expiry"
+        checks.append(Check("sandbox.certificates", status, detail))
     else:
-        checks.append(Check("docker.engine", "ok", server))
+        checks.append(
+            Check(
+                "sandbox.engine",
+                "warn",
+                f"not usable: {probe.detail}. Sandbox work is Blocked until it is fixed "
+                "(start ./scripts/dev.ps1 or run scripts/setup_wsl_docker.py; "
+                "see docs/runbooks/docker-setup.md)",
+            )
+        )
+    profile = environ.get("USERPROFILE")
+    memory = _wslconfig_memory_gb(Path(profile) / ".wslconfig") if profile else None
+    if memory is None:
+        checks.append(
+            Check(
+                "sandbox.wsl_memory",
+                "warn",
+                f"no [wsl2] memory cap in .wslconfig (recommended {WSL_MEMORY_CAP_GB}GB, D-45)",
+            )
+        )
+    elif memory > WSL_MEMORY_CAP_GB:
+        checks.append(
+            Check("sandbox.wsl_memory", "warn", f"{memory:g} GB (recommended {WSL_MEMORY_CAP_GB} GB, D-45)")
+        )
+    else:
+        checks.append(Check("sandbox.wsl_memory", "ok", f"{memory:g} GB"))
+    lock = settings.sandbox_image_lock_path
+    if lock.is_file():
+        checks.append(
+            Check(
+                "sandbox.images",
+                "ok",
+                f"image lock present ({lock.name}); digests are checked before each run",
+            )
+        )
+    else:
+        checks.append(
+            Check("sandbox.images", "warn", "not built yet: uv run python scripts/build_sandbox_images.py")
+        )
     return checks
 
 
@@ -202,6 +320,7 @@ def run_checks(
     runner: Runner = run_command,
     environ: Mapping[str, str] | None = None,
     client: httpx.Client | None = None,
+    sandbox_prober: SandboxProber | None = None,
 ) -> list[Check]:
     env = os.environ if environ is None else environ
     checks = [
@@ -221,7 +340,7 @@ def run_checks(
     finally:
         if owns_client:
             http.close()
-    checks += check_docker(runner)
+    checks += check_sandbox(settings, sandbox_prober or probe_sandbox, env)
     checks += check_memory(settings)
     checks.append(check_disk(settings))
     checks.append(check_api_token(settings))

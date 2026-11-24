@@ -14,6 +14,8 @@ guardrail before they reach a model (C.4).
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 from devteam_core.contracts._base import DocumentId
@@ -24,6 +26,9 @@ from devteam_harness.tools.files import WriteOutcome
 from devteam_harness.tools.layer import ToolInvocation, ToolNotFoundError, ToolUnavailableError
 from devteam_harness.tools.registry import ToolRegistry, ToolSpec
 from devteam_state.repositories import documents
+
+if TYPE_CHECKING:
+    from devteam_harness.sandbox.service import SandboxService
 
 _BUILD = frozenset(
     {
@@ -154,7 +159,11 @@ def _search(_inv: ToolInvocation) -> SearchResult:
     raise ToolUnavailableError("project knowledge search is available from Part F (RAG)")
 
 
-def build_default_registry() -> ToolRegistry:
+def build_default_registry(sandbox: SandboxService | None = None) -> ToolRegistry:
+    """The tool catalogue. Part E adds the three execute tools; without a configured ``sandbox`` they are
+    registered but refuse every call as Blocked (fail closed), so the central policy stays consistent."""
+    from devteam_harness.sandbox.tools import blocked_tool_specs, sandbox_tool_specs  # noqa: PLC0415
+
     registry = ToolRegistry()
     registry.register(
         ToolSpec(
@@ -227,4 +236,6 @@ def build_default_registry() -> ToolRegistry:
             handler=_search,
         )
     )
+    for spec in sandbox_tool_specs(sandbox) if sandbox is not None else blocked_tool_specs():
+        registry.register(spec)
     return registry

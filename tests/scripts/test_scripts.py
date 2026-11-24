@@ -188,17 +188,57 @@ def test_doctor_warns_on_unset_ollama_limits_and_unreachable_server(isolated_set
         assert checks[key].status == "warn"  # type: ignore[attr-defined]
 
 
-def test_doctor_docker_states(isolated_settings: Settings) -> None:
-    def runner(args: list[str]) -> str | None:
-        if args[:2] == ["docker", "info"]:
-            return None  # engine stopped
-        return GOOD_TOOLS.get(args[0])
+def test_doctor_sandbox_states(isolated_settings: Settings, tmp_path: Path) -> None:
+    """Part E (D-07 (b)): the doctor checks the WSL engine over mutual TLS, not the Docker Desktop CLI."""
 
+    def down(_settings: Settings) -> doctor.SandboxProbe:
+        return doctor.SandboxProbe(False, "the Docker Engine in WSL is not reachable")
+
+    def up(_settings: Settings) -> doctor.SandboxProbe:
+        return doctor.SandboxProbe(True, "ok", "29.1.3", "Ubuntu 24.04.4 LTS", "Nov 22 16:06:00 2028 GMT")
+
+    profile = tmp_path / "profile"
+    profile.mkdir()
+    env = {**GOOD_ENV, "USERPROFILE": str(profile)}
     checks = _by_name(
-        doctor.run_checks(isolated_settings, runner=runner, environ=GOOD_ENV, client=_ollama_client(True))
+        doctor.run_checks(
+            isolated_settings,
+            runner=_fake_runner(GOOD_TOOLS),
+            environ=env,
+            client=_ollama_client(True),
+            sandbox_prober=down,
+        )
     )
-    assert checks["docker.cli"].status == "ok"  # type: ignore[attr-defined]
-    assert checks["docker.engine"].status == "warn"  # type: ignore[attr-defined]
+    assert "docker.cli" not in checks  # the Windows Docker CLI (Docker Desktop) is not used
+    assert checks["sandbox.engine"].status == "warn"  # type: ignore[attr-defined]
+    assert "Blocked" in checks["sandbox.engine"].detail  # type: ignore[attr-defined]
+    assert checks["sandbox.wsl_memory"].status == "warn"  # type: ignore[attr-defined]
+
+    (profile / ".wslconfig").write_text("[wsl2]\nmemory=4GB\nswap=2GB\n", encoding="utf-8")
+    checks = _by_name(
+        doctor.run_checks(
+            isolated_settings,
+            runner=_fake_runner(GOOD_TOOLS),
+            environ=env,
+            client=_ollama_client(True),
+            sandbox_prober=up,
+        )
+    )
+    assert checks["sandbox.engine"].status == "ok"  # type: ignore[attr-defined]
+    assert checks["sandbox.certificates"].status == "ok"  # type: ignore[attr-defined]
+    assert checks["sandbox.wsl_memory"].status == "ok"  # type: ignore[attr-defined]
+
+    (profile / ".wslconfig").write_text("[wsl2]\nmemory=8GB\n", encoding="utf-8")
+    checks = _by_name(
+        doctor.run_checks(
+            isolated_settings,
+            runner=_fake_runner(GOOD_TOOLS),
+            environ=env,
+            client=_ollama_client(True),
+            sandbox_prober=up,
+        )
+    )
+    assert checks["sandbox.wsl_memory"].status == "warn"  # type: ignore[attr-defined]
 
 
 @pytest.mark.parametrize(("text", "expected"), [("v22.20.0", (22, 20, 0)), ("uv 0.11", (0, 11)), ("x", None)])

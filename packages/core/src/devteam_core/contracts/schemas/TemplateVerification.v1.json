@@ -1,0 +1,308 @@
+{
+  "$defs": {
+    "RecipeOutcome": {
+      "additionalProperties": false,
+      "properties": {
+        "duration_ms": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Duration Ms",
+          "type": "integer"
+        },
+        "execution_id": {
+          "anyOf": [
+            {
+              "pattern": "^sbx_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Execution Id"
+        },
+        "exit_code": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Exit Code"
+        },
+        "peak_memory_mb": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Peak Memory Mb"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "maxLength": 2000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        },
+        "recipe": {
+          "pattern": "^[a-z][a-z0-9_]{2,39}$",
+          "title": "Recipe",
+          "type": "string"
+        },
+        "reports_tests": {
+          "default": false,
+          "title": "Reports Tests",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "status": {
+          "$ref": "#/$defs/SandboxExecutionStatus"
+        },
+        "tests": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TestCounts"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "recipe",
+        "status"
+      ],
+      "title": "RecipeOutcome",
+      "type": "object"
+    },
+    "SandboxExecutionStatus": {
+      "enum": [
+        "completed",
+        "failed",
+        "timed_out",
+        "oom_killed",
+        "blocked",
+        "cancelled"
+      ],
+      "title": "SandboxExecutionStatus",
+      "type": "string"
+    },
+    "TemplateVerificationStatus": {
+      "enum": [
+        "queued",
+        "running",
+        "passed",
+        "failed",
+        "blocked",
+        "stale"
+      ],
+      "title": "TemplateVerificationStatus",
+      "type": "string"
+    },
+    "TestCounts": {
+      "additionalProperties": false,
+      "properties": {
+        "errors": {
+          "minimum": 0,
+          "title": "Errors",
+          "type": "integer"
+        },
+        "failed": {
+          "minimum": 0,
+          "title": "Failed",
+          "type": "integer"
+        },
+        "passed": {
+          "minimum": 0,
+          "title": "Passed",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "skipped": {
+          "minimum": 0,
+          "title": "Skipped",
+          "type": "integer"
+        },
+        "tests": {
+          "minimum": 0,
+          "title": "Tests",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "tests",
+        "passed",
+        "failed",
+        "errors",
+        "skipped"
+      ],
+      "title": "TestCounts",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "duration_ms": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Duration Ms"
+    },
+    "finished_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Finished At"
+    },
+    "image_digests": {
+      "additionalProperties": {
+        "pattern": "^sha256:[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "propertyNames": {
+        "enum": [
+          "python_api",
+          "node_web"
+        ]
+      },
+      "title": "Image Digests",
+      "type": "object"
+    },
+    "peak_memory_mb": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Peak Memory Mb"
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "maxLength": 2000,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reason"
+    },
+    "recipes": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/RecipeOutcome"
+      },
+      "title": "Recipes",
+      "type": "array"
+    },
+    "requested_at": {
+      "format": "date-time",
+      "title": "Requested At",
+      "type": "string"
+    },
+    "requested_by": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Requested By",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "status": {
+      "$ref": "#/$defs/TemplateVerificationStatus"
+    },
+    "template_checksum": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Template Checksum"
+    },
+    "template_id": {
+      "pattern": "^[a-z][a-z0-9_]{2,63}$",
+      "title": "Template Id",
+      "type": "string"
+    },
+    "template_version": {
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "title": "Template Version",
+      "type": "string"
+    },
+    "verification_id": {
+      "pattern": "^tvf_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Verification Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "verification_id",
+    "template_id",
+    "template_version",
+    "status",
+    "requested_by",
+    "requested_at"
+  ],
+  "title": "TemplateVerification",
+  "type": "object"
+}

@@ -169,6 +169,28 @@ class OllamaProvider:
         value = self._get("/api/version").get("version")
         return value if isinstance(value, str) else "unknown"
 
+    # ------------------------------------------------------------- residency (Part E Resource Guard)
+
+    def loaded_models(self) -> tuple[str, ...]:
+        """Models currently in memory (``/api/ps``). Ollama not running means nothing is loaded."""
+        try:
+            data = self._get("/api/ps")
+        except ResourceUnavailableError:
+            return ()
+        models = data.get("models")
+        if not isinstance(models, list):
+            return ()
+        return tuple(str(m.get("name")) for m in models if isinstance(m, Mapping) and m.get("name"))
+
+    def unload(self, model: str) -> None:
+        """Ask Ollama to release a model now (``keep_alive: 0``). Never downloads or starts anything."""
+        if not isinstance(model, str) or not model:
+            return
+        try:
+            self._client.post("/api/generate", json={"model": model, "keep_alive": 0}, timeout=30.0)
+        except httpx.HTTPError:
+            return  # not running: nothing to unload
+
     def _get(self, path: str) -> Mapping[str, Any]:
         try:
             response = self._client.get(path, timeout=10.0)

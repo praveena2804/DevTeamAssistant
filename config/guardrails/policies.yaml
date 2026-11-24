@@ -39,6 +39,7 @@ roles:
       read_project_file: {read: [generated/]}
       list_project_files: {read: [generated/]}
       write_project_file: {write: [generated/database/, generated/backend/models/]}
+      request_migration_check: {}   # Part E sandbox recipe (no path, no command)
 
   backend_developer:
     stages: [build, change_request]
@@ -46,6 +47,8 @@ roles:
       read_project_file: {read: [generated/]}
       list_project_files: {read: [generated/]}
       write_project_file: {write: [generated/backend/, generated/config/]}
+      request_build: {}   # Part E sandbox recipe (no path, no command)
+      request_test_run: {}   # Part E sandbox recipe (no path, no command)
 
   frontend_developer:
     stages: [build, change_request]
@@ -53,6 +56,7 @@ roles:
       read_project_file: {read: [generated/]}
       list_project_files: {read: [generated/]}
       write_project_file: {write: [generated/frontend/]}
+      request_build: {}   # Part E sandbox recipe (no path, no command)
 
   tester:
     stages: [build, change_request]
@@ -60,6 +64,7 @@ roles:
       read_project_file: {read: [generated/]}
       list_project_files: {read: [generated/]}
       write_project_file: {write: [generated/tests/]}
+      request_test_run: {}   # Part E sandbox recipe (no path, no command)
 
   debugger_reviewer:
     stages: [build, change_request]
@@ -67,6 +72,8 @@ roles:
       read_project_file: {read: [generated/]}
       list_project_files: {read: [generated/]}
       write_project_file: {write: [generated/backend/, generated/frontend/, generated/database/, generated/config/]}
+      request_build: {}   # Part E sandbox recipe (no path, no command)
+      request_test_run: {}   # Part E sandbox recipe (no path, no command)
 
   documenter:
     stages: [delivery, change_request]

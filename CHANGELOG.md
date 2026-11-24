@@ -4,6 +4,54 @@ One section per approved part (roadmap §8). Entries are added at gate approval;
 
 **Versioning:** SemVer, pre-1.0. Each approved part bumps the minor version (Part A = 0.1.0, B = 0.2.0, …, R = 0.18.0); fixes to an approved part bump the patch version. The accepted MVP is `1.0.0-mvp`. Git tags: `vX.Y.Z` plus `part-<letter>-approved` (roadmap §16.2).
 
+## 0.5.0 — Part E: Secure Docker Sandbox and Starter Kits (G-E approved 2026-11-24)
+
+### Added (checkpoint E.1)
+
+- Docker Engine inside WSL2 (Ubuntu 24.04, Ubuntu `docker.io`, free and open source), set up by
+  `scripts/setup_wsl_docker.py`; never Docker Desktop, never a host fallback (ADR-0008)
+- Mutual TLS on `127.0.0.1:2376` with a private CA (deleted after issuance); the client key is stored only
+  encrypted and its passphrase only in Windows Credential Manager (D-50, spike S-1 passed)
+- `devteam_harness.sandbox.engine`, the only module that may import the Docker SDK (import-linter contract)
+- SQLite resource lease shared by model calls and sandbox runs (D-46); migration `0007_sandbox`
+  (`template_verifications`, `sandbox_executions`, `resource_lock`); nine sandbox contracts
+- `scripts/doctor.py` sandbox check (engine identity, certificates, lease)
+
+### Added (checkpoint E.2)
+
+- Disposable containers: `network=none`, read-only root, user 10001, all capabilities dropped,
+  `no-new-privileges`, memory/CPU/PID/time limits from the profile, a per-run volume, no host bind mounts,
+  archive copy-in/copy-out (D-48); every created container is re-inspected before start
+- Resource Guard: takes the lease, unloads Ollama models and requires free memory before a run
+- Locked images `python_api` and `node_web` (base images pinned by digest, hash-pinned Python wheels,
+  `npm ci --ignore-scripts`), built by `scripts/build_sandbox_images.py`, the only step with network;
+  licence policy check and `pip-audit`/`npm audit` on every build (spikes S-2 and S-3 passed)
+
+### Added (checkpoint E.3)
+
+- Ten fixed recipes (no arbitrary shell): `pytest_api`, `pytest_db`, `alembic_upgrade`,
+  `alembic_autogenerate`, `ruff_check`, `bandit_scan`, `static_validation`, `tsc_check`, `vitest_run`,
+  `npm_build`; results come only from parsed reports, and unexecuted tests are never reported as passed
+- Execute tools `request_build`, `request_test_run`, `request_migration_check` with per-role ceilings
+  (no agent declares them yet, D-47); Migration Runner, Test Runner and Integration Builder services
+
+### Added (checkpoint E.4)
+
+- Starter kits `react_fastapi_sqlite` and `html_fastapi_sqlite` with manifests, protected files, locked
+  dependencies and their own self-tests; template verification records (passed / failed / stale)
+
+### Added (checkpoint E.5)
+
+- The worker runs queued template verifications and keeps a sandbox status file; model calls hold the
+  shared lease
+- API: `GET /api/sandbox/status`, `GET /api/sandbox/templates`, `POST /api/sandbox/verifications`,
+  `GET /api/sandbox/verifications/{id}`; web page **Sandbox**
+
+### Fixed
+
+- `tests/security/test_audit_chain.py`: one tamper case did nothing when the hash already began with `f`
+  (failed about 1 run in 16); it now always changes the hash
+
 ## 0.4.0 — Part D: LangGraph Orchestration, Ten Agents & Head Agent Deterministic Core (G-D approved 2026-11-23)
 
 ### Added (checkpoint D.1)

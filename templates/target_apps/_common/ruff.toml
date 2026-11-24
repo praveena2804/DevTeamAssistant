@@ -1,0 +1,15 @@
+# Lint rules for the generated application (checked by the ruff_check recipe in the sandbox).
+line-length = 110
+target-version = "py312"
+src = ["backend"]  # the application package `app` lives in backend/
+
+[lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM"]
+ignore = ["B008"]  # FastAPI dependencies are declared as default arguments
+
+[lint.per-file-ignores]
+"tests/**" = ["S101"]
+"backend/alembic/versions/*" = ["E501"]
+
+[lint.isort]
+known-third-party = ["alembic"]  # backend/alembic is the migrations folder, not a package

@@ -42,6 +42,7 @@ from devteam_core.contracts.tools import ToolCall, ToolOutcome, ToolResult
 from devteam_core.errors import ConfigError, DevTeamError
 from devteam_core.ids import new_id
 from devteam_core.logging import redact_text, secret_registry
+from devteam_harness.errors import HarnessError
 from devteam_harness.guardrails.policy import Access, AuditSink, PolicyEngine, PolicyRequest
 from devteam_harness.iam.principals import AgentPrincipal
 from devteam_harness.tools.files import ControlledFileService, FileLimitError, FileSafetyError
@@ -325,6 +326,10 @@ class ToolLayer:
                 "tool.not_available",
                 exc.message,
             )
+        except HarnessError as exc:
+            # Part E: a categorised harness error (waiting for resources, a policy refusal inside the
+            # handler, a Blocked sandbox) keeps its own category instead of becoming a generic failure.
+            return self._fail(call, ctx, spec, summary, started, exc.category, exc.code, exc.message)
         except Exception as exc:
             return self._fail(
                 call, ctx, spec, summary, started, ErrorCategory.FATAL, "tool.failed", type(exc).__name__

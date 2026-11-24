@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "generated_at": "2026-11-23T17:44:40+00:00",
+  "engine": "29.1.3",
+  "images": {
+    "python_api": {
+      "tag": "devteam-sandbox/python_api:1",
+      "image_id": "sha256:4e10191d7f744ddf807b813feeb4d56051aa1c7a1a37d9c88e6f619d6cf25891",
+      "dockerfile_sha256": "7aa528865f5083166699d5f85aa20c8968de53be3dfa810d1b8f4615fcef407f",
+      "lock_sha256": "04c97eb4885d8c4cb9afd1e7504a39d0b2805029aa5cefa5ab386a0b9f93dc15",
+      "packages_by_tier": {
+        "1": 87,
+        "2": 1,
+        "3": 18,
+        "4": 17
+      },
+      "reviewed_tier3": [
+        "certifi"
+      ],
+      "audit": {
+        "tool": "pip-audit",
+        "status": "clean",
+        "vulnerabilities": [],
+        "checked": 35
+      }
+    },
+    "node_web": {
+      "tag": "devteam-sandbox/node_web:1",
+      "image_id": "sha256:95620d56d3ae37a11c70a920c3acaf1dbf7f4f8839751d1abf08721c81f4a47c",
+      "dockerfile_sha256": "04c763de37af0343e7b35a000d453af1dcf23fed1aa94d167d8b7add668b110d",
+      "lock_sha256": "7d5728a8a92c3e25abbcbff12c0735539c88c81d8ea36627401ba3cae5078b1e",
+      "packages_by_tier": {
+        "1": 88,
+        "2": 0,
+        "3": 80,
+        "4": 3
+      },
+      "reviewed_tier3": [
+        "lightningcss",
+        "lightningcss-linux-x64-gnu",
+        "lightningcss-linux-x64-musl"
+      ],
+      "audit": {
+        "tool": "npm audit",
+        "status": "clean",
+        "vulnerabilities": {},
+        "advisories": []
+      }
+    }
+  }
+}

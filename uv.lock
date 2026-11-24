@@ -298,7 +298,7 @@ wheels = [
 
 [[package]]
 name = "devteam-agent-architect"
-version = "0.4.0"
+version = "0.5.0"
 source = { editable = "agents/architect" }
 dependencies = [
     { name = "devteam-core" },
@@ -313,7 +313,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-agent-backend-developer"
-version = "0.4.0"
+version = "0.5.0"
 source = { editable = "agents/backend_developer" }
 dependencies = [
     { name = "devteam-core" },
@@ -328,7 +328,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-agent-brd-analyst"
-version = "0.4.0"
+version = "0.5.0"
 source = { editable = "agents/brd_analyst" }
 dependencies = [
     { name = "devteam-core" },
@@ -343,7 +343,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-agent-database-developer"
-version = "0.4.0"
+version = "0.5.0"
 source = { editable = "agents/database_developer" }
 dependencies = [
     { name = "devteam-core" },
@@ -358,7 +358,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-agent-debugger-reviewer"
-version = "0.4.0"
+version = "0.5.0"
 source = { editable = "agents/debugger_reviewer" }
 dependencies = [
     { name = "devteam-core" },
@@ -373,7 +373,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-agent-documenter"
-version = "0.4.0"
+version = "0.5.0"
 source = { editable = "agents/documenter" }
 dependencies = [
     { name = "devteam-core" },
@@ -388,7 +388,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-agent-frontend-developer"
-version = "0.4.0"
+version = "0.5.0"
 source = { editable = "agents/frontend_developer" }
 dependencies = [
     { name = "devteam-core" },
@@ -403,7 +403,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-agent-head"
-version = "0.4.0"
+version = "0.5.0"
 source = { editable = "agents/head" }
 dependencies = [
     { name = "devteam-core" },
@@ -418,7 +418,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-agent-requirements-finalizer"
-version = "0.4.0"
+version = "0.5.0"
 source = { editable = "agents/requirements_finalizer" }
 dependencies = [
     { name = "devteam-core" },
@@ -433,7 +433,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-agent-tester"
-version = "0.4.0"
+version = "0.5.0"
 source = { editable = "agents/tester" }
 dependencies = [
     { name = "devteam-core" },
@@ -448,7 +448,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-ai"
-version = "0.4.0"
+version = "0.5.0"
 source = { virtual = "." }
 dependencies = [
     { name = "devteam-agent-architect" },
@@ -523,7 +523,7 @@ dev = [
 
 [[package]]
 name = "devteam-api"
-version = "0.4.0"
+version = "0.5.0"
 source = { editable = "apps/api" }
 dependencies = [
     { name = "devteam-core" },
@@ -550,7 +550,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-core"
-version = "0.4.0"
+version = "0.5.0"
 source = { editable = "packages/core" }
 dependencies = [
     { name = "pydantic" },
@@ -569,11 +569,12 @@ requires-dist = [
 
 [[package]]
 name = "devteam-harness"
-version = "0.4.0"
+version = "0.5.0"
 source = { editable = "packages/harness" }
 dependencies = [
     { name = "devteam-core" },
     { name = "devteam-state" },
+    { name = "docker" },
     { name = "keyring" },
     { name = "opentelemetry-api" },
     { name = "opentelemetry-sdk" },
@@ -584,6 +585,7 @@ dependencies = [
 requires-dist = [
     { name = "devteam-core", editable = "packages/core" },
     { name = "devteam-state", editable = "packages/state" },
+    { name = "docker", specifier = ">=7.1,<8" },
     { name = "keyring", specifier = ">=25,<26" },
     { name = "opentelemetry-api", specifier = ">=1.27,<2" },
     { name = "opentelemetry-sdk", specifier = ">=1.27,<2" },
@@ -592,7 +594,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-orchestration"
-version = "0.4.0"
+version = "0.5.0"
 source = { editable = "packages/orchestration" }
 dependencies = [
     { name = "devteam-agent-architect" },
@@ -635,7 +637,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-services"
-version = "0.4.0"
+version = "0.5.0"
 source = { editable = "packages/services" }
 dependencies = [
     { name = "charset-normalizer" },
@@ -660,7 +662,7 @@ requires-dist = [
 
 [[package]]
 name = "devteam-state"
-version = "0.4.0"
+version = "0.5.0"
 source = { editable = "packages/state" }
 dependencies = [
     { name = "alembic" },
@@ -677,12 +679,13 @@ requires-dist = [
 
 [[package]]
 name = "devteam-worker"
-version = "0.4.0"
+version = "0.5.0"
 source = { editable = "apps/worker" }
 dependencies = [
     { name = "devteam-core" },
     { name = "devteam-harness" },
     { name = "devteam-orchestration" },
+    { name = "devteam-services" },
     { name = "devteam-state" },
     { name = "psutil" },
 ]
@@ -692,6 +695,7 @@ requires-dist = [
     { name = "devteam-core", editable = "packages/core" },
     { name = "devteam-harness", editable = "packages/harness" },
     { name = "devteam-orchestration", editable = "packages/orchestration" },
+    { name = "devteam-services", editable = "packages/services" },
     { name = "devteam-state", editable = "packages/state" },
     { name = "psutil", specifier = ">=6.1,<8" },
 ]
@@ -712,6 +716,20 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/fc/f8/98eea607f65de6527f8a2e8885fc8015d3e6f5775df186e443e0964a11c3/distro-1.9.0.tar.gz", hash = "sha256:2fa77c6fd8940f116ee1d6b94a2f90b13b5ea8d019b98bc8bafdcabcdd9bdbed", size = 60722, upload-time = "2023-12-24T09:54:32.31Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/12/b3/231ffd4ab1fc9d679809f356cebee130ac7daa00d6d6f3206dd4fd137e9e/distro-1.9.0-py3-none-any.whl", hash = "sha256:7bffd925d65168f85027d8da9af6bddab658135b840670a223589bc0c8ef02b2", size = 20277, upload-time = "2023-12-24T09:54:30.421Z" },
+]
+
+[[package]]
+name = "docker"
+version = "7.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pywin32", marker = "sys_platform == 'win32'" },
+    { name = "requests" },
+    { name = "urllib3" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/88/7f/731ff914b0255d3d065f45fd4e626d4b8c95dbcbaada049f337a6ac16410/docker-7.2.0.tar.gz", hash = "sha256:cebb93773d334f778e023a7ee352a8d6e13ab1bd3b863a4d4a59dec897df43ac", size = 118731, upload-time = "2026-07-09T14:53:46.39Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/75/23/529140fe1aab80fc6992f93a706deec709140a6397439139a054e1515c45/docker-7.2.0-py3-none-any.whl", hash = "sha256:a3f45fdeb9165e2d25d9a1d02ddf3bc70fb572cf5ebbf9b58558c22caf29b71f", size = 148775, upload-time = "2026-07-09T14:53:45.224Z" },
 ]
 
 [[package]]
@@ -1669,6 +1687,16 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/7e/c0/c753d487a83d873f6946cee6cbc26cea3fe59a476ad0de99a14938a2fbd8/python_multipart-0.0.34.tar.gz", hash = "sha256:b998ae90ca6e1e363261ce2e0e230281b8af53867b757970abd69ee9edcd843a", size = 52456, upload-time = "2026-11-16T10:40:38.261Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f5/0e/090c52b122d8ec5fa37942c1410fea9cf04ce98bca0c84dde7f0aa11594d/python_multipart-0.0.34-py3-none-any.whl", hash = "sha256:ebacd224bd686eee2f9aa1066a657affe07435a185834e05e5235e2e59173e91", size = 32585, upload-time = "2026-11-16T10:40:37.119Z" },
+]
+
+[[package]]
+name = "pywin32"
+version = "312"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/83/ff/32aa7d2ed0ab12b323aaa64f9b75e6ad4f8fd09f9ccfc28c79414d46838d/pywin32-312-cp312-cp312-win32.whl", hash = "sha256:dab4f65ac9c4e48400a2a0530c46c3c579cd5905ecd11b80692373915269208b", size = 6371877, upload-time = "2026-06-04T07:49:28.836Z" },
+    { url = "https://files.pythonhosted.org/packages/03/d9/77040d3b43df3f3be32ea289433d660d2727f5ba327bc73be835127d9d60/pywin32-312-cp312-cp312-win_amd64.whl", hash = "sha256:b457f6d628a47e8a7346ce22acb7e1a46a4a78b52e1d17e1af56871bd19a93bc", size = 6914841, upload-time = "2026-06-04T07:49:31.85Z" },
+    { url = "https://files.pythonhosted.org/packages/e3/cc/7b1ec671775756020a0ee7f4feeaf3c568f0ab86bd3900088cf986937a92/pywin32-312-cp312-cp312-win_arm64.whl", hash = "sha256:6017c58e12f6809fbb0555b75df144c2922a9ffd18e4b9b5afa863b6c1a9d950", size = 6727901, upload-time = "2026-06-04T07:49:34.244Z" },
 ]
 
 [[package]]

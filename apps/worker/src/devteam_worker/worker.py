@@ -15,6 +15,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 import threading
 import time
@@ -26,16 +27,21 @@ import psutil
 from sqlalchemy import select
 
 from devteam_core.contracts.events import MetricSample
+from devteam_core.contracts.sandbox import TemplateVerificationStatus
 from devteam_core.contracts.statuses import RunStatus
 from devteam_core.ids import new_id
 from devteam_core.logging import get_logger
 from devteam_orchestration.execution import Advance, advance
 from devteam_orchestration.runtime import Runtime
+from devteam_services.templates import refresh_stale, run_verification
 from devteam_state.models import Run, RunJob
 from devteam_state.repositories import audit
 from devteam_state.repositories import orchestration as orch
+from devteam_state.repositories import sandbox as sandbox_repo
 
 WORKER = "service:run_worker"
+SANDBOX_STATUS_FILE = "sandbox_status.json"  # under data/; read by the API (the API never contacts Docker)
+SANDBOX_STATUS_INTERVAL_S = 60.0
 _log = get_logger("devteam_worker")
 R = RunStatus
 
@@ -58,6 +64,7 @@ class Worker:
         self._lost = threading.Event()
         self._current_run: tuple[str, str] | None = None
         self._heartbeat: threading.Thread | None = None
+        self._sandbox_checked = 0.0
 
     # ------------------------------------------------------------------------------------ lease
 
@@ -97,6 +104,7 @@ class Worker:
             _log.warning("worker_refused_lease_held")
             return False
         self.recover()
+        self.refresh_sandbox(sweep=True)
         self._heartbeat = threading.Thread(target=self._beat, name="devteam-heartbeat", daemon=True)
         self._heartbeat.start()
         return True
@@ -241,5 +249,73 @@ class Worker:
 
     def run_forever(self) -> None:
         while not self.stopping:
-            if self.run_once() is None:
+            if self.run_once() is None and not self.run_verification_once():
+                if time.monotonic() - self._sandbox_checked >= SANDBOX_STATUS_INTERVAL_S:
+                    self.refresh_sandbox()
                 self._stop.wait(self.settings.poll_interval_s)
+
+    # ------------------------------------------------------------------------- sandbox (Part E)
+
+    def refresh_sandbox(self, *, sweep: bool = False) -> dict[str, Any]:
+        """Check the WSL engine (and, at start, remove leftovers of crashed runs); write the status file the
+        API reads, so the API itself never contacts Docker."""
+        sandbox = self.rt.sandbox
+        status: dict[str, Any] = {"configured": sandbox is not None}
+        if sandbox is not None:
+            status.update(sandbox.engine_status())
+            if sweep and status.get("reachable"):
+                removed = sandbox.sweep()
+                status["swept"] = list(removed) if removed else [0, 0]
+                if removed and any(removed):
+                    with self.rt.sessions.begin() as session:
+                        audit.append(
+                            session,
+                            action="sandbox.swept",
+                            outcome="success",
+                            principal_id=WORKER,
+                            details={"containers": removed[0], "volumes": removed[1]},
+                            clock=self.rt.clock,
+                        )
+            if sweep:
+                try:
+                    status["stale_marked"] = refresh_stale(self.rt.settings, self.rt.sessions)
+                except Exception:  # sandbox housekeeping must never stop the run worker
+                    _log.exception("sandbox_stale_refresh_failed")
+                    status["stale_marked"] = None
+        status["checked_at"] = self.rt.clock.now().isoformat(timespec="seconds")
+        target = self.rt.settings.data_dir / SANDBOX_STATUS_FILE
+        target.parent.mkdir(parents=True, exist_ok=True)
+        temporary = target.with_suffix(".tmp")
+        temporary.write_text(json.dumps(status, indent=2), encoding="utf-8")
+        temporary.replace(target)
+        self._sandbox_checked = time.monotonic()
+        return status
+
+    def run_verification_once(self) -> bool:
+        """Run one queued starter-kit verification (D-49), if any. Runs are always served first."""
+        sandbox = self.rt.sandbox
+        if sandbox is None:
+            return False
+        with self.rt.sessions.begin() as session:
+            verification = sandbox_repo.claim_next_verification(session, clock=self.rt.clock)
+        if verification is None:
+            return False
+        _log.info("verification_started", verification_id=verification.verification_id)
+        try:
+            result = run_verification(
+                verification, sandbox, self.rt.settings, self.rt.sessions, clock=self.rt.clock
+            )
+        except Exception as exc:
+            _log.exception("verification_failed", verification_id=verification.verification_id)
+            blocked = verification.model_copy(
+                update={
+                    "status": TemplateVerificationStatus.BLOCKED,
+                    "finished_at": self.rt.clock.now(),
+                    "reason": f"the verification stopped with an error ({type(exc).__name__})",
+                }
+            )
+            with self.rt.sessions.begin() as session:
+                sandbox_repo.finish_verification(session, blocked)
+            return True
+        _log.info("verification_done", verification_id=result.verification_id, status=result.status.value)
+        return True

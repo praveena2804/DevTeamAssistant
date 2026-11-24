@@ -1,0 +1,64 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "cpus": {
+      "exclusiveMinimum": 0,
+      "maximum": 8,
+      "title": "Cpus",
+      "type": "number"
+    },
+    "memory_mb": {
+      "maximum": 8192,
+      "minimum": 64,
+      "title": "Memory Mb",
+      "type": "integer"
+    },
+    "output_kb": {
+      "maximum": 16384,
+      "minimum": 1,
+      "title": "Output Kb",
+      "type": "integer"
+    },
+    "pids": {
+      "maximum": 4096,
+      "minimum": 16,
+      "title": "Pids",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "tmpfs_mb": {
+      "maximum": 2048,
+      "minimum": 16,
+      "title": "Tmpfs Mb",
+      "type": "integer"
+    },
+    "wall_clock_s": {
+      "maximum": 3600,
+      "minimum": 1,
+      "title": "Wall Clock S",
+      "type": "integer"
+    },
+    "work_copy_mb": {
+      "maximum": 4096,
+      "minimum": 1,
+      "title": "Work Copy Mb",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "memory_mb",
+    "cpus",
+    "pids",
+    "wall_clock_s",
+    "tmpfs_mb",
+    "work_copy_mb",
+    "output_kb"
+  ],
+  "title": "ContainerLimits",
+  "type": "object"
+}

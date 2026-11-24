@@ -196,6 +196,53 @@ class OrchestrationSettings(_Section):
         return self
 
 
+class SandboxLimits(_Section):
+    """HC-14 container ceilings for one sandbox run (Part E plan §3.2). Recipes may only ask for less."""
+
+    memory_mb: int = Field(default=1536, ge=256, le=8192)  # hard limit; swap is never added on top
+    cpus: float = Field(default=1.5, gt=0, le=8)
+    pids: int = Field(default=256, ge=32, le=4096)
+    wall_clock_s: int = Field(default=600, ge=10, le=3600)  # watchdog kills, then the container is removed
+    tmpfs_mb: int = Field(default=256, ge=16, le=2048)  # /tmp, noexec
+    work_copy_mb: int = Field(default=512, ge=16, le=4096)  # most bytes copied into /work
+    output_kb: int = Field(default=1024, ge=16, le=16_384)  # stdout / stderr kept per stream
+
+
+_DISTRO = r"^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+
+
+class SandboxSettings(_Section):
+    """HC-14 Docker sandbox (Part E plan §3.2, §3.10, §3.11; D-07 (b), D-45, D-46, D-50).
+
+    The engine runs inside WSL2 and is reached only on loopback with mutual TLS. There is no setting
+    for the container network, user, root filesystem or mounts: those are fixed in code.
+    """
+
+    enabled: bool = True
+    docker_host: str = "tcp://127.0.0.1:2376"
+    wsl_distribution: str = Field(default="Ubuntu-24.04", pattern=_DISTRO)  # doctor and scripts only
+    min_free_ram_mb: int = Field(default=2048, ge=256, le=16_384)
+    unload_models_before_run: bool = True
+    lock_ttl_s: float = Field(default=120.0, ge=10, le=3600)  # D-46: a resource lease older than this is dead
+    lock_wait_s: float = Field(
+        default=900.0, ge=1, le=7200
+    )  # wait this long for the lease, then wait for resources
+    image_lock_path: Path = Path("sandbox/images/images.lock.json")
+    limits: SandboxLimits = Field(default_factory=SandboxLimits)
+
+    @field_validator("docker_host")
+    @classmethod
+    def _loopback_tls_endpoint(cls, value: str) -> str:
+        # D-50: only the WSL engine's mutual-TLS listener on IPv4 loopback. Plain TCP to a remote host,
+        # Unix sockets, named pipes (Docker Desktop) and SSH are refused at load time.
+        parts = urlsplit(value)
+        if parts.scheme != "tcp" or parts.hostname != "127.0.0.1" or parts.port is None:
+            raise ValueError("sandbox.docker_host must be tcp://127.0.0.1:<port> (mutual TLS, D-50)")
+        if parts.username or parts.password or parts.path not in {"", "/"} or parts.query:
+            raise ValueError("sandbox.docker_host must be exactly tcp://127.0.0.1:<port>")
+        return f"tcp://127.0.0.1:{parts.port}"
+
+
 class Settings(_Section):
     profile: ProfileName = "low_memory"
     root: Path
@@ -211,6 +258,7 @@ class Settings(_Section):
     files: FileToolSettings = FileToolSettings()
     ratelimit: RateLimitSettings = RateLimitSettings()
     orchestration: OrchestrationSettings = OrchestrationSettings()
+    sandbox: SandboxSettings = SandboxSettings()
 
     @model_validator(mode="after")
     def _memory_secrets_only_in_tests(self) -> Self:
@@ -246,6 +294,15 @@ class Settings(_Section):
     @property
     def api_token_path(self) -> Path:
         return self.data_dir / self.auth.token_file
+
+    @property
+    def sandbox_tls_dir(self) -> Path:
+        """Client certificate, encrypted client key and CA certificate for the engine (D-50)."""
+        return self.data_dir / "sandbox_tls"
+
+    @property
+    def sandbox_image_lock_path(self) -> Path:
+        return self._resolve(self.sandbox.image_lock_path)
 
     def _resolve(self, value: Path) -> Path:
         return value if value.is_absolute() else (self.root / value).resolve()

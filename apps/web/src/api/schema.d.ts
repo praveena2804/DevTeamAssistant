@@ -368,6 +368,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/sandbox/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Sandbox.Status */
+        get: operations["sandbox_status_api_sandbox_status_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sandbox/templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Sandbox.Templates */
+        get: operations["sandbox_templates_api_sandbox_templates_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sandbox/templates/{template_id}/verifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sandbox.Verification Request */
+        post: operations["sandbox_verification_request_api_sandbox_templates__template_id__verifications_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sandbox/verifications/{verification_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Sandbox.Verification */
+        get: operations["sandbox_verification_api_sandbox_verifications__verification_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/session": {
         parameters: {
             query?: never;
@@ -739,6 +807,17 @@ export interface components {
              */
             ts: string;
         };
+        /** ImageOut */
+        ImageOut: {
+            /** Audit */
+            audit: string;
+            /** Image Id */
+            image_id: string;
+            /** Name */
+            name: string;
+            /** Tag */
+            tag: string;
+        };
         /** MetricsOut */
         MetricsOut: {
             /** Input Tokens */
@@ -817,6 +896,22 @@ export interface components {
             description?: string | null;
             /** Name */
             name?: string | null;
+        };
+        /** RecipeOutcomeOut */
+        RecipeOutcomeOut: {
+            /** Duration Ms */
+            duration_ms: number;
+            /** Exit Code */
+            exit_code: number | null;
+            /** Peak Memory Mb */
+            peak_memory_mb: number | null;
+            /** Reason */
+            reason: string | null;
+            /** Recipe */
+            recipe: string;
+            /** Status */
+            status: string;
+            tests: components["schemas"]["TestCountsOut"] | null;
         };
         /** RunDetail */
         RunDetail: {
@@ -939,6 +1034,25 @@ export interface components {
              */
             run_kind: "initial" | "change_request";
         };
+        /** SandboxStatusOut */
+        SandboxStatusOut: {
+            /** Checked At */
+            checked_at?: string | null;
+            /** Configured */
+            configured: boolean;
+            /** Engine Version */
+            engine_version?: string | null;
+            /** Images */
+            images: components["schemas"]["ImageOut"][];
+            /** Lock Holder */
+            lock_holder?: ("llm" | "sandbox") | null;
+            /** Operating System */
+            operating_system?: string | null;
+            /** Reachable */
+            reachable: boolean | null;
+            /** Reason */
+            reason?: string | null;
+        };
         /** SessionInfo */
         SessionInfo: {
             /** Display Name */
@@ -1006,6 +1120,33 @@ export interface components {
             /** Task Id */
             task_id: string;
         };
+        /** TemplateOut */
+        TemplateOut: {
+            /** Description */
+            description: string;
+            /** Frontend */
+            frontend: string;
+            latest: components["schemas"]["VerificationOut"] | null;
+            /** Self Test */
+            self_test: string[];
+            /** Template Id */
+            template_id: string;
+            /** Version */
+            version: string;
+        };
+        /** TestCountsOut */
+        TestCountsOut: {
+            /** Errors */
+            errors: number;
+            /** Failed */
+            failed: number;
+            /** Passed */
+            passed: number;
+            /** Skipped */
+            skipped: number;
+            /** Tests */
+            tests: number;
+        };
         /** TraceOut */
         TraceOut: {
             /** Run Id */
@@ -1036,6 +1177,34 @@ export interface components {
             msg: string;
             /** Error Type */
             type: string;
+        };
+        /** VerificationOut */
+        VerificationOut: {
+            /** Duration Ms */
+            duration_ms: number | null;
+            /** Finished At */
+            finished_at: string | null;
+            /** Peak Memory Mb */
+            peak_memory_mb: number | null;
+            /** Reason */
+            reason: string | null;
+            /** Recipes */
+            recipes: components["schemas"]["RecipeOutcomeOut"][];
+            /**
+             * Requested At
+             * Format: date-time
+             */
+            requested_at: string;
+            /** Requested By */
+            requested_by: string;
+            /** Status */
+            status: string;
+            /** Template Id */
+            template_id: string;
+            /** Template Version */
+            template_version: string;
+            /** Verification Id */
+            verification_id: string;
         };
         /** VersionResponse */
         VersionResponse: {
@@ -2765,6 +2934,243 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TraceOut"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Origin or role not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    sandbox_status_api_sandbox_status_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SandboxStatusOut"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Origin or role not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    sandbox_templates_api_sandbox_templates_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TemplateOut"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Origin or role not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    sandbox_verification_request_api_sandbox_templates__template_id__verifications_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VerificationOut"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Origin or role not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Already queued or running */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    sandbox_verification_api_sandbox_verifications__verification_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                verification_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VerificationOut"];
                 };
             };
             /** @description Not signed in */

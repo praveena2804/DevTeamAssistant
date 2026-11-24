@@ -1,0 +1,29 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "node": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Node",
+      "type": "array"
+    },
+    "python": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Python",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    }
+  },
+  "title": "TemplateDependencies",
+  "type": "object"
+}

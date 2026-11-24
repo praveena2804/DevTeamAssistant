@@ -80,3 +80,21 @@ orchestration:                       # HC-07/HC-19 run worker (Part D plan §3.6
   lease_ttl_s: 30                    # a worker lease older than this counts as dead
   max_crash_resumes: 3               # D-40: more consecutive crash-interrupted attempts -> task Blocked
   resource_wait_s: 60                # retry delay while WAITING_FOR_RESOURCES
+
+sandbox:                             # HC-14 Docker sandbox (Part E; D-07 (b) Docker Engine in WSL2)
+  enabled: true
+  docker_host: tcp://127.0.0.1:2376  # D-50: WSL engine, loopback + mutual TLS only (nothing else accepted)
+  wsl_distribution: Ubuntu-24.04     # used by the doctor and owner-run scripts only
+  min_free_ram_mb: 2048              # below this, sandbox work waits for resources
+  unload_models_before_run: true     # Spec §7.2: never an LLM and a container at the same time
+  lock_ttl_s: 120                    # D-46 resource lease: older than this = holder died
+  lock_wait_s: 900
+  image_lock_path: sandbox/images/images.lock.json
+  limits:                            # ceilings per container (plan §3.2, low_memory values)
+    memory_mb: 1536
+    cpus: 1.5
+    pids: 256
+    wall_clock_s: 600
+    tmpfs_mb: 256
+    work_copy_mb: 512
+    output_kb: 1024

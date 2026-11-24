@@ -1,0 +1,75 @@
+# Licence policy for the sandbox images (Part E plan §12.3, approved AP-021). Applied automatically by
+# scripts/build_sandbox_images.py at every image build and re-checked by tests/contract/test_sandbox_images.py.
+#
+# Tier 1  operating-system packages of the pinned Debian base image: any free licence, incl. GPL/LGPL.
+#         Recorded (package, version, copyright file), never modified. Images are used only on this
+#         laptop and never distributed; distributing them would need a separate decision.
+# Tier 2  language runtimes and the base image's own Python/Node packages (CPython, pip, Node.js, npm).
+# Tier 3  packages installed for build/test/check recipes.
+# Tier 4  application runtime dependencies that travel with every generated app: permissive only.
+# Unknown or unlisted licences fail the build; nothing is accepted by default.
+
+permissive:            # canonical identifiers accepted in tiers 2-4
+  - MIT
+  - MIT-0
+  - BSD
+  - BSD-2-Clause
+  - BSD-3-Clause
+  - Apache-2.0
+  - ISC
+  - PSF-2.0
+  - Python-2.0
+  - 0BSD
+  - Unlicense
+  - CC0-1.0
+  - BlueOak-1.0.0
+  - Zlib
+  - Artistic-2.0       # npm itself (tier 2) and a few npm packages
+
+tier3_review:          # allowed in tier 3 only as unmodified, separate packages; each listed below
+  - MPL-2.0
+  - LGPL-2.1-or-later
+  - LGPL-3.0-or-later
+
+refused_markers:       # any identifier containing one of these is refused in tiers 2-4
+  - AGPL
+  - GPL-2.0-only
+  - GPL-2.0-or-later
+  - GPL-3.0
+  - SSPL
+  - BUSL
+  - Commons-Clause
+  - Elastic
+  - proprietary
+  - UNLICENSED
+
+# Normalisation of package metadata (classifiers and free text) to the identifiers above.
+aliases:
+  "MIT License": MIT
+  "MIT license": MIT
+  "BSD License": BSD
+  "BSD": BSD
+  "Apache Software License": Apache-2.0
+  "Apache License 2.0": Apache-2.0
+  "Apache 2.0": Apache-2.0
+  "Apache-2": Apache-2.0
+  "Python Software Foundation License": PSF-2.0
+  "PSF": PSF-2.0
+  "PSF License": PSF-2.0
+  "Mozilla Public License 2.0 (MPL 2.0)": MPL-2.0
+  "ISC License (ISCL)": ISC
+  "The Unlicense (Unlicense)": Unlicense
+  "CC0 1.0 Universal (CC0 1.0) Public Domain Dedication": CC0-1.0
+
+# Tier-3 packages under a tier3_review licence, each reviewed (owner-visible in the image licence report).
+tier3_reviewed:
+  certifi: "MPL-2.0. CA bundle used by httpx in tests only; unmodified wheel. Same package and terms as the platform (KI-026)."
+  lightningcss: "MPL-2.0. CSS transformer/minifier used by Vite 8 at build time only; unmodified npm package; its code is not copied into generated apps (KI-037, listed for owner review)."
+  lightningcss-linux-x64-gnu: "MPL-2.0. Native binary of lightningcss for Linux (glibc); build time only; unmodified (KI-037)."
+  lightningcss-linux-x64-musl: "MPL-2.0. Native binary of lightningcss for Linux (musl), installed by npm alongside the glibc build; unused on Debian; unmodified (KI-037)."
+
+# Tier 4: runtime dependencies of the generated applications (and their own runtime dependencies).
+tier4:
+  python: [fastapi, starlette, pydantic, pydantic-core, annotated-types, annotated-doc, typing-extensions,
+           typing-inspection, anyio, idna, uvicorn, h11, click, sqlalchemy, alembic, mako, markupsafe]
+  node: [react, react-dom, scheduler]

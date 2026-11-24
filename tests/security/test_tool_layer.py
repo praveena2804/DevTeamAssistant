@@ -533,6 +533,10 @@ def test_every_spec_declares_the_spec_11_2_attributes() -> None:
         "write_project_file",
         "read_extracted_document",
         "search_project_knowledge",
+        # Part E (DV-025): allowlisted sandbox recipes; no path, no command, never a shell
+        "request_build",
+        "request_test_run",
+        "request_migration_check",
     }
     assert not any("shell" in n or "exec" in n for n in names)
 

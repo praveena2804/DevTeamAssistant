@@ -55,6 +55,7 @@ MPL-2.0 is a file-level copyleft licence. Its conditions attach to the MPL-licen
 | click | 8.5.1 | BSD-3-Clause |
 | cryptography | 50.0.2 | Apache-2.0 OR BSD-3-Clause |
 | distro | 1.9.0 | Apache Software License |
+| docker | 7.2.0 | Apache-2.0 |
 | fastapi | 0.165.0 | MIT |
 | h11 | 0.16.0 | MIT License |
 | httpcore | 1.0.9 | BSD-3-Clause |
@@ -101,6 +102,7 @@ MPL-2.0 is a file-level copyleft licence. Its conditions attach to the MPL-licen
 | python-dotenv | 1.2.4 | BSD-3-Clause |
 | python-multipart | 0.0.34 | Apache-2.0 |
 | pywin32-ctypes | 0.2.3 | BSD-3-Clause |
+| pywin32 | 312 | Python Software Foundation License |
 | PyYAML | 6.0.3 | MIT License |
 | requests | 2.34.2 | Apache Software License |
 | requests-toolbelt | 1.0.0 | Apache Software License |
@@ -120,3 +122,23 @@ MPL-2.0 is a file-level copyleft licence. Its conditions attach to the MPL-licen
 | websockets | 17.4 | BSD-3-Clause |
 | xxhash | 4.1.0 | BSD-2-Clause |
 | zstandard | 0.25.0 | BSD-3-Clause |
+
+## 3. Sandbox images (Part E)
+
+The two sandbox images are **built and used only on this machine** (`scripts/build_sandbox_images.py`); they are never pushed to a registry or distributed. Licences are handled in tiers (`sandbox/images/licence_policy.yaml`, Part E plan §12.3, approved AP-021). The full per-package list is `sandbox/images/licence_report.json`; `tests/contract/test_sandbox_images.py` re-checks it against the policy on every test run.
+
+| Tier | What | Rule | `python_api` | `node_web` |
+|---|---|---|---|---|
+| 1 | Debian packages of the pinned base image | Any free licence, **including GPL/LGPL** (e.g. `bash`, `coreutils`, `glibc`); unmodified; copyright files kept in `/usr/share/doc` | 87 | 88 |
+| 2 | Runtimes and the base image's own packages (CPython PSF-2.0, `pip` MIT; Node.js MIT, npm Artistic-2.0) | Permissive | 1 | Node.js and npm (not listed separately) |
+| 3 | Build/test/check tools installed for recipes | Permissive; MPL-2.0 or LGPL only as unmodified separate packages listed for review | 18 | 80 |
+| 4 | Runtime dependencies that travel with every generated app | Permissive only | 17 | 3 |
+
+**Tier-3 MPL-2.0 packages listed for the owner's review** (unmodified, not copied into generated apps):
+
+| Package | Image | Why it is there |
+|---|---|---|
+| `certifi` | `python_api` | CA bundle used by `httpx` in generated tests only (same package and terms as the platform, KI-026) |
+| `lightningcss` (+ `-linux-x64-gnu`, `-linux-x64-musl`) | `node_web` | CSS transformer/minifier that Vite 8 runs at build time (KI-037) |
+
+**Obligations.** The images are not distributed, so neither the GPL/LGPL source-offer obligations of the tier-1 packages nor the MPL-2.0 executable-form obligations are triggered. Distributing an image would need a separate decision and would then require these notices and pointers to the corresponding source. Nothing is modified. Vulnerability audits (`pip-audit`, `npm audit`) run on the locked dependency lists at every image build; the result is stored in `sandbox/images/images.lock.json` (both **clean** at the 2026-11-23 build).

@@ -33,6 +33,9 @@ export type RunTrace = Schemas["TraceOut"];
 export type Span = Schemas["SpanOut"];
 export type HistoryItem = Schemas["HistoryItem"];
 export type RunMetrics = Schemas["MetricsOut"];
+export type SandboxStatus = Schemas["SandboxStatusOut"];
+export type StarterKit = Schemas["TemplateOut"];
+export type Verification = Schemas["VerificationOut"];
 
 export class ApiError extends Error {
   readonly status: number;
@@ -173,3 +176,11 @@ export const getRunHistory = (projectId: string, runId: string, signal?: AbortSi
   request<HistoryItem[]>(`${runPath(projectId, runId)}/history`, opt(signal));
 export const getRunMetrics = (projectId: string, runId: string, signal?: AbortSignal) =>
   request<RunMetrics>(`${runPath(projectId, runId)}/metrics`, opt(signal));
+
+// ---------------------------------------------------------------- sandbox (Part E)
+export const getSandboxStatus = (signal?: AbortSignal) => request<SandboxStatus>("/api/sandbox/status", opt(signal));
+export const listStarterKits = (signal?: AbortSignal) => request<StarterKit[]>("/api/sandbox/templates", opt(signal));
+export const requestVerification = (templateId: string) =>
+  request<Verification>(`/api/sandbox/templates/${encodeURIComponent(templateId)}/verifications`, { method: "POST" });
+export const getVerification = (verificationId: string, signal?: AbortSignal) =>
+  request<Verification>(`/api/sandbox/verifications/${encodeURIComponent(verificationId)}`, opt(signal));

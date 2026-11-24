@@ -5,6 +5,9 @@
 .DESCRIPTION
   API:  http://127.0.0.1:8000  (uv run python -m devteam_api)
   UI:   http://127.0.0.1:5173  (Vite dev server; proxies /health, /version and /api to the API)
+  Sandbox: keeps the WSL distribution with the Docker Engine open while the platform runs (Part E, D-07 (b));
+  WSL stops an idle distribution, and the engine with it. If WSL or the engine is missing, sandbox work is
+  Blocked; nothing else changes.
   Worker: uv run python -m devteam_worker (D-41: runs execute here, never in the API). It starts after the
   API has migrated the database, uses the local Ollama only, and refuses to start if a second worker runs.
   Press Ctrl+C to stop all processes.
@@ -31,6 +34,7 @@ $root = Split-Path -Parent $PSScriptRoot
 $api = $null
 $web = $null
 $worker = $null
+$wslKeepAlive = $null
 
 function Wait-Http([string]$Url, [int]$TimeoutSeconds = 60) {
     $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
@@ -54,6 +58,17 @@ if (Test-Path (Join-Path $root "data/api_token")) {
 }
 
 try {
+    # Part E: keep the WSL distribution (and its Docker Engine) running; WSL stops an idle distribution.
+    $distro = (& uv run python -c "from devteam_core.config import load_settings; print(load_settings().sandbox.wsl_distribution)").Trim()
+    try {
+        $wslKeepAlive = Start-Process -FilePath "wsl.exe" -ArgumentList @("-d", $distro, "--exec", "sleep", "infinity") `
+            -WindowStyle Hidden -PassThru
+        Write-Host "Sandbox: WSL distribution '$distro' kept open (Docker Engine)"
+    }
+    catch {
+        Write-Host "Sandbox: WSL distribution '$distro' not available; sandbox work will be Blocked"
+    }
+
     $api = Start-Process -FilePath "uv" -ArgumentList @("run", "python", "-m", "devteam_api") `
         -WorkingDirectory $root -PassThru -NoNewWindow
     $web = Start-Process -FilePath "npm.cmd" -ArgumentList @("--prefix", "apps/web", "run", "dev") `
@@ -96,7 +111,7 @@ try {
     Wait-Process -Id $api.Id
 }
 finally {
-    foreach ($proc in @($worker, $web, $api)) {
+    foreach ($proc in @($worker, $web, $api, $wslKeepAlive)) {
         if ($null -ne $proc -and -not $proc.HasExited) {
             # /T stops the whole process tree (uv -> python, npm -> node). A killed worker is safe:
             # the next one recovers the run from its last checkpoint (D-40).

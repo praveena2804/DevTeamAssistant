@@ -1,0 +1,14 @@
+﻿# Python sandbox image (Part E plan §3.5): tools to build, test and check generated FastAPI backends.
+# Versions match the platform's own (known to work together). Resolved with hashes for Linux by
+#   uv pip compile sandbox/images/python_api/requirements.in --generate-hashes --python-version 3.12 \
+#     --python-platform x86_64-manylinux_2_28 -o sandbox/images/python_api/requirements.lock
+fastapi==0.165.0
+uvicorn==0.54.0
+pydantic==2.14.3
+sqlalchemy==2.1.9
+alembic==1.20.1
+httpx==0.28.1
+pytest==9.2.0
+pytest-cov==7.1.0
+ruff==0.17.5
+bandit>=1.8,<2

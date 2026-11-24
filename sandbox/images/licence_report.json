@@ -1,0 +1,2064 @@
+{
+ "python_api": [
+  {
+   "ecosystem": "debian",
+   "name": "adduser",
+   "version": "3.152",
+   "licence": "GPL-2+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "apt",
+   "version": "3.0.4",
+   "licence": "BSD-3-clause, Expat, GPL-2, GPL-2+, GPL-2+ and curl, curl",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "base-files",
+   "version": "13.8+deb13u7",
+   "licence": "GPL-2+, verbatim",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "base-passwd",
+   "version": "3.6.7",
+   "licence": "GPL-2, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "bash",
+   "version": "5.2.37-2+b10",
+   "licence": "BSD-4-clause-UC, BSD-4-clause-UC and MIT-like, GFDL-NIV-1.3, GPL-2+, GPL-3+, GPL-3+ with Bison exception, Latex2e, MIT-like, permissive",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "bsdutils",
+   "version": "1:2.41.5-0+deb13u1",
+   "licence": "BSD-2-clause, BSD-3-clause, BSD-4-clause, BSLA, Expat, GPL-2, GPL-2+, GPL-3+, ISC, LGPL, LGPL-2+, LGPL-2.1+, LGPL-3+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "ca-certificates",
+   "version": "20250419+deb13u1",
+   "licence": "GPL-2+, MPL-2.0",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "coreutils",
+   "version": "9.7-3",
+   "licence": "BSD-4-clause-UC, FSFULLR, GFDL-NIV-1.3, GPL-3+, GPL-3+ and BSD-4-clause-UC, GPL-3+ and ISC, ISC",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "dash",
+   "version": "0.5.12-12",
+   "licence": "BSD-3-Clause, BSD-3-clause, GPL-2+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "debconf",
+   "version": "1.5.91",
+   "licence": "BSD-2-clause",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "debian-archive-keyring",
+   "version": "2025.1",
+   "licence": "see copyright file",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "debianutils",
+   "version": "5.23.2",
+   "licence": "GPL-2+, SMAIL-GPL, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "diffutils",
+   "version": "1:3.10-4",
+   "licence": "FSFAP, FSFULLR, GFDL-NIV-1.3, GPL-2+, GPL-3+, GPL-3+ and FSFULLR, GPL-3+ with autoconf exception, GPL-3+ with texinfo exception, LGPL-2.0+, LGPL-2.1+, LGPL-3.0+, LGPL-3.0+ or GPL-2+, X11, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "dpkg",
+   "version": "1.22.22",
+   "licence": "GPL-2+, public-domain-s-s-d",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "findutils",
+   "version": "4.10.0-3",
+   "licence": "BSD-3-clause, BSD-3-clause or GPL-3+, BSD-3-clause or LGPL-2.1+, BSD-3-clause or LGPL-3+, FSFAP, FSFULLR, FSFULLR or GPL or LGPL, GFDL-NIV-1.3+, GFDL-NIV-1.3+ or GFDL-NIV-1.3+, GPL, GPL with automake exception, GPL-2+, GPL-2+ with Autoconf-data exception, GPL-3+, GPL-3+ with Autoconf-data exception,",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "gcc-14-base",
+   "version": "14.2.0-19",
+   "licence": "see copyright file",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "grep",
+   "version": "3.11-4",
+   "licence": "GPL-3+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "gzip",
+   "version": "1.13-1+deb13u1",
+   "licence": "FSF-manpages, GFDL-1.3+-no-invariant, GPL-3+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "hostname",
+   "version": "3.25",
+   "licence": "GPL-2",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "init-system-helpers",
+   "version": "1.69~deb13u1",
+   "licence": "BSD-3-clause, GPL-2+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libacl1",
+   "version": "2.3.2-2+b1",
+   "licence": "GPL-2+, LGPL-2+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libapt-pkg7.0",
+   "version": "3.0.4",
+   "licence": "BSD-3-clause, Expat, GPL-2, GPL-2+, GPL-2+ and curl, curl",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libattr1",
+   "version": "1:2.5.2-3",
+   "licence": "GPL-2+, LGPL-2+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libaudit-common",
+   "version": "1:4.0.2-2+deb13u1",
+   "licence": "GPL-2, LGPL-2.1",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libaudit1",
+   "version": "1:4.0.2-2+deb13u1",
+   "licence": "GPL-2, LGPL-2.1",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libblkid1",
+   "version": "2.41.5-0+deb13u1",
+   "licence": "BSD-2-clause, BSD-3-clause, BSD-4-clause, BSLA, Expat, GPL-2, GPL-2+, GPL-3+, ISC, LGPL, LGPL-2+, LGPL-2.1+, LGPL-3+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libbsd0",
+   "version": "0.12.2-2",
+   "licence": "BSD-2-clause, BSD-2-clause-NetBSD, BSD-2-clause-author, BSD-2-clause-verbatim, BSD-3-clause, BSD-3-clause-John-Birrell, BSD-3-clause-Regents, BSD-3-clause-Regents and BSD-2-clause-NetBSD, BSD-3-clause-author, BSD-5-clause-Peter-Wemm, Beerware, Expat, ISC, ISC-Original, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libbz2-1.0",
+   "version": "1.0.8-6",
+   "licence": "BSD-variant, GPL-2",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libc-bin",
+   "version": "2.41-12+deb13u4",
+   "licence": "BSD-2-clause, BSD-2-clause or GPL-2, BSD-3-clause-Berkeley, BSD-3-clause-Berkeley and BSD-3-clause-WIDE, BSD-3-clause-Berkeley and DEC, BSD-3-clause-Berkeley and DEC and IBM and ISC, BSD-3-clause-Berkeley and DEC and ISC, BSD-3-clause-Berkeley and DEC and ISC and LGPL-2.1+, BSD-3-clause-Berkeley and",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libc6",
+   "version": "2.41-12+deb13u4",
+   "licence": "BSD-2-clause, BSD-2-clause or GPL-2, BSD-3-clause-Berkeley, BSD-3-clause-Berkeley and BSD-3-clause-WIDE, BSD-3-clause-Berkeley and DEC, BSD-3-clause-Berkeley and DEC and IBM and ISC, BSD-3-clause-Berkeley and DEC and ISC, BSD-3-clause-Berkeley and DEC and ISC and LGPL-2.1+, BSD-3-clause-Berkeley and",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libcap-ng0",
+   "version": "0.8.5-4+b1",
+   "licence": "GPL-2+, GPL-3, LGPL-2.1+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libcap2",
+   "version": "1:2.75-10+deb13u1+b3",
+   "licence": "BSD-3-clause, BSD-3-clause or GPL-2, BSD-3-clause or GPL-2+, GPL-2, GPL-2+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libcrypt1",
+   "version": "1:4.4.38-1",
+   "licence": "see copyright file",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libdb5.3t64",
+   "version": "5.3.28+dfsg2-9",
+   "licence": "Artistic or BSD-3-clause, BSD-3-clause, BSD-3-clause-fjord, GPL, GPL or Artistic, GPL-3, MIT-old, Ms-PL, Sleepycat, Sleepycat and BSD-3-clause, TCL-like, X11, zlib",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libdebconfclient0",
+   "version": "0.280",
+   "licence": "BSD-2-Clause, BSD-2-clause, GPL-2+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libffi8",
+   "version": "3.4.8-2",
+   "licence": "Expat, GPL, GPL-2+, GPL-3+, MPL-1.1 or GPL-2+ or LGPL-2.1+, X11, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libgcc-s1",
+   "version": "14.2.0-19",
+   "licence": "(copyright file not found)",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libgdbm6t64",
+   "version": "1.24-2",
+   "licence": "GFDL-NIV-1.3+, GPL-2+, GPL-3+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libgmp10",
+   "version": "2:6.3.0+dfsg-3",
+   "licence": "GPL-2+, GPL-2+ or LGPL-3+, GPL-3+, GPL-3+ with Bison exception, LGPL-3+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libhogweed6t64",
+   "version": "3.10.1-1",
+   "licence": "Expat, GAP, GPL-2, GPL-2+, GPL-3+ with Autoconf exception, LGPL-2+, LGPL-3+, LGPL-3+ or GPL-2+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "liblastlog2-2",
+   "version": "2.41.5-0+deb13u1",
+   "licence": "BSD-2-clause, BSD-3-clause, BSD-4-clause, BSLA, Expat, GPL-2, GPL-2+, GPL-3+, ISC, LGPL, LGPL-2+, LGPL-2.1+, LGPL-3+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "liblz4-1",
+   "version": "1.10.0-4",
+   "licence": "BSD-2-clause, BSD-2-clause or GPL-2+, GPL-2+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "liblzma5",
+   "version": "5.8.1-1+deb13u2",
+   "licence": "0BSD, Different licenses apply to different files in this package. Here, FSFUL, FSFULLR, GPL-2+, GPL-3.0-or-later-WITH-Autoconf-exception-macro, LGPL-2.1+, PD, PD-debian, noderivs, none, permissive-nowarranty",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libmd0",
+   "version": "1.1.0-2+b1",
+   "licence": "BSD-2-clause, BSD-2-clause-NetBSD, BSD-3-clause, BSD-3-clause-Aaron-D-Gifford, Beerware, ISC, public-domain-md4, public-domain-md5, public-domain-sha1",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libmount1",
+   "version": "2.41.5-0+deb13u1",
+   "licence": "BSD-2-clause, BSD-3-clause, BSD-4-clause, BSLA, Expat, GPL-2, GPL-2+, GPL-3+, ISC, LGPL, LGPL-2+, LGPL-2.1+, LGPL-3+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libncursesw6",
+   "version": "6.5+20250216-2",
+   "licence": "(copyright file not found)",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libnettle8t64",
+   "version": "3.10.1-1",
+   "licence": "Expat, GAP, GPL-2, GPL-2+, GPL-3+ with Autoconf exception, LGPL-2+, LGPL-3+, LGPL-3+ or GPL-2+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libpam-modules",
+   "version": "1.7.0-5",
+   "licence": "BSD-3-clause or GPL, BSD-tcp_wrappers, Beerware, GPL-2, GPL-2+, GPL-3, GPL-3+ with Bison exception, LGPL-2+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libpam-modules-bin",
+   "version": "1.7.0-5",
+   "licence": "BSD-3-clause or GPL, BSD-tcp_wrappers, Beerware, GPL-2, GPL-2+, GPL-3, GPL-3+ with Bison exception, LGPL-2+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libpam-runtime",
+   "version": "1.7.0-5",
+   "licence": "BSD-3-clause or GPL, BSD-tcp_wrappers, Beerware, GPL-2, GPL-2+, GPL-3, GPL-3+ with Bison exception, LGPL-2+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libpam0g",
+   "version": "1.7.0-5",
+   "licence": "BSD-3-clause or GPL, BSD-tcp_wrappers, Beerware, GPL-2, GPL-2+, GPL-3, GPL-3+ with Bison exception, LGPL-2+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libpcre2-8-0",
+   "version": "10.46-1~deb13u3",
+   "licence": "BSD-2-clause, BSD-3-clause, BSD-3-clause-Cambridge with BINARY LIBRARY-LIKE PACKAGES exception, X11, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libreadline8t64",
+   "version": "8.2-6",
+   "licence": "GFDL-NIV-1.3+, GPL-2+, GPL-3, GPL-3+, ISC-no-attribution",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libseccomp2",
+   "version": "2.6.0-2",
+   "licence": "LGPL-2.1",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libselinux1",
+   "version": "3.8.1-1",
+   "licence": "GPL-2, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libsemanage-common",
+   "version": "3.8.1-1",
+   "licence": "GPL-2, LGPL-2.1+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libsemanage2",
+   "version": "3.8.1-1",
+   "licence": "GPL-2, LGPL-2.1+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libsepol2",
+   "version": "3.8.1-1",
+   "licence": "GPL-2, GPL-2+, LGPL-2.1+, Zlib",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libsmartcols1",
+   "version": "2.41.5-0+deb13u1",
+   "licence": "BSD-2-clause, BSD-3-clause, BSD-4-clause, BSLA, Expat, GPL-2, GPL-2+, GPL-3+, ISC, LGPL, LGPL-2+, LGPL-2.1+, LGPL-3+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libsqlite3-0",
+   "version": "3.46.1-7+deb13u2",
+   "licence": "GPL-2+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libssl3t64",
+   "version": "3.5.7-1~deb13u3",
+   "licence": "Apache-2.0, Artistic, Artistic or GPL-1+, GPL-1+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libstdc++6",
+   "version": "14.2.0-19",
+   "licence": "(copyright file not found)",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libsystemd0",
+   "version": "257.13-1~deb13u1",
+   "licence": "CC0-1.0, Expat, GPL-2 with Linux-syscall-note exception, GPL-2+, LGPL-2.1+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libtinfo6",
+   "version": "6.5+20250216-2",
+   "licence": "BSD-3-clause, MIT/X11, X11",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libudev1",
+   "version": "257.13-1~deb13u1",
+   "licence": "CC0-1.0, Expat, GPL-2 with Linux-syscall-note exception, GPL-2+, LGPL-2.1+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libuuid1",
+   "version": "2.41.5-0+deb13u1",
+   "licence": "BSD-2-clause, BSD-3-clause, BSD-4-clause, BSLA, Expat, GPL-2, GPL-2+, GPL-3+, ISC, LGPL, LGPL-2+, LGPL-2.1+, LGPL-3+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libxxhash0",
+   "version": "0.8.3-2",
+   "licence": "BSD-2-clause, BSD-2-clause or GPL-2+, GPL-2+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libzstd1",
+   "version": "1.5.7+dfsg-1",
+   "licence": "BSD-3-clause, BSD-3-clause or GPL-2, Expat, GPL-2, zlib",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "login",
+   "version": "1:4.16.0-2+really2.41.5-0+deb13u1",
+   "licence": "BSD-2-clause, BSD-3-clause, BSD-4-clause, BSLA, Expat, GPL-2, GPL-2+, GPL-3+, ISC, LGPL, LGPL-2+, LGPL-2.1+, LGPL-3+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "login.defs",
+   "version": "1:4.17.4-2",
+   "licence": "BSD-3-clause, GPL-1, GPL-2+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "mawk",
+   "version": "1.3.4.20250131-1",
+   "licence": "CC-BY-3.0, GPL-2.0-only, X11",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "mount",
+   "version": "2.41.5-0+deb13u1",
+   "licence": "BSD-2-clause, BSD-3-clause, BSD-4-clause, BSLA, Expat, GPL-2, GPL-2+, GPL-3+, ISC, LGPL, LGPL-2+, LGPL-2.1+, LGPL-3+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "ncurses-base",
+   "version": "6.5+20250216-2",
+   "licence": "BSD-3-clause, MIT/X11, X11",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "ncurses-bin",
+   "version": "6.5+20250216-2",
+   "licence": "BSD-3-clause, MIT/X11, X11",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "netbase",
+   "version": "6.5",
+   "licence": "GPL-2",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "openssl",
+   "version": "3.5.7-1~deb13u3",
+   "licence": "Apache-2.0, Artistic, Artistic or GPL-1+, GPL-1+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "openssl-provider-legacy",
+   "version": "3.5.7-1~deb13u3",
+   "licence": "Apache-2.0, Artistic, Artistic or GPL-1+, GPL-1+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "passwd",
+   "version": "1:4.17.4-2",
+   "licence": "BSD-3-clause, GPL-1, GPL-2+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "perl-base",
+   "version": "5.40.1-6+deb13u1",
+   "licence": "Artistic, Artistic or GPL-1+, Artistic or GPL-1+ or Artistic-dist, Artistic-2, Artistic-dist, BSD-3-clause, BSD-3-clause-GENERIC, BSD-3-clause-with-weird-numbering, BSD-4-clause-POWERDOG, BZIP, CC0-1.0, DONT-CHANGE-THE-GPL, Expat, Expat or GPL-1+ or Artistic, FSFAP, GPL-1+, GPL-1+ or Artistic, GPL-1",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "readline-common",
+   "version": "8.2-6",
+   "licence": "GFDL-NIV-1.3+, GPL-2+, GPL-3, GPL-3+, ISC-no-attribution",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "sed",
+   "version": "4.9-2+deb13u1",
+   "licence": "BSD-4-clause-UC, BSL-1, GFDL-NIV-1.3+, GPL-3+, GPL-3+ and ISC, ISC, X11, pcre",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "sqv",
+   "version": "1.3.0-3+b2",
+   "licence": "LGPL-2.0-or-later",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "sysvinit-utils",
+   "version": "3.14-4",
+   "licence": "GPL-2.0, GPL-2.0+, GPL-3.0, LGPL-2.1+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "tar",
+   "version": "1.35+dfsg-3.1",
+   "licence": "GPL-2+, GPL-3+, GPL-3+ with Bison exception, LGPL-2.1+, LGPL-3+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "tzdata",
+   "version": "2026f-0+deb13u1",
+   "licence": "public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "util-linux",
+   "version": "2.41.5-0+deb13u1",
+   "licence": "BSD-2-clause, BSD-3-clause, BSD-4-clause, BSLA, Expat, GPL-2, GPL-2+, GPL-3+, ISC, LGPL, LGPL-2+, LGPL-2.1+, LGPL-3+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "zlib1g",
+   "version": "1:1.3.dfsg+really1.3.1-1+b1",
+   "licence": "Zlib",
+   "tier": 1
+  },
+  {
+   "ecosystem": "python",
+   "name": "alembic",
+   "version": "1.20.1",
+   "licence": "MIT",
+   "tier": 4
+  },
+  {
+   "ecosystem": "python",
+   "name": "annotated-doc",
+   "version": "0.0.7",
+   "licence": "MIT",
+   "tier": 4
+  },
+  {
+   "ecosystem": "python",
+   "name": "annotated-types",
+   "version": "0.8.0",
+   "licence": "MIT",
+   "tier": 4
+  },
+  {
+   "ecosystem": "python",
+   "name": "anyio",
+   "version": "4.16.0",
+   "licence": "MIT",
+   "tier": 4
+  },
+  {
+   "ecosystem": "python",
+   "name": "bandit",
+   "version": "1.9.4",
+   "licence": "Apache-2.0",
+   "tier": 3
+  },
+  {
+   "ecosystem": "python",
+   "name": "certifi",
+   "version": "2026.11.20",
+   "licence": "Mozilla Public License 2.0 (MPL 2.0)",
+   "tier": 3
+  },
+  {
+   "ecosystem": "python",
+   "name": "click",
+   "version": "8.5.1",
+   "licence": "BSD-3-Clause",
+   "tier": 4
+  },
+  {
+   "ecosystem": "python",
+   "name": "coverage",
+   "version": "7.17.5",
+   "licence": "Apache-2.0",
+   "tier": 3
+  },
+  {
+   "ecosystem": "python",
+   "name": "fastapi",
+   "version": "0.165.0",
+   "licence": "MIT",
+   "tier": 4
+  },
+  {
+   "ecosystem": "python",
+   "name": "h11",
+   "version": "0.16.0",
+   "licence": "MIT License",
+   "tier": 4
+  },
+  {
+   "ecosystem": "python",
+   "name": "httpcore",
+   "version": "1.0.9",
+   "licence": "BSD-3-Clause",
+   "tier": 3
+  },
+  {
+   "ecosystem": "python",
+   "name": "httpx",
+   "version": "0.28.1",
+   "licence": "BSD License",
+   "tier": 3
+  },
+  {
+   "ecosystem": "python",
+   "name": "idna",
+   "version": "3.20",
+   "licence": "BSD-3-Clause",
+   "tier": 4
+  },
+  {
+   "ecosystem": "python",
+   "name": "iniconfig",
+   "version": "2.3.1",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "python",
+   "name": "Mako",
+   "version": "1.4.3",
+   "licence": "MIT",
+   "tier": 4
+  },
+  {
+   "ecosystem": "python",
+   "name": "markdown-it-py",
+   "version": "4.3.0",
+   "licence": "MIT License",
+   "tier": 3
+  },
+  {
+   "ecosystem": "python",
+   "name": "MarkupSafe",
+   "version": "3.0.4",
+   "licence": "BSD-3-Clause",
+   "tier": 4
+  },
+  {
+   "ecosystem": "python",
+   "name": "mdurl",
+   "version": "0.1.2",
+   "licence": "MIT License",
+   "tier": 3
+  },
+  {
+   "ecosystem": "python",
+   "name": "opentelemetry-api",
+   "version": "1.45.2",
+   "licence": "Apache-2.0",
+   "tier": 3
+  },
+  {
+   "ecosystem": "python",
+   "name": "packaging",
+   "version": "26.3",
+   "licence": "Apache-2.0 OR BSD-2-Clause",
+   "tier": 3
+  },
+  {
+   "ecosystem": "python",
+   "name": "pip",
+   "version": "25.0.1",
+   "licence": "MIT License",
+   "tier": 2
+  },
+  {
+   "ecosystem": "python",
+   "name": "pluggy",
+   "version": "1.7.0",
+   "licence": "MIT License",
+   "tier": 3
+  },
+  {
+   "ecosystem": "python",
+   "name": "pydantic",
+   "version": "2.14.3",
+   "licence": "MIT",
+   "tier": 4
+  },
+  {
+   "ecosystem": "python",
+   "name": "pydantic_core",
+   "version": "2.50.4",
+   "licence": "MIT",
+   "tier": 4
+  },
+  {
+   "ecosystem": "python",
+   "name": "Pygments",
+   "version": "2.21.0",
+   "licence": "BSD-2-Clause",
+   "tier": 3
+  },
+  {
+   "ecosystem": "python",
+   "name": "pytest",
+   "version": "9.2.0",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "python",
+   "name": "pytest-cov",
+   "version": "7.1.0",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "python",
+   "name": "PyYAML",
+   "version": "6.0.4",
+   "licence": "MIT License",
+   "tier": 3
+  },
+  {
+   "ecosystem": "python",
+   "name": "rich",
+   "version": "15.0.0",
+   "licence": "MIT License",
+   "tier": 3
+  },
+  {
+   "ecosystem": "python",
+   "name": "ruff",
+   "version": "0.17.5",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "python",
+   "name": "SQLAlchemy",
+   "version": "2.1.9",
+   "licence": "MIT",
+   "tier": 4
+  },
+  {
+   "ecosystem": "python",
+   "name": "starlette",
+   "version": "1.10.0",
+   "licence": "BSD-3-Clause",
+   "tier": 4
+  },
+  {
+   "ecosystem": "python",
+   "name": "stevedore",
+   "version": "5.10.0",
+   "licence": "Apache-2.0",
+   "tier": 3
+  },
+  {
+   "ecosystem": "python",
+   "name": "typing_extensions",
+   "version": "4.16.0",
+   "licence": "PSF-2.0",
+   "tier": 4
+  },
+  {
+   "ecosystem": "python",
+   "name": "typing-inspection",
+   "version": "0.4.5",
+   "licence": "MIT",
+   "tier": 4
+  },
+  {
+   "ecosystem": "python",
+   "name": "uvicorn",
+   "version": "0.54.0",
+   "licence": "BSD-3-Clause",
+   "tier": 4
+  }
+ ],
+ "node_web": [
+  {
+   "ecosystem": "debian",
+   "name": "adduser",
+   "version": "3.134",
+   "licence": "GPL-2+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "apt",
+   "version": "2.6.2",
+   "licence": "BSD-3-clause, Expat, GPL-2, GPL-2+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "base-files",
+   "version": "12.4+deb12u15",
+   "licence": "see copyright file",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "base-passwd",
+   "version": "3.6.1",
+   "licence": "GPL-2, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "bash",
+   "version": "5.2.15-2+b13",
+   "licence": "BSD-4-clause-UC, BSD-4-clause-UC and MIT-like, GFDL-NIV-1.3, GPL-2+, GPL-3+, GPL-3+ with Bison exception, Latex2e, MIT-like, permissive",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "bsdutils",
+   "version": "1:2.38.1-5+deb12u3",
+   "licence": "BSD-3-clause, BSD-4-clause, BSLA, GPL-2, GPL-2+, GPL-3+, LGPL, LGPL-2+, LGPL-2.1+, LGPL-3+, MIT, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "coreutils",
+   "version": "9.1-1",
+   "licence": "BSD-4-clause-UC, FSFULLR, GFDL-NIV-1.3, GPL-3+, GPL-3+ and BSD-4-clause-UC, GPL-3+ and ISC, ISC",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "dash",
+   "version": "0.5.12-2",
+   "licence": "BSD-3-Clause, BSD-3-clause, GPL-2+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "debconf",
+   "version": "1.5.82",
+   "licence": "BSD-2-clause",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "debian-archive-keyring",
+   "version": "2023.3+deb12u2",
+   "licence": "see copyright file",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "debianutils",
+   "version": "5.7-0.5~deb12u1",
+   "licence": "GPL-2+, SMAIL-GPL, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "diffutils",
+   "version": "1:3.8-4",
+   "licence": "FSFAP, FSFULLR, GFDL-NIV-1.3, GPL-2+, GPL-3+, GPL-3+ and FSFULLR, GPL-3+ with autoconf exception, GPL-3+ with texinfo exception, LGPL-2.0+, LGPL-2.1+, LGPL-3.0+, LGPL-3.0+ or GPL-2+, X11, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "dpkg",
+   "version": "1.21.23",
+   "licence": "BSD-2-clause, GPL-2, GPL-2+, public-domain-s-s-d",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "e2fsprogs",
+   "version": "1.47.0-2+b2",
+   "licence": "Apache-2, BSD-3-Clause, GPL or MIT-US-export, GPL-2, GPL-2+ with Texinfo exception, ISC, Kazlib, LGPL-2, Latex2e",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "findutils",
+   "version": "4.9.0-4",
+   "licence": "BSD-3-clause, BSD-3-clause and/or GPL-3+, FSFAP, FSFULLR, GFDL-NIV-1.3+, GPL with automake exception, GPL-2+, GPL-2+ with Autoconf-data exception, GPL-3+, GPL-3+ with Autoconf-data exception, GPL-3+ with Bison-2.2 exception, ISC, ISC and/or LGPL-2.1+, LGPL-2+, LGPL-2.1+, LGPL-3, LGPL-3+, X11, public",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "gcc-12-base",
+   "version": "12.2.0-14+deb12u1",
+   "licence": "see copyright file",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "gpgv",
+   "version": "2.2.40-1.1+deb12u2",
+   "licence": "BSD-3-clause, CC0-1.0, Expat, GPL-3+, GPL-3+ or BSD-3-clause, LGPL-2.1+, LGPL-3+, RFC-Reference, TinySCHEME, permissive",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "grep",
+   "version": "3.8-5",
+   "licence": "GPL-3+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "gzip",
+   "version": "1.12-1",
+   "licence": "FSF-manpages, GFDL-1.3+-no-invariant, GPL-3+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "hostname",
+   "version": "3.23+nmu1",
+   "licence": "GPL-2",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "init-system-helpers",
+   "version": "1.65.2+deb12u1",
+   "licence": "BSD-3-clause, GPL-2+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libacl1",
+   "version": "2.3.1-3",
+   "licence": "GPL-2+, LGPL-2+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libapt-pkg6.0",
+   "version": "2.6.2",
+   "licence": "BSD-3-clause, Expat, GPL-2, GPL-2+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libattr1",
+   "version": "1:2.5.1-4",
+   "licence": "GPL-2+, LGPL-2+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libaudit-common",
+   "version": "1:3.0.9-1",
+   "licence": "GPL-2, LGPL-2.1",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libaudit1",
+   "version": "1:3.0.9-1",
+   "licence": "GPL-2, LGPL-2.1",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libblkid1",
+   "version": "2.38.1-5+deb12u3",
+   "licence": "BSD-3-clause, BSD-4-clause, BSLA, GPL-2, GPL-2+, GPL-3+, LGPL, LGPL-2+, LGPL-2.1+, LGPL-3+, MIT, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libbz2-1.0",
+   "version": "1.0.8-5+b1",
+   "licence": "BSD-variant, GPL-2",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libc-bin",
+   "version": "2.36-9+deb12u14",
+   "licence": "see copyright file",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libc6",
+   "version": "2.36-9+deb12u14",
+   "licence": "see copyright file",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libcap-ng0",
+   "version": "0.8.3-1+b3",
+   "licence": "GPL-2+, GPL-3, LGPL-2.1+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libcap2",
+   "version": "1:2.66-4+deb12u3+b1",
+   "licence": "BSD-3-clause, BSD-3-clause or GPL-2, BSD-3-clause or GPL-2+, GPL-2, GPL-2+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libcom-err2",
+   "version": "1.47.0-2+b2",
+   "licence": "Apache-2, BSD-3-Clause, GPL or MIT-US-export, GPL-2, GPL-2+ with Texinfo exception, ISC, Kazlib, LGPL-2, Latex2e",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libcrypt1",
+   "version": "1:4.4.33-2",
+   "licence": "see copyright file",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libdb5.3",
+   "version": "5.3.28+dfsg2-1",
+   "licence": "Artistic or BSD-3-clause, BSD-3-clause, BSD-3-clause-fjord, GPL, GPL or Artistic, GPL-3, MIT-old, Ms-PL, Sleepycat, Sleepycat and BSD-3-clause, TCL-like, X11, zlib",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libdebconfclient0",
+   "version": "0.270",
+   "licence": "BSD-2-Clause, BSD-2-clause, GPL-2+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libext2fs2",
+   "version": "1.47.0-2+b2",
+   "licence": "Apache-2, BSD-3-Clause, GPL or MIT-US-export, GPL-2, GPL-2+ with Texinfo exception, ISC, Kazlib, LGPL-2, Latex2e",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libffi8",
+   "version": "3.4.4-1",
+   "licence": "Expat, GPL, GPL-2+, GPL-3+, MPL-1.1 or GPL-2+ or LGPL-2.1+, X11, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libgcc-s1",
+   "version": "12.2.0-14+deb12u1",
+   "licence": "(copyright file not found)",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libgcrypt20",
+   "version": "1.10.1-3+deb12u1",
+   "licence": "Most of the package is licensed under the GNU Lesser General Public",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libgmp10",
+   "version": "2:6.2.1+dfsg1-1.1",
+   "licence": "GPL-2+, GPL-2+ or LGPL-3+, GPL-3+, GPL-3+ with Bison exception, LGPL-3+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libgnutls30",
+   "version": "3.7.9-2+deb12u7",
+   "licence": "* Redistribution and use in source and binary forms, with or without, Apache-2.0, BSD-3-Clause, CC0 license, Expat, GPLv3+, LGPLv2.1+, LGPLv3+_or_GPLv2+, Public domain., The main library is licensed under GNU Lesser, based on Russian standard GOST 28147-89",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libgpg-error0",
+   "version": "1.46-1",
+   "licence": "BSD-3-clause, GPL-3+, LGPL-2.1+, LGPL-2.1+ or BSD-3-clause, g10-permissive",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libhogweed6",
+   "version": "3.8.1-2",
+   "licence": "Expat, GAP, GPL-2, GPL-2+, GPL-3+, GPL-3+ with Autoconf exception, LGPL-2+, LGPL-3+, LGPL-3+ or GPL-2+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libidn2-0",
+   "version": "2.3.3-1+b1",
+   "licence": "GPL-2+, GPL-3+, LGPL-3+, LGPL-3+ or GPL-2+, Unicode",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "liblz4-1",
+   "version": "1.9.4-1",
+   "licence": "BSD-2-clause, GPL-2+, GPL-2+ or BSD-2-clause",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "liblzma5",
+   "version": "5.4.1-1+deb12u2",
+   "licence": "Autoconf, Different licenses apply to different files in this package. Here, GPL-2, GPL-2+, LGPL-2.1+, PD, PD-debian, config-h, noderivs, none, permissive-fsf, permissive-nowarranty, probably-PD",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libmd0",
+   "version": "1.0.4-2",
+   "licence": "BSD-2-clause, BSD-2-clause-NetBSD, BSD-3-clause, BSD-3-clause-Aaron-D-Gifford, Beerware, ISC, public-domain-md4, public-domain-md5, public-domain-sha1",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libmount1",
+   "version": "2.38.1-5+deb12u3",
+   "licence": "BSD-3-clause, BSD-4-clause, BSLA, GPL-2, GPL-2+, GPL-3+, LGPL, LGPL-2+, LGPL-2.1+, LGPL-3+, MIT, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libnettle8",
+   "version": "3.8.1-2",
+   "licence": "Expat, GAP, GPL-2, GPL-2+, GPL-3+, GPL-3+ with Autoconf exception, LGPL-2+, LGPL-3+, LGPL-3+ or GPL-2+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libp11-kit0",
+   "version": "0.24.1-2",
+   "licence": "Apache-2.0, BSD-3-Clause, ISC, ISC+IBM, LGPL-2.1+, permissive-like-automake-output, same-as-rest-of-p11kit",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libpam-modules",
+   "version": "1.5.2-6+deb12u2",
+   "licence": "BSD-3-clause or GPL, BSD-tcp_wrappers, Beerware, GPL-2, GPL-2+, GPL-3, GPL-3+ with Bison exception, LGPL-2+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libpam-modules-bin",
+   "version": "1.5.2-6+deb12u2",
+   "licence": "BSD-3-clause or GPL, BSD-tcp_wrappers, Beerware, GPL-2, GPL-2+, GPL-3, GPL-3+ with Bison exception, LGPL-2+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libpam-runtime",
+   "version": "1.5.2-6+deb12u2",
+   "licence": "BSD-3-clause or GPL, BSD-tcp_wrappers, Beerware, GPL-2, GPL-2+, GPL-3, GPL-3+ with Bison exception, LGPL-2+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libpam0g",
+   "version": "1.5.2-6+deb12u2",
+   "licence": "BSD-3-clause or GPL, BSD-tcp_wrappers, Beerware, GPL-2, GPL-2+, GPL-3, GPL-3+ with Bison exception, LGPL-2+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libpcre2-8-0",
+   "version": "10.42-1+deb12u2",
+   "licence": "BSD-2-clause, BSD-3-clause, BSD-3-clause-Cambridge with BINARY LIBRARY-LIKE PACKAGES exception, X11, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libseccomp2",
+   "version": "2.5.4-1+deb12u1",
+   "licence": "LGPL-2.1",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libselinux1",
+   "version": "3.4-1+b6",
+   "licence": "see copyright file",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libsemanage-common",
+   "version": "3.4-1",
+   "licence": "see copyright file",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libsemanage2",
+   "version": "3.4-1+b5",
+   "licence": "see copyright file",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libsepol2",
+   "version": "3.4-2.1",
+   "licence": "GPL-2, GPL-2+, LGPL-2.1+, Zlib",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libsmartcols1",
+   "version": "2.38.1-5+deb12u3",
+   "licence": "BSD-3-clause, BSD-4-clause, BSLA, GPL-2, GPL-2+, GPL-3+, LGPL, LGPL-2+, LGPL-2.1+, LGPL-3+, MIT, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libss2",
+   "version": "1.47.0-2+b2",
+   "licence": "Apache-2, BSD-3-Clause, GPL or MIT-US-export, GPL-2, GPL-2+ with Texinfo exception, ISC, Kazlib, LGPL-2, Latex2e",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libstdc++6",
+   "version": "12.2.0-14+deb12u1",
+   "licence": "(copyright file not found)",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libsystemd0",
+   "version": "252.39-1~deb12u2",
+   "licence": "CC0-1.0, Expat, GPL-2 with Linux-syscall-note exception, GPL-2+, LGPL-2.1+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libtasn1-6",
+   "version": "4.19.0-2+deb12u1",
+   "licence": "see copyright file",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libtinfo6",
+   "version": "6.4-4",
+   "licence": "BSD-3-clause, MIT/X11, X11",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libudev1",
+   "version": "252.39-1~deb12u2",
+   "licence": "CC0-1.0, Expat, GPL-2 with Linux-syscall-note exception, GPL-2+, LGPL-2.1+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libunistring2",
+   "version": "1.0-2",
+   "licence": "FreeSoftware, GFDL-1.2+, GPL-2+, GPL-2+ with distribution exception, GPL-3+, GPL-3+ or GFDL-1.2+, LGPL-3+, LGPL-3+ or GPL-2+, MIT",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libuuid1",
+   "version": "2.38.1-5+deb12u3",
+   "licence": "BSD-3-clause, BSD-4-clause, BSLA, GPL-2, GPL-2+, GPL-3+, LGPL, LGPL-2+, LGPL-2.1+, LGPL-3+, MIT, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libxxhash0",
+   "version": "0.8.1-1",
+   "licence": "BSD-2-clause, GPL-2",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "libzstd1",
+   "version": "1.5.4+dfsg2-5",
+   "licence": "BSD-3-clause, BSD-3-clause or GPL-2, Expat, GPL-2, zlib",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "login",
+   "version": "1:4.13+dfsg1-1+deb12u2",
+   "licence": "BSD-3-clause, GPL-1, GPL-2+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "logsave",
+   "version": "1.47.0-2+b2",
+   "licence": "Apache-2, BSD-3-Clause, GPL or MIT-US-export, GPL-2, GPL-2+ with Texinfo exception, ISC, Kazlib, LGPL-2, Latex2e",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "mawk",
+   "version": "1.3.4.20200120-3.1",
+   "licence": "CC-BY-3.0, GPL-2, X11",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "mount",
+   "version": "2.38.1-5+deb12u3",
+   "licence": "BSD-3-clause, BSD-4-clause, BSLA, GPL-2, GPL-2+, GPL-3+, LGPL, LGPL-2+, LGPL-2.1+, LGPL-3+, MIT, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "ncurses-base",
+   "version": "6.4-4",
+   "licence": "BSD-3-clause, MIT/X11, X11",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "ncurses-bin",
+   "version": "6.4-4",
+   "licence": "BSD-3-clause, MIT/X11, X11",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "passwd",
+   "version": "1:4.13+dfsg1-1+deb12u2",
+   "licence": "BSD-3-clause, GPL-1, GPL-2+, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "perl-base",
+   "version": "5.36.0-7+deb12u4",
+   "licence": "Artistic, Artistic or GPL-1+ or Artistic-dist, Artistic-2, Artistic-dist, BSD-3-clause, BSD-3-clause-GENERIC, BSD-3-clause-with-weird-numbering, BSD-4-clause-POWERDOG, BZIP, CC0-1.0, DONT-CHANGE-THE-GPL, Expat, Expat or GPL-1+ or Artistic, GPL-1+, GPL-1+ or Artistic, GPL-1+ or Artistic or Artistic-d",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "sed",
+   "version": "4.9-1+deb12u1",
+   "licence": "BSD-4-clause-UC, BSL-1, GFDL-NIV-1.3+, GPL-3+, GPL-3+ and ISC, ISC, X11, pcre",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "sysvinit-utils",
+   "version": "3.06-4",
+   "licence": "GPL-2.0, GPL-2.0+, GPL-3.0",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "tar",
+   "version": "1.34+dfsg-1.2+deb12u1",
+   "licence": "GPL-2+, GPL-3+, GPL-3+ with Bison exception, LGPL-3+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "tzdata",
+   "version": "2026f-0+deb12u1",
+   "licence": "public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "usr-is-merged",
+   "version": "37~deb12u1",
+   "licence": "GPL-2+",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "util-linux",
+   "version": "2.38.1-5+deb12u3",
+   "licence": "BSD-3-clause, BSD-4-clause, BSLA, GPL-2, GPL-2+, GPL-3+, LGPL, LGPL-2+, LGPL-2.1+, LGPL-3+, MIT, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "util-linux-extra",
+   "version": "2.38.1-5+deb12u3",
+   "licence": "BSD-3-clause, BSD-4-clause, BSLA, GPL-2, GPL-2+, GPL-3+, LGPL, LGPL-2+, LGPL-2.1+, LGPL-3+, MIT, public-domain",
+   "tier": 1
+  },
+  {
+   "ecosystem": "debian",
+   "name": "zlib1g",
+   "version": "1:1.2.13.dfsg-1",
+   "licence": "Zlib",
+   "tier": 1
+  },
+  {
+   "ecosystem": "node",
+   "name": "@asamuzakjp/css-color",
+   "version": "5.1.11",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@asamuzakjp/dom-selector",
+   "version": "7.1.1",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@asamuzakjp/generational-cache",
+   "version": "1.0.1",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@asamuzakjp/nwsapi",
+   "version": "2.3.9",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@bramus/specificity",
+   "version": "2.4.4",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@csstools/color-helpers",
+   "version": "6.1.3",
+   "licence": "MIT-0",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@csstools/css-calc",
+   "version": "3.4.4",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@csstools/css-color-parser",
+   "version": "4.2.8",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@csstools/css-parser-algorithms",
+   "version": "4.0.3",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@csstools/css-syntax-patches-for-csstree",
+   "version": "1.1.17",
+   "licence": "MIT-0",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@csstools/css-tokenizer",
+   "version": "4.0.3",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@exodus/bytes",
+   "version": "1.16.0",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@jridgewell/resolve-uri",
+   "version": "3.1.3",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@jridgewell/sourcemap-codec",
+   "version": "1.6.0",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@jridgewell/trace-mapping",
+   "version": "0.3.31",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@oxc-project/types",
+   "version": "0.156.0",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@rolldown/binding-linux-x64-gnu",
+   "version": "1.2.19",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@rolldown/binding-linux-x64-musl",
+   "version": "1.2.19",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@rolldown/pluginutils",
+   "version": "1.1.1",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@types/chai",
+   "version": "5.2.3",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@types/deep-eql",
+   "version": "4.0.2",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@types/estree",
+   "version": "1.0.10",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@types/react",
+   "version": "19.3.0",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@types/react-dom",
+   "version": "19.3.0",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@vitejs/plugin-react",
+   "version": "6.3.0",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@vitest/mocker",
+   "version": "5.1.1",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "@vitest/spy",
+   "version": "5.1.1",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "assertion-error",
+   "version": "2.0.1",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "bidi-js",
+   "version": "1.1.0",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "chai",
+   "version": "6.3.0",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "css-tree",
+   "version": "3.2.1",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "csstype",
+   "version": "3.2.4",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "data-urls",
+   "version": "7.0.0",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "decimal.js",
+   "version": "10.6.0",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "detect-libc",
+   "version": "2.1.2",
+   "licence": "Apache-2.0",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "entities",
+   "version": "9.0.0",
+   "licence": "BSD-2-Clause",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "es-module-lexer",
+   "version": "2.3.2",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "estree-walker",
+   "version": "3.0.3",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "expect-type",
+   "version": "1.4.0",
+   "licence": "Apache-2.0",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "fdir",
+   "version": "6.5.0",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "html-encoding-sniffer",
+   "version": "6.0.0",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "is-potential-custom-element-name",
+   "version": "1.0.1",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "jsdom",
+   "version": "29.1.1",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "lightningcss",
+   "version": "1.33.0",
+   "licence": "MPL-2.0",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "lightningcss-linux-x64-gnu",
+   "version": "1.33.0",
+   "licence": "MPL-2.0",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "lightningcss-linux-x64-musl",
+   "version": "1.33.0",
+   "licence": "MPL-2.0",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "lru-cache",
+   "version": "11.5.3",
+   "licence": "BlueOak-1.0.0",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "magic-string",
+   "version": "1.4.5",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "mdn-data",
+   "version": "2.27.1",
+   "licence": "CC0-1.0",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "nanoid",
+   "version": "3.3.20",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "obug",
+   "version": "3.0.0",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "parse5",
+   "version": "8.1.1",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "picocolors",
+   "version": "1.1.1",
+   "licence": "ISC",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "picomatch",
+   "version": "4.0.7",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "postcss",
+   "version": "8.5.33",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "punycode",
+   "version": "2.3.1",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "react",
+   "version": "19.3.1",
+   "licence": "MIT",
+   "tier": 4
+  },
+  {
+   "ecosystem": "node",
+   "name": "react-dom",
+   "version": "19.3.1",
+   "licence": "MIT",
+   "tier": 4
+  },
+  {
+   "ecosystem": "node",
+   "name": "require-from-string",
+   "version": "2.0.2",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "rolldown",
+   "version": "1.2.19",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "saxes",
+   "version": "6.0.0",
+   "licence": "ISC",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "scheduler",
+   "version": "0.28.0",
+   "licence": "MIT",
+   "tier": 4
+  },
+  {
+   "ecosystem": "node",
+   "name": "source-map-js",
+   "version": "1.2.4",
+   "licence": "BSD-3-Clause",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "std-env",
+   "version": "4.3.0",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "symbol-tree",
+   "version": "3.2.4",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "tinybench",
+   "version": "6.2.5",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "tinyexec",
+   "version": "1.3.1",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "tinyglobby",
+   "version": "0.2.17",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "tldts",
+   "version": "7.5.5",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "tldts-core",
+   "version": "7.5.5",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "tough-cookie",
+   "version": "6.1.0",
+   "licence": "BSD-3-Clause",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "tr46",
+   "version": "6.0.0",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "typescript",
+   "version": "5.9.3",
+   "licence": "Apache-2.0",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "undici",
+   "version": "7.30.2",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "vite",
+   "version": "8.3.8",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "vitest",
+   "version": "5.1.1",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "w3c-xmlserializer",
+   "version": "5.0.0",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "webidl-conversions",
+   "version": "8.0.1",
+   "licence": "BSD-2-Clause",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "whatwg-mimetype",
+   "version": "5.0.0",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "whatwg-url",
+   "version": "16.0.1",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "why-is-node-running",
+   "version": "3.2.1",
+   "licence": "MIT",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "xml-name-validator",
+   "version": "5.0.0",
+   "licence": "Apache-2.0",
+   "tier": 3
+  },
+  {
+   "ecosystem": "node",
+   "name": "xmlchars",
+   "version": "2.2.0",
+   "licence": "MIT",
+   "tier": 3
+  }
+ ]
+}

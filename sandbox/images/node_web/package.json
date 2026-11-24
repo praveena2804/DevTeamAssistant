@@ -1,0 +1,20 @@
+{
+  "name": "devteam-sandbox-node-web",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Locked dependency set of the node_web sandbox image (Part E). Starter-kit package.json files must list exactly these versions.",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.3.0",
+    "jsdom": "29.1.1",
+    "typescript": "5.9.3",
+    "vite": "8.3.8",
+    "vitest": "5.1.1"
+  }
+}

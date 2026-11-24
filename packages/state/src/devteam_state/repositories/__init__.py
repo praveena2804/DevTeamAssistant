@@ -11,6 +11,7 @@ from devteam_state.repositories import (
     principals,
     projects,
     runs,
+    sandbox,
     spec_versions,
 )
 
@@ -22,5 +23,6 @@ __all__ = [
     "principals",
     "projects",
     "runs",
+    "sandbox",
     "spec_versions",
 ]

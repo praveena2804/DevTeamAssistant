@@ -4,7 +4,7 @@
 
 [project]
 name = "devteam-ai"
-version = "0.4.0"
+version = "0.5.0"
 description = "DevTeam AI platform — local-first, BRD-driven software development platform (workspace root)"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
@@ -90,7 +90,7 @@ dev = [
 [tool.ruff]
 line-length = 110
 target-version = "py312"
-extend-exclude = ["apps/web", "data", "workspaces"]
+extend-exclude = ["apps/web", "data", "workspaces", "templates"]  # templates: generated-app code, checked in the sandbox
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "S", "N", "SIM", "RUF", "TID", "PTH", "C4", "PL"]
@@ -104,6 +104,11 @@ ignore = [
 "tests/**" = ["S101", "S105", "S106", "PLR2004", "S603", "S607", "S608"]
 "scripts/**" = ["S603", "S607", "T201"]
 "**/migrations/versions/*.py" = ["N999"]
+# Part E: "/tmp" in these files is a path INSIDE the sandbox container (a noexec tmpfs), not a host temp dir.
+"packages/harness/src/devteam_harness/sandbox/spec.py" = ["S108"]
+"tests/sandbox/**" = ["S101", "S105", "S106", "PLR2004", "S603", "S607", "S608", "S108", "PLR0917"]
+"tests/security/test_sandbox_units.py" = ["S101", "PLR2004", "S108"]
+"sandbox/tools/devteam_static_check.py" = ["PLR0912"]
 
 [tool.ruff.lint.isort]
 known-first-party = [
@@ -140,7 +145,7 @@ plugins = ["pydantic.mypy"]
 exclude = ["^apps/web/", "/migrations/versions/"]
 
 [[tool.mypy.overrides]]
-module = ["alembic.*", "pdfplumber.*", "docx.*", "lxml.*"]
+module = ["alembic.*", "pdfplumber.*", "docx.*", "lxml.*", "docker.*"]  # docker: no stubs shipped (Part E)
 ignore_missing_imports = true
 
 # ---------------------------------------------------------------- pytest
@@ -258,6 +263,38 @@ source_modules = [
 forbidden_modules = ["httpx"]
 ignore_imports = ["devteam_harness.llm_gateway.providers.** -> httpx"]
 unmatched_ignore_imports_alerting = "none"
+
+# ---- Part E.1: sandbox boundaries (Part E plan 3.1; D-50)
+
+[[tool.importlinter.contracts]]
+name = "only sandbox.engine may import the Docker SDK (HC-14)"
+type = "forbidden"
+source_modules = [
+    "devteam_core", "devteam_state", "devteam_harness", "devteam_services", "devteam_agents",
+    "devteam_orchestration", "devteam_worker", "devteam_api",
+]
+forbidden_modules = ["docker", "requests"]
+ignore_imports = [
+    "devteam_harness.sandbox.engine -> docker",
+    "devteam_harness.sandbox.engine -> docker.utils.proxy",
+    "devteam_harness.sandbox.engine -> requests",
+    "devteam_harness.sandbox.engine -> requests.adapters",
+]
+unmatched_ignore_imports_alerting = "none"
+
+[[tool.importlinter.contracts]]
+name = "agents, orchestration, API and worker never touch the Docker engine directly"
+type = "forbidden"
+source_modules = ["devteam_agents", "devteam_orchestration", "devteam_api", "devteam_worker"]
+forbidden_modules = ["devteam_harness.sandbox.engine", "devteam_harness.sandbox.tls"]
+allow_indirect_imports = true  # the sanctioned route is the sandbox service / tool layer; never a direct import
+
+[[tool.importlinter.contracts]]
+name = "the API never runs sandbox work (it only queues requests)"
+type = "forbidden"
+source_modules = ["devteam_api"]
+forbidden_modules = ["devteam_harness.sandbox.service", "devteam_harness.sandbox.runner", "devteam_harness.sandbox.guard"]
+allow_indirect_imports = true
 
 # ---- Part D.1: orchestration and worker boundaries (roadmap 7.1, Part D plan 3.1)
 

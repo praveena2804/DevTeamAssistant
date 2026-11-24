@@ -1,0 +1,64 @@
+# Starter kit: React + Vite + TypeScript frontend, FastAPI backend, SQLite (Part E plan §3.6).
+# Files come from ../_common (backend, tests, delivery files) plus this folder. Checked by TemplateManifest.
+template_id: react_fastapi_sqlite
+version: 1.0.0
+description: React (Vite, TypeScript) frontend with a FastAPI + SQLAlchemy + Alembic backend on SQLite.
+frontend: react
+backend: fastapi
+database: sqlite          # D-16: PostgreSQL arrives in Part K
+auth: none                # D-04: no login in Part E; an auth slot is reserved for a later extension
+writable_slots:           # what generated work may add or change (agents' own write scopes still apply)
+  - backend/app/models/**
+  - backend/app/api/**
+  - backend/app/services/**
+  - backend/alembic/versions/**
+  - frontend/src/pages/**
+  - frontend/src/components/**
+  - frontend/src/api/**
+  - docs/**
+tester_slots:
+  - tests/backend/**
+protected_files:          # checksum-recorded at materialisation; any change is reported
+  - backend/app/main.py
+  - backend/app/db.py
+  - backend/app/config.py
+  - backend/app/errors.py
+  - backend/alembic/env.py
+  - backend/alembic.ini
+  - frontend/vite.config.ts
+  - frontend/tsconfig.json
+  - frontend/package.json
+  - pytest.ini
+  - ruff.toml
+  - .github/workflows/ci.yml
+self_test:                # run in this order, offline, in the sandbox
+  - ruff_check
+  - bandit_scan
+  - alembic_upgrade
+  - pytest_api
+  - pytest_db
+  - tsc_check
+  - vitest_run
+  - npm_build
+dependencies:             # must equal entries of the image locks (contract test)
+  python:
+    - fastapi==0.165.0
+    - uvicorn==0.54.0
+    - pydantic==2.14.3
+    - sqlalchemy==2.1.9
+    - alembic==1.20.1
+  node:
+    - react==19.3.1
+    - react-dom==19.3.1
+    - "@vitejs/plugin-react==6.3.0"
+    - typescript==5.9.3
+    - vite==8.3.8
+    - vitest==5.1.1
+    - jsdom==29.1.1
+    - "@types/react==19.3.0"
+    - "@types/react-dom==19.3.0"
+app_runtime_dependencies: [fastapi, uvicorn, pydantic, sqlalchemy, alembic, react, react-dom]
+env_placeholders:         # non-secret defaults rendered into generated/.env
+  APP_NAME: "{{APP_TITLE}}"
+  DATABASE_URL: sqlite:///./data/app.db
+  LOG_LEVEL: INFO
