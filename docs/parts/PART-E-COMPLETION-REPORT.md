@@ -212,7 +212,7 @@ Deviations: DV-023…DV-028 in the tracker (§10), each minimal and explained.
 
 - G-E approved and push authorised by the owner (AP-022). Merged into `main` (`--no-ff`), version `0.5.0`,
   annotated tags `v0.5.0` and `part-e-approved`. No force-push; history not rewritten.
-- The push to `origin` and the remote check are recorded in the tracker (TR-0132) after they happen.
+- Pushed to `origin` without force (TR-0132): `main`, `part/b-intake`, `part/c-harness-core`, `part/d-orchestration`, `part/e-sandbox` and the tags `v0.4.0`, `part-d-approved`, `v0.5.0`, `part-e-approved`. Every branch and tag ID was compared with GitHub and matches.
 
 ## Acceptance criteria
 

@@ -110,4 +110,4 @@ I built Part E, the safe place where generated code will be built and tested. Do
 
 **Run 28 — Part E approved**
 
-You asked me to finish Part E completely. I ran every check again, fixed what they found, marked Part E as version 0.5.0, joined it into the main line of the project and labelled it.
+You asked me to finish Part E completely. I ran every check again, fixed what they found, marked Part E as version 0.5.0, joined it into the main line of the project and labelled it, and uploaded all of it to GitHub, where I checked that everything matches what was tested here.
