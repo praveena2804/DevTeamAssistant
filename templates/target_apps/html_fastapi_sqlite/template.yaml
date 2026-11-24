@@ -1,0 +1,47 @@
+# Starter kit: plain HTML/CSS/JS frontend, FastAPI backend, SQLite (Part E plan §3.6).
+# Files come from ../_common (backend, tests, delivery files) plus this folder. Checked by TemplateManifest.
+template_id: html_fastapi_sqlite
+version: 1.0.0
+description: Plain HTML, CSS and JavaScript frontend with a FastAPI + SQLAlchemy + Alembic backend on SQLite.
+frontend: html
+backend: fastapi
+database: sqlite          # D-16: PostgreSQL arrives in Part K
+auth: none                # D-04
+writable_slots:
+  - backend/app/models/**
+  - backend/app/api/**
+  - backend/app/services/**
+  - backend/alembic/versions/**
+  - frontend/**
+  - docs/**
+tester_slots:
+  - tests/backend/**
+protected_files:
+  - backend/app/main.py
+  - backend/app/db.py
+  - backend/app/config.py
+  - backend/app/errors.py
+  - backend/alembic/env.py
+  - backend/alembic.ini
+  - pytest.ini
+  - ruff.toml
+  - .github/workflows/ci.yml
+self_test:
+  - ruff_check
+  - bandit_scan
+  - alembic_upgrade
+  - pytest_api
+  - pytest_db
+  - static_validation
+dependencies:
+  python:
+    - fastapi==0.165.0
+    - uvicorn==0.54.0
+    - pydantic==2.14.3
+    - sqlalchemy==2.1.9
+    - alembic==1.20.1
+app_runtime_dependencies: [fastapi, uvicorn, pydantic, sqlalchemy, alembic]
+env_placeholders:
+  APP_NAME: "{{APP_TITLE}}"
+  DATABASE_URL: sqlite:///./data/app.db
+  LOG_LEVEL: INFO

@@ -73,6 +73,30 @@ def engine(live_settings: Settings, live_secrets: SecretsManager, wsl_keepalive:
         eng.close()
 
 
+@pytest.fixture(autouse=True)
+def release_wsl_page_cache(request: pytest.FixtureRequest) -> None:
+    """Test-environment housekeeping (KI-039): container runs leave page cache in the WSL VM, and without
+    ``autoMemoryReclaim`` in ``.wslconfig`` (D-45, owner-managed) Windows does not get it back, so the
+    Resource Guard would correctly make later tests wait. Before each Docker test, if free memory is low,
+    ask WSL to drop its cache. No platform control is changed."""
+    if request.node.get_closest_marker("docker") is None:
+        return
+    import psutil  # noqa: PLC0415
+
+    if psutil.virtual_memory().available // (1024 * 1024) >= 3072:
+        return
+    settings = load_settings()
+    subprocess.run(
+        ["wsl.exe", "-d", settings.sandbox.wsl_distribution, "-u", "root", "--", "sh", "-c",
+         "sync; echo 3 > /proc/sys/vm/drop_caches"],
+        capture_output=True, check=False, timeout=120,
+    )  # fmt: skip
+    for _ in range(30):  # Windows reclaims the freed VM memory after a short delay
+        if psutil.virtual_memory().available // (1024 * 1024) >= 3072:
+            return
+        time.sleep(1)
+
+
 @pytest.fixture(scope="session")
 def image_lock(live_settings: Settings) -> ImageLock:
     return ImageLock.load(live_settings.sandbox_image_lock_path)

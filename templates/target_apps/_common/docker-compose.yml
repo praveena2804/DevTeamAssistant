@@ -1,0 +1,11 @@
+# Run the generated application locally with Docker Compose (delivered as a file; not run by DevTeam AI).
+services:
+  app:
+    build: .
+    env_file: .env
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - app-data:/app/backend/data
+volumes:
+  app-data:

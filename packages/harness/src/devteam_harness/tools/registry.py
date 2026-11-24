@@ -44,8 +44,12 @@ class ToolSpec:
     summary_exclude: frozenset[str] = frozenset()  # argument names summarised by size only (e.g. content)
 
     def __post_init__(self) -> None:
-        if self.side_effect in {SideEffect.EXECUTE, SideEffect.EXTERNAL}:
-            raise ValueError("execute/external tools arrive with the sandbox (E) and publishing (P)")
+        if self.side_effect is SideEffect.EXTERNAL:
+            raise ValueError("external tools arrive with publishing (P)")
+        if self.side_effect is SideEffect.EXECUTE and (self.access is not Access.NONE or self.path_arg):
+            # Part E: execute tools run allowlisted sandbox recipes on the task's generated tree; they never
+            # take a path or a command from the caller.
+            raise ValueError("execute tools take no path argument and no file access")
         if self.timeout_s <= 0:
             raise ValueError("a tool needs a positive time limit")
         if (self.access is Access.NONE) != (self.path_arg is None):

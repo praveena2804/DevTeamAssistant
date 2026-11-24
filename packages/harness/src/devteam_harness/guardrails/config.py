@@ -39,7 +39,19 @@ GENERATED = "generated/"
 READ_TOOLS = frozenset({"read_project_file", "list_project_files"})
 WRITE_TOOLS = frozenset({"write_project_file"})
 NON_PATH_TOOLS = frozenset({"read_extracted_document", "search_project_knowledge"})
-KNOWN_TOOLS = READ_TOOLS | WRITE_TOOLS | NON_PATH_TOOLS
+# Part E: execute tools run allowlisted sandbox recipes (no path, no command). Per-role ceilings follow
+# docs/architecture/HARNESS_ASSESSMENT.md (B = build, T = tests, M = migrations).
+EXECUTE_TOOLS = frozenset({"request_build", "request_test_run", "request_migration_check"})
+KNOWN_TOOLS = READ_TOOLS | WRITE_TOOLS | NON_PATH_TOOLS | EXECUTE_TOOLS
+EXECUTE_CEILINGS: Mapping[AgentRole, frozenset[str]] = MappingProxyType(
+    {
+        AgentRole.DATABASE_DEVELOPER: frozenset({"request_migration_check"}),
+        AgentRole.BACKEND_DEVELOPER: frozenset({"request_build", "request_test_run"}),
+        AgentRole.FRONTEND_DEVELOPER: frozenset({"request_build"}),
+        AgentRole.TESTER: frozenset({"request_test_run"}),
+        AgentRole.DEBUGGER_REVIEWER: frozenset({"request_build", "request_test_run"}),
+    }
+)
 
 _BUILD = frozenset({Stage.BUILD, Stage.CHANGE_REQUEST})
 STAGE_CEILINGS: Mapping[AgentRole, frozenset[Stage]] = MappingProxyType(
@@ -254,6 +266,12 @@ def _check_policy(policy: _PolicyFile, protected: _ProtectedFile) -> None:  # no
             if tool not in KNOWN_TOOLS:
                 raise ConfigError(
                     f"{where}: unknown tool '{tool}' (tools are added in code, not configuration)"
+                )
+            if tool in EXECUTE_TOOLS and (
+                grant.read or grant.write or tool not in EXECUTE_CEILINGS.get(role, ())
+            ):
+                raise ConfigError(
+                    f"{where}.{tool}: execute tools take no path scopes and need the role's ceiling"
                 )
             if tool in NON_PATH_TOOLS and (grant.read or grant.write):
                 raise ConfigError(f"{where}.{tool}: this tool takes no path scopes")

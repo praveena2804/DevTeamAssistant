@@ -37,6 +37,7 @@ from devteam_harness.sandbox.images import ImageLock, verify_image
 from devteam_harness.sandbox.spec import METRICS_FILE, OUT_DIR, WORK_DIR, ContainerSpec, locked_down_problems
 
 SANDBOX_UID = 10001
+STANDARD_FOLDERS = (".devteam", ".devteam/out", ".devteam/home")
 _TRUNCATED = b"\n[... output truncated by the sandbox ...]\n"
 MAX_COLLECTED_FILES = 200
 
@@ -95,6 +96,11 @@ def build_tar(files: Mapping[str, bytes], max_bytes: int) -> bytes:
     buffer = io.BytesIO()
     folders: set[str] = set()
     with tarfile.open(fileobj=buffer, mode="w", format=tarfile.PAX_FORMAT) as tar:
+        for folder in STANDARD_FOLDERS:  # every recipe may write its reports and caches here
+            info = tarfile.TarInfo(folder)
+            info.type, info.mode, info.uid, info.gid = tarfile.DIRTYPE, 0o755, SANDBOX_UID, SANDBOX_UID
+            tar.addfile(info)
+            folders.add(folder)
         for raw_path in sorted(files):
             path = _safe_relative(raw_path)
             parent = posixpath.dirname(path)

@@ -100,7 +100,9 @@ def test_workdir_outside_work_is_refused() -> None:
 def test_tar_is_owned_by_the_sandbox_user_and_regular_files_only() -> None:
     with tarfile.open(fileobj=io.BytesIO(build_tar({"a/b/c.txt": b"x", "d.txt": b"y"}, 100))) as tar:
         members = {m.name: m for m in tar.getmembers()}
-    assert set(members) == {"a", "a/b", "a/b/c.txt", "d.txt"}
+    standard = {".devteam", ".devteam/out", ".devteam/home"}  # runner.STANDARD_FOLDERS, always present
+    assert set(members) == {"a", "a/b", "a/b/c.txt", "d.txt"} | standard
+    assert all(members[name].isdir() for name in standard)
     assert all(m.uid == m.gid == 10001 for m in members.values())
     assert all(m.isreg() or m.isdir() for m in members.values())
 

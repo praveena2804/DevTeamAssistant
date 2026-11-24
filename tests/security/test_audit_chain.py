@@ -112,7 +112,14 @@ def test_redacted_details_are_what_gets_hashed(sessions: sessionmaker[Session]) 
         ),
         (("DELETE FROM audit_events WHERE seq = 6", "UPDATE audit_chain_head SET seq = 6"), 6, "removed"),
         (("DELETE FROM audit_events WHERE seq = 6",), 6, "removed"),  # the newest entry deleted
-        (("UPDATE audit_events SET hash = 'f' || substr(hash, 2) WHERE seq = 6",), 6, "altered"),
+        (
+            (  # always a real change: a hash already starting with 'f' made this a no-op 1 time in 16
+                "UPDATE audit_events SET hash = "
+                "(CASE WHEN substr(hash, 1, 1) = 'f' THEN 'e' ELSE 'f' END) || substr(hash, 2) WHERE seq = 6",
+            ),
+            6,
+            "altered",
+        ),
     ],
 )
 def test_tampering_is_detected_at_the_right_entry(

@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "generated_at": "2026-11-23T16:59:51+00:00",
+  "generated_at": "2026-11-23T17:44:40+00:00",
   "engine": "29.1.3",
   "images": {
     "python_api": {
       "tag": "devteam-sandbox/python_api:1",
-      "image_id": "sha256:97050d65714518666b6fe6f6acf3ffc4959542fe12cb33b0895c5a8ad0d73b00",
+      "image_id": "sha256:4e10191d7f744ddf807b813feeb4d56051aa1c7a1a37d9c88e6f619d6cf25891",
       "dockerfile_sha256": "7aa528865f5083166699d5f85aa20c8968de53be3dfa810d1b8f4615fcef407f",
       "lock_sha256": "04c97eb4885d8c4cb9afd1e7504a39d0b2805029aa5cefa5ab386a0b9f93dc15",
       "packages_by_tier": {

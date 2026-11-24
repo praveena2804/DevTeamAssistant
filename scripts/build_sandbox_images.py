@@ -41,6 +41,7 @@ import docker
 
 from devteam_core.config import Settings, load_settings
 from devteam_harness.sandbox.engine import Engine, connect
+from devteam_harness.sandbox.errors import SandboxBlockedError
 from devteam_harness.sandbox.licences import LicencePolicy, PackageLicence, evaluate
 from devteam_harness.secrets import secrets_manager_from_settings
 
@@ -343,6 +344,18 @@ def _sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _connect_when_ready(settings: Settings) -> Engine:
+    """WSL may still be booting the distribution (cold start after `wsl --shutdown`): retry for 90 s."""
+    deadline = time.monotonic() + 90
+    while True:
+        try:
+            return connect(settings, secrets_manager_from_settings(settings), timeout=900)
+        except SandboxBlockedError:
+            if time.monotonic() > deadline:
+                raise
+            time.sleep(3)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--relock-node", action="store_true")
@@ -356,8 +369,7 @@ def main(argv: list[str] | None = None) -> int:
         stdin=subprocess.DEVNULL,
     )
     try:
-        time.sleep(3)
-        with connect(settings, secrets_manager_from_settings(settings), timeout=900) as engine:
+        with _connect_when_ready(settings) as engine:
             if args.relock_node or not (IMAGES / "node_web" / "package-lock.json").is_file():
                 relock_node(engine)
             images: dict[str, Any] = {}
@@ -408,10 +420,27 @@ def main(argv: list[str] | None = None) -> int:
             (IMAGES / "licence_report.json").write_text(
                 json.dumps(report, indent=1) + "\n", encoding="utf-8", newline="\n"
             )
-    except (BuildError, docker.errors.DockerException) as exc:
+    except (BuildError, SandboxBlockedError, docker.errors.DockerException) as exc:
         print(f"image build failed: {exc}", file=sys.stderr)
         return 1
     finally:
+        # Image builds leave page cache in the WSL VM; release it so Windows gets the memory back (D-45).
+        subprocess.run(
+            [
+                "wsl.exe",
+                "-d",
+                settings.sandbox.wsl_distribution,
+                "-u",
+                "root",
+                "--",
+                "sh",
+                "-c",
+                "sync; echo 3 > /proc/sys/vm/drop_caches",
+            ],
+            capture_output=True,
+            check=False,
+            timeout=120,
+        )
         keepalive.terminate()
     print("images built, checked and locked: sandbox/images/images.lock.json")
     return 0

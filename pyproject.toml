@@ -287,6 +287,7 @@ name = "agents, orchestration, API and worker never touch the Docker engine dire
 type = "forbidden"
 source_modules = ["devteam_agents", "devteam_orchestration", "devteam_api", "devteam_worker"]
 forbidden_modules = ["devteam_harness.sandbox.engine", "devteam_harness.sandbox.tls"]
+allow_indirect_imports = true  # the sanctioned route is the sandbox service / tool layer; never a direct import
 
 # ---- Part D.1: orchestration and worker boundaries (roadmap 7.1, Part D plan 3.1)
 
