@@ -34,6 +34,9 @@ REMOTE_SETTINGS = (
     "LANGCHAIN_API_KEY",
     "LANGSMITH_OTEL_ENABLED",
 )
+# Part F (KI-045): ChromaDB brings the OpenTelemetry OTLP exporter as a dependency. It is never configured by
+# the platform; any variable that could configure an OpenTelemetry exporter or endpoint is refused.
+OTEL_PREFIXES = ("OTEL_EXPORTER_", "OTEL_TRACES_EXPORTER", "OTEL_METRICS_EXPORTER", "OTEL_LOGS_EXPORTER")
 _OFF = {"", "0", "false", "no", "off"}
 
 
@@ -63,6 +66,9 @@ def cloud_tracing_settings(environ: Mapping[str, str] | None = None) -> TracingR
     env = os.environ if environ is None else environ
     enabled = tuple(name for name in TRACING_SWITCHES if env.get(name, "").strip().lower() not in _OFF)
     remote = tuple(name for name in REMOTE_SETTINGS if env.get(name, "").strip())
+    remote += tuple(
+        sorted(name for name in env if name.upper().startswith(OTEL_PREFIXES) and str(env[name]).strip())
+    )
     return TracingReport(enabled_switches=enabled, remote_settings=remote)
 
 

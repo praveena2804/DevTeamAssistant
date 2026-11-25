@@ -15,7 +15,7 @@ pytestmark = pytest.mark.contract
 
 INVENTORY = REPO_ROOT / "docs" / "THIRD_PARTY_LICENSES.md"
 ROW = re.compile(r"^\| (?P<name>[A-Za-z0-9_.\-]+) \| (?P<version>[^|]+?) \| (?P<licence>[^|]+?) \|$")
-COPYLEFT_RULED = {"orjson", "certifi"}  # listed in §1 with their ruling status
+COPYLEFT_RULED = {"orjson", "certifi", "tqdm"}  # listed in §1 with their ruling status (tqdm: AP-024)
 DEV_ONLY_MPL = {"hypothesis", "pathspec"}
 
 

@@ -17,6 +17,7 @@ The generated target applications are not covered here; their dependencies come 
 |---|---|---|---|---|
 | `orjson` | 3.13.0 | `MPL-2.0 AND (Apache-2.0 OR MIT)` | `langgraph-sdk` (LangGraph) and `langsmith` (via `langchain-core`); D.1 | **Accepted conditionally** by the owner on 2026-11-23 (KI-023): obligations below; source never modified |
 | `certifi` | 2026.10.23 | `MPL-2.0` (metadata `License` field and classifier) | `httpx` / `httpcore` and `requests`; in the lockfile since Part A (v0.1.0) | **Accepted conditionally** by the owner on 2026-11-23 (KI-026), on the same terms as orjson: obligations below; source never modified |
+| `tqdm` | 4.70.1 | `MPL-2.0 AND MIT` | `chromadb` (Part F.5, D-54) | **Accepted** by the owner on 2026-11-25 with ChromaDB (AP-024; audit TR-0141): progress bars only, used unmodified as a separate package; obligations below |
 
 Development-only tools, which are never part of a runtime install or a distribution:
 - `hypothesis` 6.170.15 (MPL-2.0), the test framework;
@@ -34,43 +35,66 @@ MPL-2.0 is a file-level copyleft licence. Its conditions attach to the MPL-licen
 | The executable form may be distributed under other terms only if those terms do not limit the recipient's rights to the MPL source (§3.2(b)) | Nothing in this project restricts them |
 
 **What triggers a new review:**
-- upgrading orjson or certifi to a version whose licence expression changes (the test fails);
+- upgrading orjson, certifi or tqdm to a version whose licence expression changes (the test fails);
 - copying any of their source files into this repository;
 - distributing the platform in packaged form.
 
 ## 2. All runtime packages
 
-76 packages. Three are installed only on other platforms (environment markers) and are not on this Windows install.
+134 packages. 4 are installed only on other platforms (environment markers) and are not on this Windows install.
 
 | Package | Version | Licence (from package metadata) |
 |---|---|---|
+| aiohappyeyeballs | 2.7.1 | Python Software Foundation License |
+| aiohttp | 3.14.5 | Apache-2.0 AND MIT |
+| aiohttp-retry | 2.9.1 | MIT License |
+| aiosignal | 1.4.0 | Apache Software License |
 | aiosqlite | 0.22.1 | MIT License |
 | alembic | 1.20.1 | MIT |
 | annotated-doc | 0.0.7 | MIT |
 | annotated-types | 0.8.0 | MIT |
 | anyio | 4.16.0 | MIT |
+| attrs | 26.1.0 | MIT |
+| bcrypt | 5.0.0 | Apache Software License |
+| build | 1.6.1 | MIT |
 | certifi | 2026.10.23 | Mozilla Public License 2.0 (MPL 2.0) |
 | cffi | 2.1.1 | MIT-0 |
 | charset-normalizer | 3.5.2 | MIT |
+| chromadb | 1.5.9 | Apache Software License |
 | click | 8.5.1 | BSD-3-Clause |
+| colorama | 0.4.6 | BSD License |
 | cryptography | 50.0.2 | Apache-2.0 OR BSD-3-Clause |
 | distro | 1.9.0 | Apache Software License |
 | docker | 7.2.0 | Apache-2.0 |
+| durationpy | 0.12 | MIT |
 | fastapi | 0.165.0 | MIT |
+| filelock | 4.2.12 | MIT |
+| flatbuffers | 25.12.19 | Apache Software License |
+| frozenlist | 1.8.0 | Apache-2.0 |
+| fsspec | 2026.9.0 | BSD-3-Clause |
+| googleapis-common-protos | 1.76.0 | Apache-2.0 |
+| grpcio | 1.85.4 | Apache-2.0 |
 | h11 | 0.16.0 | MIT License |
+| hf-xet | 1.8.0 | Apache-2.0 |
 | httpcore | 1.0.9 | BSD-3-Clause |
 | httpcore2 | 2.16.2 | BSD-3-Clause |
+| httptools | 0.9.0 | MIT |
 | httpx | 0.28.1 | BSD License |
 | httpx2 | 2.16.2 | BSD-3-Clause |
-| httpx2-jsfetch | 1.0 | not installed on Windows (platform-specific); licence not checked |
+| httpx2-jsfetch | 1.0 | not installed on Windows (sys_platform == 'emscripten') |
+| huggingface_hub | 2.4.0 | Apache Software License |
 | idna | 3.20 | BSD-3-Clause |
+| importlib_resources | 7.1.0 | Apache-2.0 |
 | jaraco.classes | 3.4.0 | MIT License |
 | jaraco.context | 6.1.2 | MIT |
 | jaraco.functools | 4.6.0 | MIT |
-| jeepney | 0.9.0 | not installed on Windows (platform-specific); licence not checked |
+| jeepney | 0.9.0 | not installed on Windows (sys_platform == 'linux') |
 | jsonpatch | 1.48 | BSD-3-Clause |
 | jsonpointer | 3.12 | BSD-3-Clause |
+| jsonschema | 4.26.0 | MIT |
+| jsonschema-specifications | 2025.9.1 | MIT |
 | keyring | 25.7.0 | MIT |
+| kubernetes | 37.0.3 | Apache-2.0 |
 | langchain-core | 1.8.4 | MIT License |
 | langchain-protocol | 0.0.22 | MIT License |
 | langgraph | 1.2.24 | MIT |
@@ -81,46 +105,79 @@ MPL-2.0 is a file-level copyleft licence. Its conditions attach to the MPL-licen
 | langsmith | 0.16.0 | MIT |
 | lxml | 6.1.3 | BSD-3-Clause |
 | Mako | 1.4.3 | MIT |
+| markdown-it-py | 4.3.0 | MIT License |
 | MarkupSafe | 3.0.4 | BSD-3-Clause |
+| mdurl | 0.1.2 | MIT License |
+| mmh3 | 5.3.1 | MIT License |
 | more-itertools | 11.2.1 | MIT |
+| multidict | 7.2.1 | Apache-2.0 |
+| numpy | 2.5.5 | BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0 |
+| oauthlib | 4.0.1 | BSD-3-Clause |
+| onnxruntime | 1.32.0 | MIT License |
 | opentelemetry-api | 1.45.2 | Apache-2.0 |
+| opentelemetry-exporter-otlp-common | 0.66b2 | Apache-2.0 |
+| opentelemetry-exporter-otlp-proto-common | 1.45.2 | Apache-2.0 |
+| opentelemetry-exporter-otlp-proto-grpc | 1.45.2 | Apache-2.0 |
+| opentelemetry-proto | 1.45.2 | Apache-2.0 |
 | opentelemetry-sdk | 1.45.2 | Apache-2.0 |
 | opentelemetry-semantic-conventions | 0.66b2 | Apache-2.0 |
 | orjson | 3.13.0 | MPL-2.0 AND (Apache-2.0 OR MIT) |
 | ormsgpack | 1.13.1 | Apache-2.0 OR MIT |
+| overrides | 7.7.0 | Apache License, Version 2.0 |
 | packaging | 26.3 | Apache-2.0 OR BSD-2-Clause |
 | pdfminer.six | 20260107 | MIT |
 | pdfplumber | 0.11.10 | MIT License |
 | pillow | 13.0.0 | MIT-CMU |
+| propcache | 0.5.4 | Apache-2.0 |
+| protobuf | 7.36.2 | 3-Clause BSD License |
 | psutil | 7.2.2 | BSD-3-Clause |
+| pybase64 | 1.5.2 | BSD-2-Clause |
 | pycparser | 3.12 | BSD-3-Clause |
 | pydantic | 2.14.3 | MIT |
+| pydantic-settings | 2.16.3 | MIT |
 | pydantic_core | 2.50.4 | MIT |
+| Pygments | 2.21.0 | BSD-2-Clause |
 | pypdf | 6.21.4 | BSD-3-Clause |
 | pypdfium2 | 5.15.2 | BSD-3-Clause, Apache-2.0, dependency licenses |
+| PyPika | 0.51.1 | Apache Software License |
+| pyproject_hooks | 1.3.3 | MIT |
+| python-dateutil | 4.0.0 | BSD-3-Clause |
 | python-docx | 1.2.0 | MIT License |
 | python-dotenv | 1.2.4 | BSD-3-Clause |
 | python-multipart | 0.0.34 | Apache-2.0 |
-| pywin32-ctypes | 0.2.3 | BSD-3-Clause |
 | pywin32 | 312 | Python Software Foundation License |
+| pywin32-ctypes | 0.2.3 | BSD-3-Clause |
 | PyYAML | 6.0.3 | MIT License |
+| referencing | 0.37.0 | MIT |
 | requests | 2.34.2 | Apache Software License |
+| requests-oauthlib | 2.0.0 | BSD License |
 | requests-toolbelt | 1.0.0 | Apache Software License |
-| secretstorage | 3.5.0 | not installed on Windows (platform-specific); licence not checked |
+| rich | 15.0.0 | MIT License |
+| rpds-py | 2026.9.1 | MIT |
+| secretstorage | 3.5.0 | not installed on Windows (sys_platform == 'linux') |
+| shellingham | 1.5.4 | ISC License (ISCL) |
 | sniffio | 1.3.1 | MIT License / Apache Software License |
 | SQLAlchemy | 2.1.9 | MIT |
 | sqlite-vec | 0.1.9 | MIT License, Apache License, Version 2.0 |
 | starlette | 1.10.0 | BSD-3-Clause |
 | structlog | 26.1.0 | MIT OR Apache-2.0 |
 | tenacity | 9.2.1 | Apache-2.0 |
+| tokenizers | 0.23.3 | Apache Software License |
+| tqdm | 4.70.1 | MPL-2.0 AND MIT |
 | truststore | 0.10.5 | MIT |
+| typer | 0.29.2 | MIT |
 | typing-inspection | 0.4.5 | MIT |
 | typing_extensions | 4.16.0 | PSF-2.0 |
+| tzdata | 2026.6 | Apache-2.0 |
 | urllib3 | 2.8.0 | MIT |
 | uuid_utils | 0.19.0 | BSD-3-Clause |
 | uvicorn | 0.54.0 | BSD-3-Clause |
+| uvloop | 0.23.0 | not installed on Windows (platform_python_implementation != 'PyPy' and sys_platform != 'cygwin' and sys_platform != 'win32') |
+| watchfiles | 1.3.0 | MIT License |
+| websocket-client | 1.9.2 | Apache-2.0 |
 | websockets | 17.4 | BSD-3-Clause |
 | xxhash | 4.1.0 | BSD-2-Clause |
+| yarl | 1.25.1 | Apache-2.0 |
 | zstandard | 0.25.0 | BSD-3-Clause |
 
 ## 3. Sandbox images (Part E)

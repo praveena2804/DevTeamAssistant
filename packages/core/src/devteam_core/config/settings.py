@@ -245,6 +245,28 @@ class LlmSettings(_Section):
     digest_refresh_s: float = Field(default=300, gt=0, le=86_400)
 
 
+class RagSettings(_Section):
+    """Retrieval over project knowledge (Part F, HC-08; plan §6.4-§6.5). ChromaDB in-process (D-54)."""
+
+    top_k: int = Field(default=6, ge=1, le=12)
+    max_distance: float = Field(default=0.8, gt=0, le=2)  # cosine distance cut-off
+    batch_size: int = Field(default=16, ge=1, le=64)
+    search_timeout_s: float = Field(default=30, gt=0, le=300)
+    index_job_max_calls: int = Field(default=2000, ge=1, le=100_000)
+    index_job_minutes: float = Field(default=30, gt=0, le=600)
+
+
+class ContextSettings(_Section):
+    """Context Manager token budgets per role group (Part F plan §6.5): retrieval and memory caps."""
+
+    discovery_retrieval_tokens: int = Field(default=1536, ge=0, le=8192)
+    discovery_memory_tokens: int = Field(default=256, ge=0, le=8192)
+    build_retrieval_tokens: int = Field(default=1024, ge=0, le=8192)
+    build_memory_tokens: int = Field(default=512, ge=0, le=8192)
+    documenter_retrieval_tokens: int = Field(default=768, ge=0, le=8192)
+    documenter_memory_tokens: int = Field(default=512, ge=0, le=8192)
+
+
 class Settings(_Section):
     profile: ProfileName = "low_memory"
     root: Path
@@ -254,6 +276,8 @@ class Settings(_Section):
     logging: LoggingSettings = LoggingSettings()
     ollama: OllamaSettings = OllamaSettings()
     llm: LlmSettings = LlmSettings()
+    rag: RagSettings = RagSettings()
+    context: ContextSettings = ContextSettings()
     resources: ResourceSettings = ResourceSettings()
     uploads: UploadSettings = UploadSettings()
     auth: AuthSettings = AuthSettings()

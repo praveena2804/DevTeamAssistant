@@ -309,15 +309,22 @@ allow_indirect_imports = true
 [[tool.importlinter.contracts]]
 name = "evaluation, RAG, context and memory never reach a model provider directly (AC-F-01)"
 type = "forbidden"
-source_modules = ["devteam_harness.evaluation"]
+source_modules = ["devteam_harness.evaluation", "devteam_harness.rag", "devteam_harness.context", "devteam_harness.memory"]
 forbidden_modules = ["devteam_harness.llm_gateway.providers", "httpx"]
 allow_indirect_imports = true
+
+[[tool.importlinter.contracts]]
+name = "only rag.store imports ChromaDB (D-54, KI-045)"
+type = "forbidden"
+source_modules = ["devteam_core", "devteam_state", "devteam_harness", "devteam_services", "devteam_orchestration", "devteam_api", "devteam_worker", "devteam_agents"]
+forbidden_modules = ["chromadb"]
+ignore_imports = ["devteam_harness.rag.store -> chromadb"]
 
 [[tool.importlinter.contracts]]
 name = "the API never calls models or opens the vector store (D-57)"
 type = "forbidden"
 source_modules = ["devteam_api"]
-forbidden_modules = ["devteam_harness.llm_gateway"]
+forbidden_modules = ["devteam_harness.llm_gateway", "devteam_harness.rag.store", "chromadb"]
 allow_indirect_imports = true
 # ---- Part D.1: orchestration and worker boundaries (roadmap 7.1, Part D plan 3.1)
 

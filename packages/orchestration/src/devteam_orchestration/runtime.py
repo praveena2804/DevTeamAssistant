@@ -38,6 +38,7 @@ from devteam_harness.agent_sdk.registry import AgentRegistry
 from devteam_harness.approvals import ApprovalService, load_approval_rules
 from devteam_harness.audit import DatabaseAuditSink
 from devteam_harness.budgets import BudgetManager, Budgets, load_budgets
+from devteam_harness.budgets.jobs import JobBudget, JobLimits
 from devteam_harness.budgets.resource_lease import ResourceLease
 from devteam_harness.errors import HarnessError
 from devteam_harness.executor import AgentExecutor, HarnessServices
@@ -52,6 +53,7 @@ from devteam_harness.llm_gateway.providers.ollama import OllamaProvider
 from devteam_harness.llm_gateway.resilience import CircuitBreakers
 from devteam_harness.llm_gateway.router import Router
 from devteam_harness.observability import Tracer
+from devteam_harness.rag import Ingestor, Retriever, VectorStore
 from devteam_harness.resilience import RetryPolicy
 from devteam_harness.sandbox.service import SandboxService
 from devteam_harness.secrets import secrets_manager_from_settings
@@ -59,6 +61,7 @@ from devteam_harness.tools import ToolLayer, build_default_registry
 from devteam_harness.tools.files import ControlledFileService, FileLimits
 from devteam_orchestration.prompts import build_prompt_registry
 from devteam_orchestration.safety import ensure_local_only
+from devteam_services.extractor import CHUNKER_VERSION
 
 PROVIDER_GRACE_S = 15  # the HTTP timeout outlives the gateway's F-9d timeout slightly
 
@@ -105,6 +108,8 @@ class Runtime:
     sandbox: SandboxService | None = None  # Part E: reached through tools and verification jobs only
     router: Router | None = None  # Part F: model routing (config/models.yaml)
     gateway: LLMGateway | None = None  # Part F: the one door to models, also for service jobs (RAG)
+    retriever: Retriever | None = None  # Part F.5: project-isolated retrieval (search tool)
+    ingestor: Ingestor | None = None  # Part F.5: indexing (worker jobs); None without a vector store
 
     def workspace(self, project_id: str) -> Path:
         root = self.settings.workspaces_dir.resolve()
@@ -126,6 +131,7 @@ def build_runtime(
     *,
     config_dir: Path | None = None,
     clock: Clock = system_clock,
+    rag_store: VectorStore | None = None,
 ) -> Runtime:
     ensure_local_only()
     config = config_dir or (find_repo_root() / "config")
@@ -156,9 +162,6 @@ def build_runtime(
     sandbox = SandboxService(
         settings, sessions, secrets_manager_from_settings(settings), models=provider, clock=clock
     )
-    tools = build_default_registry(sandbox)
-    tools.check_consistency(guardrails)
-    tool_layer = ToolLayer(tools, PolicyEngine(guardrails), sink, sessions)
     lease = ResourceLease(
         sessions, ttl_s=settings.sandbox.lock_ttl_s, wait_s=settings.sandbox.lock_wait_s, clock=clock
     )
@@ -195,6 +198,33 @@ def build_runtime(
             ram_margin_mb=catalog.ram_margin_mb,
         ),
     )
+    # Part F.5: retrieval over project knowledge (HC-08). The vector store is supplied by the caller (D-54);
+    # without one, indexing and search fail closed (``rag.store_unavailable``).
+    rag = settings.rag
+
+    def rag_budget(project_id: str) -> JobBudget:
+        limits = JobLimits(
+            max_model_calls=rag.index_job_max_calls,
+            max_tokens=rag.index_job_max_calls * 8_192,
+            max_minutes=rag.index_job_minutes,
+            model_call_timeout_s=int(rag.search_timeout_s),
+            min_free_ram_mb=budgets.resources.min_free_ram_mb,
+        )
+        return JobBudget(limits, project_id=project_id)
+
+    retriever = Retriever(
+        gateway, rag_store, sessions, chunker_version=CHUNKER_VERSION, new_budget=rag_budget,
+        max_distance=rag.max_distance, clock=clock,
+    )  # fmt: skip
+    ingestor = (
+        Ingestor(gateway, rag_store, sessions, chunker_version=CHUNKER_VERSION, new_budget=rag_budget,
+                 batch_size=rag.batch_size, clock=clock)
+        if rag_store is not None
+        else None
+    )  # fmt: skip
+    tools = build_default_registry(sandbox, retriever=retriever, search_timeout_s=rag.search_timeout_s)
+    tools.check_consistency(guardrails)
+    tool_layer = ToolLayer(tools, PolicyEngine(guardrails), sink, sessions)
     services = HarnessServices(
         registry=registry,
         behaviours=MappingProxyType(behaviours),
@@ -233,6 +263,8 @@ def build_runtime(
         sandbox=sandbox,
         router=router,
         gateway=gateway,
+        retriever=retriever,
+        ingestor=ingestor,
     )
 
 

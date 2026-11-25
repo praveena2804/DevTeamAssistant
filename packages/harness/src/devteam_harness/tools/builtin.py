@@ -14,6 +14,7 @@ guardrail before they reach a model (C.4).
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
@@ -28,6 +29,7 @@ from devteam_harness.tools.registry import ToolRegistry, ToolSpec
 from devteam_state.repositories import documents
 
 if TYPE_CHECKING:
+    from devteam_harness.rag.retrieve import Retriever
     from devteam_harness.sandbox.service import SandboxService
 
 _BUILD = frozenset(
@@ -111,12 +113,24 @@ class ReadDocumentResult(_Strict):
 
 
 class SearchArgs(_Strict):
+    """v2 (Part F): optional document filter. The project always comes from the task, never from here."""
+
     query: str = Field(min_length=1, max_length=500)
-    limit: int = Field(default=5, ge=1, le=10)
+    limit: int = Field(default=6, ge=1, le=12)
+    sources: tuple[DocumentId, ...] = Field(default=(), max_length=10)
+
+
+class SearchHit(_Strict):
+    chunk_id: str
+    document_id: str
+    reference: str
+    text: str
+    score: float
 
 
 class SearchResult(_Strict):
-    hits: tuple[DocumentChunkView, ...]
+    hits: tuple[SearchHit, ...]
+    index_incomplete: bool = False  # some documents of the project are not indexed yet
 
 
 # ---------------------------------------------------------------------------------------- handlers
@@ -155,11 +169,30 @@ def _read_document(inv: ToolInvocation) -> ReadDocumentResult:
     return ReadDocumentResult(document_id=inv.args.document_id, total=total, chunks=views)
 
 
-def _search(_inv: ToolInvocation) -> SearchResult:
-    raise ToolUnavailableError("project knowledge search is available from Part F (RAG)")
+def _search_unavailable(_inv: ToolInvocation) -> SearchResult:
+    raise ToolUnavailableError("project knowledge search is not available (no vector store configured)")
 
 
-def build_default_registry(sandbox: SandboxService | None = None) -> ToolRegistry:
+def _search_with(retriever: Retriever) -> Callable[[ToolInvocation], SearchResult]:
+    def handler(inv: ToolInvocation) -> SearchResult:
+        project_id = inv.ctx.task.project_id  # isolation: only the task's own project
+        outcome = retriever.search(project_id, inv.args.query, limit=inv.args.limit, sources=inv.args.sources)
+        hits = tuple(
+            SearchHit(chunk_id=h.chunk_id, document_id=h.document_id, reference=h.reference, text=h.text,
+                      score=h.score)
+            for h in outcome.hits
+        )  # fmt: skip
+        return SearchResult(hits=hits, index_incomplete=outcome.index_incomplete)
+
+    return handler
+
+
+def build_default_registry(
+    sandbox: SandboxService | None = None,
+    *,
+    retriever: Retriever | None = None,
+    search_timeout_s: float = 30.0,
+) -> ToolRegistry:
     """The tool catalogue. Part E adds the three execute tools; without a configured ``sandbox`` they are
     registered but refuse every call as Blocked (fail closed), so the central policy stays consistent."""
     from devteam_harness.sandbox.tools import blocked_tool_specs, sandbox_tool_specs  # noqa: PLC0415
@@ -225,15 +258,15 @@ def build_default_registry(sandbox: SandboxService | None = None) -> ToolRegistr
     registry.register(
         ToolSpec(
             name="search_project_knowledge",
-            version=1,
+            version=2,
             input_model=SearchArgs,
             output_model=SearchResult,
             side_effect=SideEffect.READ,
             access=Access.NONE,
             path_arg=None,
             allowed_roles=_DISCOVERY | {AgentRole.ARCHITECT},
-            timeout_s=5,
-            handler=_search,
+            timeout_s=search_timeout_s,
+            handler=_search_with(retriever) if retriever is not None else _search_unavailable,
         )
     )
     for spec in sandbox_tool_specs(sandbox) if sandbox is not None else blocked_tool_specs():

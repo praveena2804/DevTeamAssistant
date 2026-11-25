@@ -33,9 +33,9 @@ models:
     slow_after_s: 75
   nomic-embed-text:
     kind: embedding
-    approved: false                       # D-53 ruled (AP-023); approved once benchmarked in F.5
-    benchmark_ref: null
-    peak_ram_mb: null
+    approved: true                        # D-53 (AP-023); benchmarked 2026-11-25
+    benchmark_ref: docs/benchmarks/2026-11-25-embedding.md
+    peak_ram_mb: 480
     num_ctx: 2048
     timeouts: {connect_s: 5, read_s: 60, total_s: 60}
     slow_after_s: 40
@@ -46,7 +46,7 @@ slots:
   review:      {model: null, inherit: coder}      # D-37; Spec §9.2
   coder_large: {model: null, inherit: coder}      # Spec §9.2: a 7B only after a benchmark
   fallback:    {model: qwen2.5:1.5b}
-  embedding:   {model: null}                      # D-53: set after the F.5 benchmark; never overridden per agent/operation
+  embedding:   {model: nomic-embed-text}          # D-53; never overridden per agent or operation
 
 fallback_ladders:                         # used only after resource failures (OOM, too slow, load failure)
   instruct: [qwen2.5:1.5b]

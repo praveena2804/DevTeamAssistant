@@ -233,6 +233,7 @@ class IntakeService:
                 paragraph_end=c.paragraph_end,
                 reference=c.reference,
                 content_sha256=c.content_sha256,
+                chunker_version=CHUNKER_VERSION,  # Part F: the index is rebuilt when the chunker changes
             )
             for c in chunks
         ]

@@ -1,5 +1,6 @@
 """BRD upload, extraction detail and paginated chunks (FR-001, FR-003; AC-B-01…03)."""
 
+from datetime import UTC, datetime
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, File, Query, Request, UploadFile, status
@@ -18,13 +19,14 @@ from devteam_api.schemas import (
     UploadResponse,
     WarningOut,
 )
-from devteam_core.ids import is_valid_id
+from devteam_core.ids import is_valid_id, new_id
 from devteam_harness import audit
 from devteam_harness.validation import UploadRejected
 from devteam_services.intake import IncomingFile, IntakeService
 from devteam_state.models import SourceDocument
 from devteam_state.repositories import documents as documents_repo
 from devteam_state.repositories import projects as projects_repo
+from devteam_state.repositories import rag as rag_repo
 
 router = APIRouter(
     prefix="/api", tags=["documents"], dependencies=[Depends(limit_rate)], responses=ERROR_RESPONSES
@@ -104,6 +106,11 @@ def upload_documents(
         )
     projects_repo.touch(db, project)
     extracted = sum(o.status == "extracted" for o in outcomes)
+    if extracted:  # Part F.5: the worker indexes new documents for retrieval (the API never embeds, D-57)
+        rag_repo.queue_index_job(
+            db, job_id=new_id("rij"), project_id=project.id, kind="index", requested_by=principal.id,
+            now=datetime.now(UTC),
+        )  # fmt: skip
     scope.set(extracted=extracted, rejected=len(outcomes) - extracted)
     return UploadResponse(
         extracted=extracted,

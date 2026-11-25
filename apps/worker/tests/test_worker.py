@@ -464,3 +464,39 @@ def test_run_forever_serves_verifications_and_refreshes_status_when_idle(
     monkeypatch.setattr(worker_module, "SANDBOX_STATUS_INTERVAL_S", 0.0)
     worker.run_forever()
     assert calls == ["verify", "refresh"]
+
+
+def test_an_index_job_without_a_vector_store_ends_blocked_and_audited(env: Env) -> None:
+    from datetime import UTC, datetime  # noqa: PLC0415
+
+    from devteam_core.ids import new_id  # noqa: PLC0415
+    from devteam_state.repositories import rag as rag_repo  # noqa: PLC0415
+
+    with env.sessions.begin() as session:
+        job_id = rag_repo.queue_index_job(
+            session, job_id=new_id("rij"), project_id=env.project_id, kind="index",
+            requested_by=env.owner.id, now=datetime.now(UTC),
+        )  # fmt: skip
+    worker = Worker(env.rt, env.graph, owner="indexer")
+    assert env.rt.ingestor is None  # no vector store configured (KI-045)
+    assert worker.run_index_job_once() is True
+    assert worker.run_index_job_once() is False  # nothing left
+    with env.sessions() as session:
+        job = rag_repo.latest_job(session, env.project_id)
+        assert job is not None and job.id == job_id
+        assert (job.status, job.error_code) == ("blocked", "rag.store_unavailable")
+        events = [
+            e.details for e in session.scalars(select(AuditEvent).where(AuditEvent.action == "rag.indexed"))
+        ]
+    assert events == [
+        {"job_id": job_id, "kind": "index", "status": "blocked", "error_code": "rag.store_unavailable"}
+    ]
+
+
+def test_the_model_inventory_is_not_written_when_ollama_is_unreachable(env: Env) -> None:
+    from devteam_state.repositories import model_calls as model_calls_repo  # noqa: PLC0415
+
+    worker = Worker(env.rt, env.graph, owner="inventory")
+    assert worker.refresh_models() is False  # the env's Ollama URL is a closed port
+    with env.sessions() as session:
+        assert model_calls_repo.inventory(session) == []

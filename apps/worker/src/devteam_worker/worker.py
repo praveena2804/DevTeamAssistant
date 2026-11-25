@@ -31,12 +31,15 @@ from devteam_core.contracts.sandbox import TemplateVerificationStatus
 from devteam_core.contracts.statuses import RunStatus
 from devteam_core.ids import new_id
 from devteam_core.logging import get_logger
+from devteam_harness.errors import HarnessError, ResourceUnavailableError
 from devteam_orchestration.execution import Advance, advance
 from devteam_orchestration.runtime import Runtime
 from devteam_services.templates import refresh_stale, run_verification
 from devteam_state.models import Run, RunJob
 from devteam_state.repositories import audit
+from devteam_state.repositories import model_calls as model_calls_repo
 from devteam_state.repositories import orchestration as orch
+from devteam_state.repositories import rag as rag_repo
 from devteam_state.repositories import sandbox as sandbox_repo
 
 WORKER = "service:run_worker"
@@ -65,6 +68,7 @@ class Worker:
         self._current_run: tuple[str, str] | None = None
         self._heartbeat: threading.Thread | None = None
         self._sandbox_checked = 0.0
+        self._models_checked = -1e9  # first idle pass records the model inventory (Part F.6)
 
     # ------------------------------------------------------------------------------------ lease
 
@@ -249,9 +253,13 @@ class Worker:
 
     def run_forever(self) -> None:
         while not self.stopping:
-            if self.run_once() is None and not self.run_verification_once():
+            idle = self.run_once() is None
+            if idle and not self.run_verification_once() and not self.run_index_job_once():
                 if time.monotonic() - self._sandbox_checked >= SANDBOX_STATUS_INTERVAL_S:
                     self.refresh_sandbox()
+                if time.monotonic() - self._models_checked >= SANDBOX_STATUS_INTERVAL_S:
+                    self._models_checked = time.monotonic()  # not in start(): a down Ollama can take seconds
+                    self.refresh_models()
                 self._stop.wait(self.settings.poll_interval_s)
 
     # ------------------------------------------------------------------------- sandbox (Part E)
@@ -290,6 +298,65 @@ class Worker:
         temporary.replace(target)
         self._sandbox_checked = time.monotonic()
         return status
+
+    def refresh_models(self) -> bool:
+        """Record the local model inventory (tags, digests, Ollama version) for the read-only Settings page
+        (Part F.6): the API reads this table and never contacts Ollama. ``False`` if Ollama is unreachable."""
+        server = self.rt.provider
+        router = self.rt.router
+        if router is None:
+            return False
+        try:
+            installed = server.list_models()
+            version = server.version()
+        except HarnessError:
+            return False
+        with self.rt.sessions.begin() as session:
+            model_calls_repo.replace_inventory(
+                session,
+                installed,
+                router.all_models(),
+                server_version=version,
+                checked_at=self.rt.clock.now(),
+            )
+        return True
+
+    def run_index_job_once(self) -> bool:
+        """Run one queued RAG index job (Part F.5), if any. Without a vector store it ends Blocked."""
+        with self.rt.sessions.begin() as session:
+            job = rag_repo.claim_next_index_job(session, now=self.rt.clock.now())
+            if job is None:
+                return False
+            job_id, project_id, kind = job.id, job.project_id, job.kind
+        status, code, detail = "done", None, None
+        try:
+            if self.rt.ingestor is None:
+                raise ResourceUnavailableError("rag.store_unavailable", "the vector store is not available")
+            result = self.rt.ingestor.index_project(project_id, rebuild=kind == "rebuild")
+            detail = (
+                f"indexed {len(result.indexed)}, unchanged {len(result.unchanged)}, "
+                f"removed {len(result.removed)}, "
+                f"skipped {len(result.skipped)}, chunks {result.chunks}"
+            )
+        except ResourceUnavailableError as exc:
+            status, code, detail = "blocked", exc.code, exc.message
+        except HarnessError as exc:
+            status, code, detail = "failed", exc.code, exc.message
+        except Exception as exc:
+            _log.exception("index_job_failed", job_id=job_id)
+            status, code, detail = "failed", "rag.index_error", type(exc).__name__
+        with self.rt.sessions.begin() as session:
+            rag_repo.finish_index_job(
+                session, job_id, status=status, now=self.rt.clock.now(), error_code=code, detail=detail
+            )
+            audit.append(
+                session, action="rag.indexed", outcome="success" if status == "done" else "error",
+                principal_id="service:rag_ingestor", project_id=project_id,
+                details={"job_id": job_id, "kind": kind, "status": status, "error_code": code},
+                clock=self.rt.clock,
+            )  # fmt: skip
+        _log.info("index_job_done", job_id=job_id, status=status)
+        return True
 
     def run_verification_once(self) -> bool:
         """Run one queued starter-kit verification (D-49), if any. Runs are always served first."""

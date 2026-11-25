@@ -23,6 +23,7 @@ from types import FrameType
 from devteam_core.config import load_settings
 from devteam_core.errors import ConfigError
 from devteam_core.logging import configure_logging, get_logger
+from devteam_harness.rag.store import ChromaVectorStore
 from devteam_harness.secrets import secrets_manager_from_settings
 from devteam_orchestration.execution import open_checkpointer
 from devteam_orchestration.graph import build_graph
@@ -57,7 +58,8 @@ def main(argv: list[str] | None = None) -> int:
                 "the state database is not at the current migration; start the API once to migrate"
             )
         sessions = session_factory(engine)
-        runtime = build_runtime(settings, sessions)
+        # Part F.5: the worker is the composition root that owns the vector store (D-54; ChromaDB in-process)
+        runtime = build_runtime(settings, sessions, rag_store=ChromaVectorStore(settings.data_dir / "chroma"))
         models = check_models(runtime)
         if models.missing:
             raise ConfigError(f"configured local models are not installed: {', '.join(models.missing)}")
@@ -85,7 +87,9 @@ def main(argv: list[str] | None = None) -> int:
     _log.info("worker_started", owner=worker.owner, model_version=models.version)
     try:
         if args.once:
-            while not worker.stopping and (worker.run_once() is not None or worker.run_verification_once()):
+            while not worker.stopping and (
+                worker.run_once() is not None or worker.run_verification_once() or worker.run_index_job_once()
+            ):
                 pass
         else:
             worker.run_forever()

@@ -254,11 +254,11 @@ def test_extracted_document_reader_is_project_isolated(
     )
 
 
-def test_knowledge_search_is_an_interface_until_part_f(
+def test_knowledge_search_fails_closed_without_a_vector_store(  # Part F: v2; was the Part C interface stub
     layer: ToolLayer, project: dict[str, str], root: Path
 ) -> None:
     ctx = _ctx(_task(project["project"], AgentRole.BRD_ANALYST), root, stage=Stage.ANALYSIS)
-    result = layer.invoke(_call(ctx, "search_project_knowledge", {"query": "orders"}), ctx)
+    result = layer.invoke(_call(ctx, "search_project_knowledge", {"query": "orders"}, version=2), ctx)
     assert result.outcome is ToolOutcome.ERROR and result.error is not None
     assert (
         result.error.category is ErrorCategory.RESOURCE_UNAVAILABLE

@@ -107,6 +107,7 @@ class DocumentChunk(Base):
     paragraph_end: Mapped[int] = mapped_column(Integer)
     reference: Mapped[str] = mapped_column(Text)
     content_sha256: Mapped[str] = mapped_column(String(64))
+    chunker_version: Mapped[str | None] = mapped_column(String(10), nullable=True)  # Part F (0009)
 
 
 class AuditEvent(Base):
@@ -524,6 +525,56 @@ class ModelInventoryRow(Base):
     checked_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
+class RagCollectionRow(Base):
+    """One vector collection per project and identity (embedding model + digest + chunker version)."""
+
+    __tablename__ = "rag_collections"
+
+    id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    project_id: Mapped[str] = mapped_column(String(40), index=True)
+    name: Mapped[str] = mapped_column(String(120), unique=True)
+    embedding_model: Mapped[str] = mapped_column(String(130))
+    embedding_digest: Mapped[str] = mapped_column(String(64))
+    chunker_version: Mapped[str] = mapped_column(String(10))
+    dimensions: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    status: Mapped[str] = mapped_column(String(12))  # building | ready | retired
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class RagIndexDocumentRow(Base):
+    """A document held by a collection, at a given content checksum and chunker version (freshness)."""
+
+    __tablename__ = "rag_index_documents"
+
+    collection_id: Mapped[str] = mapped_column(
+        ForeignKey("rag_collections.id", ondelete="CASCADE"), primary_key=True
+    )
+    document_id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    project_id: Mapped[str] = mapped_column(String(40), index=True)
+    content_sha256: Mapped[str] = mapped_column(String(64))
+    chunker_version: Mapped[str] = mapped_column(String(10))
+    chunk_count: Mapped[int] = mapped_column(Integer)
+    indexed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class RagIndexJobRow(Base):
+    """An index/rebuild request: queued by the API, run by the worker (the API never embeds)."""
+
+    __tablename__ = "rag_index_jobs"
+
+    id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    project_id: Mapped[str] = mapped_column(String(40), index=True)
+    kind: Mapped[str] = mapped_column(String(10))  # index | rebuild
+    status: Mapped[str] = mapped_column(String(10), index=True)  # queued | running | done | failed | blocked
+    requested_by: Mapped[str] = mapped_column(String(200))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    error_code: Mapped[str | None] = mapped_column(String(62), nullable=True)
+    detail: Mapped[str | None] = mapped_column(String(500), nullable=True)
+
+
 __all__ = [
     "NAMING_CONVENTION",
     "AgentOutputRow",
@@ -541,6 +592,9 @@ __all__ = [
     "Principal",
     "PrincipalRole",
     "Project",
+    "RagCollectionRow",
+    "RagIndexDocumentRow",
+    "RagIndexJobRow",
     "ResourceLock",
     "Run",
     "RunEventRow",

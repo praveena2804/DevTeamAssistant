@@ -61,14 +61,72 @@ def test_only_the_local_sqlite_exporter_is_attached(tracer: Tracer, monkeypatch:
         assert [type(e) for e in t.exporters] == [SqliteSpanExporter]
 
 
-def test_no_network_exporter_package_is_installed() -> None:
-    for name in ("opentelemetry.exporter", "opentelemetry.exporter.otlp", "opentelemetry.exporter.zipkin"):
-        assert importlib.util.find_spec(name.split(".")[0]) is not None  # opentelemetry itself exists
-        try:
-            found = importlib.util.find_spec(name)
-        except ModuleNotFoundError:
-            found = None
-        assert found is None, name
+# D-30 (Part C) used to also assert that no OpenTelemetry network exporter package was installed. Since
+# Part F,
+# ChromaDB (owner-accepted, AP-024 / KI-045) depends on the OTLP exporter, so the package is present. The
+# control is now on *use*, which is what keeps traces local (DV-033):
+#   1. no platform source imports an exporter (static scan, with a negative control);
+#   2. no environment variable may configure an exporter or endpoint (``ensure_local_only`` refuses it;
+#      ChromaDB's own ``CHROMA_*`` settings are refused by the vector store);
+#   3. after ChromaDB has been used, the global tracer provider is unchanged and the platform tracer still
+#      exports only to the local SQLite store (and the socket-jail test shows no outbound connection).
+
+PLATFORM_SRC = [
+    p
+    for root in ("packages", "apps", "agents")
+    for p in (Path(__file__).resolve().parents[2] / root).rglob("*.py")
+    if "tests" not in p.parts and "node_modules" not in p.parts
+]
+
+
+def _exporter_imports(source: str) -> list[str]:
+    import ast  # noqa: PLC0415
+
+    found = []
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, ast.Import):
+            found += [a.name for a in node.names if a.name.startswith("opentelemetry.exporter")]
+        elif isinstance(node, ast.ImportFrom) and (node.module or "").startswith("opentelemetry.exporter"):
+            found.append(node.module or "")
+    return found
+
+
+def test_no_platform_module_imports_a_network_exporter() -> None:
+    assert len(PLATFORM_SRC) > 100  # the scan really covers the platform
+    offenders = {
+        str(p): hits for p in PLATFORM_SRC if (hits := _exporter_imports(p.read_text(encoding="utf-8")))
+    }
+    assert offenders == {}
+    planted = "from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter\n"
+    assert _exporter_imports(planted)  # negative control: the scan detects an exporter import
+
+
+@pytest.mark.parametrize(
+    "variable",
+    ["OTEL_EXPORTER_OTLP_ENDPOINT", "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", "OTEL_TRACES_EXPORTER"],
+)
+def test_otel_exporter_configuration_is_refused(variable: str) -> None:
+    from devteam_orchestration.safety import CloudTracingConfiguredError, ensure_local_only  # noqa: PLC0415
+
+    with pytest.raises(CloudTracingConfiguredError) as info:
+        ensure_local_only({variable: "http://203.0.113.9:4317"})
+    assert variable in info.value.variables
+    ensure_local_only({"OTEL_SERVICE_NAME": "devteam"})  # unrelated OTEL settings are fine
+
+
+def test_chromadb_leaves_tracing_local(tmp_path: Path, tracer: Any) -> None:
+    from opentelemetry import trace  # noqa: PLC0415
+
+    from devteam_harness.rag.store import ChromaVectorStore  # noqa: PLC0415
+
+    before = type(trace.get_tracer_provider())
+    store = ChromaVectorStore(tmp_path / "chroma")
+    store.ensure("p_t")
+    store.upsert("p_t", ["x"], [[0.1, 0.2]], [{"project_id": "T"}])
+    store.query("p_t", [0.1, 0.2], limit=1, where={"project_id": "T"})
+    assert type(trace.get_tracer_provider()) is before  # ChromaDB configured no provider or exporter
+    assert [type(e) for e in tracer.exporters] == [SqliteSpanExporter]  # the platform still exports locally
+    assert importlib.util.find_spec("opentelemetry") is not None
 
 
 def test_spans_are_stored_locally_and_reuse_the_part_a_trace_id(tracer: Any) -> None:

@@ -39,6 +39,22 @@ llm:                                 # LLM Gateway (Part F; models and routing i
   unload_verify_s: 10                # /api/ps check after unloading a model
   digest_refresh_s: 300              # how often the gateway re-reads installed model digests
 
+rag:                                 # Part F (HC-08): retrieval over project knowledge
+  top_k: 6
+  max_distance: 0.8                  # cosine distance cut-off
+  batch_size: 16                     # chunks per embedding call
+  search_timeout_s: 30
+  index_job_max_calls: 2000
+  index_job_minutes: 30
+
+context:                             # Part F: Context Manager budgets (tokens) per role group
+  discovery_retrieval_tokens: 1536
+  discovery_memory_tokens: 256
+  build_retrieval_tokens: 1024
+  build_memory_tokens: 512
+  documenter_retrieval_tokens: 768
+  documenter_memory_tokens: 512
+
 resources:
   max_parallel_deterministic: 1      # D-27 (recommended default; LLM and sandbox work always sequential)
   llm_context_tokens: 4096           # Spec §9.3 initial range 4096–8192

@@ -53,7 +53,8 @@ def test_the_repository_catalogue_is_valid_and_routes_every_chat_slot() -> None:
     )
     review = router.resolve(AgentRole.DEBUGGER_REVIEWER, "debugger_reviewer.review_code", ModelSlot.REVIEW)
     assert review.tag == "qwen2.5-coder:3b" and review.rule is RouteRule.SLOT  # review inherits coder
-    assert set(router.all_models()) == {"qwen2.5:3b", "qwen2.5-coder:3b", "qwen2.5:1.5b"}
+    assert set(router.all_models()) == {"qwen2.5:3b", "qwen2.5-coder:3b", "qwen2.5:1.5b", "nomic-embed-text"}
+    assert router.embedding().tag == "nomic-embed-text"  # D-53, benchmarked
 
 
 def test_precedence_operation_then_agent_then_slot_then_global() -> None:
