@@ -52,7 +52,6 @@ from devteam_harness.llm_gateway.providers.ollama import OllamaProvider
 from devteam_harness.llm_gateway.resilience import CircuitBreakers
 from devteam_harness.llm_gateway.router import Router
 from devteam_harness.observability import Tracer
-from devteam_harness.prompts import InMemorySkillRegistry
 from devteam_harness.resilience import RetryPolicy
 from devteam_harness.sandbox.service import SandboxService
 from devteam_harness.secrets import secrets_manager_from_settings
@@ -169,6 +168,8 @@ def build_runtime(
         registry.seal(guardrails)
         router.check_operations({spec.role: [op.operation_id for op in spec.operations] for spec in registry})
         rate_limits = RateLimits(load_rate_limits(config))
+        prompts, skills = build_prompt_registry(config)  # Part F: files verified against prompts.yaml
+        prompts.check_agents({spec.prompt_id: spec.prompt_version for spec in registry})
     except ConfigError as exc:
         raise RuntimeConfigError(str(exc)) from None
     llm = settings.llm
@@ -202,8 +203,8 @@ def build_runtime(
         gateway=gateway,
         budgets=BudgetManager(budgets, sessions, sink),
         retry=retry,
-        prompts=build_prompt_registry(),
-        skills=InMemorySkillRegistry(),
+        prompts=prompts,
+        skills=skills,
         tracer=tracer,
         sink=sink,
         sessions=sessions,

@@ -13,3 +13,4 @@
 uv.lock linguist-generated=true -diff
 apps/web/package-lock.json linguist-generated=true -diff
 apps/web/src/api/schema.d.ts linguist-generated=true
+prompts/** text eol=lf

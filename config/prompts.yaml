@@ -1,0 +1,47 @@
+# Active prompt versions and the hash of every released version (Part F, HC-16; D-58).
+# Prompt files: prompts/<agent>/<prompt_id>.v<N>.md (front matter + body). The body's SHA-256 must equal
+# the hash recorded here, or the platform refuses to start (a released version is never edited).
+# eval_required (D-56): true once the prompt's agent part (H onwards) supplies its evaluation dataset;
+# the Part D stub prompts below are listed as 'not evaluated' by the CI eval gate until then.
+schema_version: 1
+prompts:
+  brd_analyst.system:
+    active: 1
+    eval_required: false
+    released: {1: b76bde95ce7564cf01ca0bcb878f819254b6ae5b5821c45c39731e125eb2523a}
+  requirements_finalizer.system:
+    active: 1
+    eval_required: false
+    released: {1: e26451daeaf5dd8f9c36560d62041f8d8679f068ce336992be81d8d1e55c36db}
+  head.system:
+    active: 1
+    eval_required: false
+    released: {1: c74128fc2dc0ca074d89fe0c3b3cf1509aae9572741d2f2aea5e1d53364e7a7d}
+  architect.system:
+    active: 1
+    eval_required: false
+    released: {1: 151434f25833dce30829341cebc4e723a53428fe6f08a8cf1889d224c7fc33a8}
+  database_developer.system:
+    active: 1
+    eval_required: false
+    released: {1: 2b73a0cccaad69b358815823f45cced37bebb4426aa274a3fabb57c6b2f7d147}
+  backend_developer.system:
+    active: 1
+    eval_required: false
+    released: {1: af31e976f6994fbc49adc9c985be64ac8442ee80adcfc5568fd62acbedb7a2b1}
+  frontend_developer.system:
+    active: 1
+    eval_required: false
+    released: {1: 57b35ec051547f6e0c3f74c316e77b75d869871ab360061803c39567cd55c39f}
+  tester.system:
+    active: 1
+    eval_required: false
+    released: {1: 9fb0827fa664f67c2d5178a3ccfc91312b2f2c1d63c2fc95a288b1084aa90065}
+  debugger_reviewer.system:
+    active: 1
+    eval_required: false
+    released: {1: 7f5c7907126ea63204485c341462c1834e5b50f19372989c828c732c0e380244}
+  documenter.system:
+    active: 1
+    eval_required: false
+    released: {1: 87f6317bf2041e9e20675d4eddab193c3689e3b9bb312190bb492b05fecb1061}

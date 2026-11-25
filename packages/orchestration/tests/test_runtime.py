@@ -14,7 +14,7 @@ from devteam_core.contracts.agents import BrdAnalystInput, DebuggerReviewerInput
 from devteam_core.contracts.llm import Provider
 from devteam_core.contracts.statuses import AgentRole, ModelSlot, Stage, TaskStatus
 from devteam_core.contracts.tasks import AgentTask
-from devteam_orchestration.prompts import PROMPT_VERSION, PROMPTS, build_prompt_registry
+from devteam_orchestration.prompts import build_prompt_registry
 from devteam_orchestration.runtime import RuntimeConfigError, build_runtime, check_models
 from devteam_orchestration.safety import CloudTracingConfiguredError
 from devteam_orchestration.steps import ResourceWait, ensure_task, run_task, task_row_status
@@ -45,10 +45,11 @@ def test_the_only_provider_is_the_local_ollama(offline: Env) -> None:
 
 
 def test_every_operation_names_a_registered_answer_contract_and_every_agent_a_prompt(offline: Env) -> None:
-    prompts = build_prompt_registry()
+    prompts, _skills = build_prompt_registry(REPO_ROOT / "config")
+    active = prompts.active()
     for spec in offline.rt.registry:
-        assert spec.prompt_id in PROMPTS
-        assert prompts.get(spec.prompt_id, PROMPT_VERSION).text == PROMPTS[spec.prompt_id]
+        assert spec.prompt_id in active  # every agent has an active, verified prompt file (Part F, D-58)
+        assert prompts.get(spec.prompt_id, spec.prompt_version).sha256 == active[spec.prompt_id].sha256
         for op in spec.operations:
             assert op.output_schema in CONTRACT_MODELS, op.operation_id
 
