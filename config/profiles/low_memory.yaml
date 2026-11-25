@@ -3,6 +3,9 @@ resources:
   max_parallel_deterministic: 1
   llm_context_tokens: 4096
   min_free_ram_mb: 3072
+  max_model_ram_mb: 3072             # 3B models at most (models.yaml rule 8)
+ollama:
+  keep_alive: 0s                     # D-59: unload right after each call on this profile
 sandbox:
   limits:
     memory_mb: 1536

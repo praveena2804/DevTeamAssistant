@@ -28,6 +28,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from devteam_core.clock import Clock, system_clock
 from devteam_core.config import Settings
+from devteam_core.config.models import CHAT_SLOTS, load_model_catalog
 from devteam_core.contracts import CONTRACT_MODELS
 from devteam_core.contracts.statuses import AgentRole, ModelSlot
 from devteam_core.errors import ConfigError
@@ -44,7 +45,12 @@ from devteam_harness.guardrails import PolicyEngine, load_guardrails
 from devteam_harness.guardrails.config import Guardrails
 from devteam_harness.guardrails.input import InputGuard
 from devteam_harness.llm_gateway import LLMGateway
+from devteam_harness.llm_gateway.cache import EmbeddingCache, ResponseCache
+from devteam_harness.llm_gateway.gateway import GatewayOptions
+from devteam_harness.llm_gateway.limits import RateLimits, load_rate_limits
 from devteam_harness.llm_gateway.providers.ollama import OllamaProvider
+from devteam_harness.llm_gateway.resilience import CircuitBreakers
+from devteam_harness.llm_gateway.router import Router
 from devteam_harness.observability import Tracer
 from devteam_harness.prompts import InMemorySkillRegistry
 from devteam_harness.resilience import RetryPolicy
@@ -98,6 +104,8 @@ class Runtime:
         default_factory=lambda: MappingProxyType({})
     )
     sandbox: SandboxService | None = None  # Part E: reached through tools and verification jobs only
+    router: Router | None = None  # Part F: model routing (config/models.yaml)
+    gateway: LLMGateway | None = None  # Part F: the one door to models, also for service jobs (RAG)
 
     def workspace(self, project_id: str) -> Path:
         root = self.settings.workspaces_dir.resolve()
@@ -127,19 +135,20 @@ def build_runtime(
     approvals = ApprovalService(load_approval_rules(config), sessions, clock=clock)
     sink = DatabaseAuditSink(sessions)
     tracer = Tracer(sessions)
-    models = settings.ollama.models
+    # Part F: model catalogue and router (config/models.yaml; MODEL_ROUTING.md); start-up rules 1-9.
+    try:
+        catalog = load_model_catalog(config, max_model_ram_mb=settings.resources.max_model_ram_mb)
+    except ConfigError as exc:
+        raise RuntimeConfigError(str(exc)) from None
+    router = Router(catalog)
     timeout = min(
         settings.ollama.request_timeout_s,
         max(p.model_call_timeout_s for p in budgets.profiles.values()) + PROVIDER_GRACE_S,
     )
+    slot_models: dict[ModelSlot, str] = {s: m for s in CHAT_SLOTS if (m := catalog.slot_model(s)) is not None}
     provider = OllamaProvider(
         settings.ollama.base_url,
-        {
-            ModelSlot.INSTRUCT: models.instruct,
-            ModelSlot.CODER: models.coder,
-            ModelSlot.REVIEW: models.review,
-            ModelSlot.FALLBACK: models.fallback,
-        },
+        slot_models,
         timeout_s=timeout,
         keep_alive=settings.ollama.keep_alive,
         schemas=_schema,
@@ -155,14 +164,36 @@ def build_runtime(
         sessions, ttl_s=settings.sandbox.lock_ttl_s, wait_s=settings.sandbox.lock_wait_s, clock=clock
     )
     retry = RetryPolicy(budgets.retries)
-    gateway = LLMGateway(
-        provider, InputGuard(guardrails.input), sink, tracer, retry, clock=clock, resource_lease=lease
-    )
     registry, behaviours = _agents()
     try:
         registry.seal(guardrails)
+        router.check_operations({spec.role: [op.operation_id for op in spec.operations] for spec in registry})
+        rate_limits = RateLimits(load_rate_limits(config))
     except ConfigError as exc:
         raise RuntimeConfigError(str(exc)) from None
+    llm = settings.llm
+    gateway = LLMGateway(
+        provider,
+        InputGuard(guardrails.input),
+        sink,
+        tracer,
+        retry,
+        clock=clock,
+        resource_lease=lease,
+        router=router,
+        sessions=sessions,
+        rate_limits=rate_limits,
+        breakers=CircuitBreakers(threshold=llm.breaker_threshold, cooldown_s=llm.breaker_cooldown_s),
+        response_cache=ResponseCache(sessions, clock=clock),
+        embedding_cache=EmbeddingCache(sessions, clock=clock),
+        options=GatewayOptions(
+            response_cache=llm.response_cache,
+            cancel_wait_s=llm.cancel_wait_s,
+            unload_verify_s=llm.unload_verify_s,
+            digest_refresh_s=llm.digest_refresh_s,
+            ram_margin_mb=catalog.ram_margin_mb,
+        ),
+    )
     services = HarnessServices(
         registry=registry,
         behaviours=MappingProxyType(behaviours),
@@ -199,6 +230,8 @@ def build_runtime(
         clock=clock,
         write_scopes=MappingProxyType({spec.role: tuple(spec.write_paths) for spec in registry}),
         sandbox=sandbox,
+        router=router,
+        gateway=gateway,
     )
 
 
@@ -214,7 +247,8 @@ def check_models(runtime: Runtime) -> ModelCheck:
     """Is the local Ollama reachable, and are the configured models installed? Never pulls a model."""
     try:
         version = runtime.provider.version()
-        missing = runtime.provider.missing_models()
+        wanted = runtime.router.all_models() if runtime.router is not None else None
+        missing = runtime.provider.missing_models(wanted)
     except HarnessError as exc:
         return ModelCheck(ok=False, version=None, missing=(), problem=exc.message)
     if missing:

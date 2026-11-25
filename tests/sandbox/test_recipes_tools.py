@@ -18,7 +18,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from devteam_core.config import Settings
 from devteam_core.contracts.errors import ErrorCategory
 from devteam_core.contracts.sandbox import SandboxExecutionStatus
-from devteam_core.contracts.statuses import AgentRole, Stage
+from devteam_core.contracts.statuses import AgentRole, ModelSlot, Stage
 from devteam_core.contracts.tasks import AgentTask
 from devteam_core.contracts.tools import ToolCall, ToolOutcome
 from devteam_core.ids import new_id
@@ -87,7 +87,7 @@ def service(
 ) -> Iterator[SandboxService]:
     provider = OllamaProvider(
         live_settings.ollama.base_url,
-        {"instruct": live_settings.ollama.models.instruct},  # type: ignore[dict-item]
+        {ModelSlot.INSTRUCT: "qwen2.5:3b"},  # only used to unload models (Resource Guard)
         timeout_s=60,
     )
     yield SandboxService(live_settings, sessions, live_secrets, models=provider)

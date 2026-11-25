@@ -1,0 +1,52 @@
+{
+  "additionalProperties": false,
+  "description": "An embedding call by a platform service (never an agent): indexing or a retrieval query (HC-08).\n\nTexts live in memory only; records keep their SHA-256 (``ModelCall.input_hash``), never the text.",
+  "properties": {
+    "principal_id": {
+      "pattern": "^service:[a-z][a-z0-9_]{1,40}$",
+      "title": "Principal Id",
+      "type": "string"
+    },
+    "project_id": {
+      "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Project Id",
+      "type": "string"
+    },
+    "purpose": {
+      "pattern": "^rag\\.(index|query)$",
+      "title": "Purpose",
+      "type": "string"
+    },
+    "request_id": {
+      "pattern": "^mrq_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Request Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "texts": {
+      "items": {
+        "maxLength": 8000,
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 64,
+      "minItems": 1,
+      "title": "Texts",
+      "type": "array"
+    }
+  },
+  "required": [
+    "request_id",
+    "principal_id",
+    "purpose",
+    "project_id",
+    "texts"
+  ],
+  "title": "EmbedRequest",
+  "type": "object"
+}

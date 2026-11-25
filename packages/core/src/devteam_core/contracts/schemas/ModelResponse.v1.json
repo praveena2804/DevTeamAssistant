@@ -65,6 +65,27 @@
       ],
       "title": "Provider",
       "type": "string"
+    },
+    "RecoveryStep": {
+      "description": "Where on the recovery ladder a call ran (Spec §9.4; Part F plan §6.2).",
+      "enum": [
+        "none",
+        "reduced_context",
+        "smaller_model"
+      ],
+      "title": "RecoveryStep",
+      "type": "string"
+    },
+    "RouteRule": {
+      "description": "Which routing rule chose the model (MODEL_ROUTING §3.2); recorded on every ``ModelCall``.",
+      "enum": [
+        "operation",
+        "agent",
+        "slot",
+        "global"
+      ],
+      "title": "RouteRule",
+      "type": "string"
     }
   },
   "additionalProperties": false,
@@ -75,6 +96,11 @@
       "minimum": 1,
       "title": "Attempt",
       "type": "integer"
+    },
+    "cache_hit": {
+      "default": false,
+      "title": "Cache Hit",
+      "type": "boolean"
     },
     "duration_ms": {
       "minimum": 0,
@@ -121,10 +147,25 @@
     "provider": {
       "$ref": "#/$defs/Provider"
     },
+    "recovery_step": {
+      "$ref": "#/$defs/RecoveryStep",
+      "default": "none"
+    },
     "request_id": {
       "pattern": "^mrq_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
       "title": "Request Id",
       "type": "string"
+    },
+    "route_rule": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RouteRule"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     },
     "schema_version": {
       "const": 1,

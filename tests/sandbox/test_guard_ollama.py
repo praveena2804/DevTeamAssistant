@@ -9,6 +9,7 @@ import httpx
 import pytest
 
 from devteam_core.config import Settings
+from devteam_core.config.models import load_model_catalog
 from devteam_core.contracts.statuses import ModelSlot
 from devteam_harness.budgets.resource_lease import ResourceLease
 from devteam_harness.llm_gateway.providers.ollama import OllamaProvider
@@ -19,7 +20,8 @@ pytestmark = pytest.mark.llm
 
 
 def test_guard_unloads_the_loaded_model(live_settings: Settings, tmp_path: Path) -> None:
-    model = live_settings.ollama.models.fallback  # the smallest configured model
+    model = load_model_catalog(live_settings.root / "config").slot_model(ModelSlot.FALLBACK)  # smallest
+    assert model is not None
     with httpx.Client(base_url=live_settings.ollama.base_url, trust_env=False, timeout=300) as client:
         client.post(
             "/api/generate", json={"model": model, "prompt": "", "keep_alive": "5m"}

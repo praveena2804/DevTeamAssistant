@@ -62,6 +62,11 @@ ALLOWED_ATTRIBUTES = frozenset(
         "model.provider",
         "model.id",
         "model.slot",
+        "model.route_rule",  # Part F: which routing rule chose the model
+        "model.recovery_step",  # Part F: none / reduced_context / smaller_model
+        "model.recovery_trigger",  # Part F: the resource error code that moved a call down a rung
+        "model.slow",
+        "model.cache_hit",
         "prompt.id",
         "prompt.version",
         "tokens.input",

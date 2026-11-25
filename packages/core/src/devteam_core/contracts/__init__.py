@@ -32,6 +32,9 @@ from devteam_core.contracts.errors import ErrorCategory, ErrorRef, is_auto_retry
 from devteam_core.contracts.events import EVENT_ADAPTER, EVENT_TYPES
 from devteam_core.contracts.llm import (
     ChatMessage,
+    EmbedRequest,
+    EmbedResponse,
+    ModelCall,
     ModelParams,
     ModelRequest,
     ModelResponse,
@@ -80,6 +83,9 @@ _REGISTERED: tuple[type[Contract], ...] = (
     ModelResponse,
     ModelUsage,
     OutputValidation,
+    EmbedRequest,
+    EmbedResponse,
+    ModelCall,
     *EVENT_TYPES,
     RunState,
     GateDecision,

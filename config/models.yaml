@@ -1,0 +1,58 @@
+# Model catalogue and routing (Part F, HC-02/03/04; docs/architecture/MODEL_ROUTING.md; D-06, D-37, D-53, D-59).
+# Validated at start-up by devteam_core.config.models (unknown or duplicate keys stop start-up).
+# Numbers come from docs/benchmarks/2026-11-19-baseline.md (chat models) and the F.5 embedding benchmark.
+# Models are never downloaded by the platform: the owner installs them with `ollama pull`.
+schema_version: 1
+default_slot: instruct                    # precedence rule 4 (global default)
+ram_margin_mb: 512                        # free RAM required on top of a model's peak before a call
+
+models:
+  qwen2.5:3b:
+    approved: true                        # AP-023 (Q1)
+    benchmark_ref: docs/benchmarks/2026-11-19-baseline.md
+    peak_ram_mb: 2144
+    num_ctx: 4096
+    reduced_num_ctx: 2048                 # first recovery rung: same model, shorter context (Spec §9.4)
+    timeouts: {connect_s: 5, read_s: 180, total_s: 180}
+    slow_after_s: 110
+  qwen2.5-coder:3b:
+    approved: true                        # AP-023 (Q1)
+    benchmark_ref: docs/benchmarks/2026-11-19-baseline.md
+    peak_ram_mb: 2148
+    num_ctx: 4096
+    reduced_num_ctx: 2048
+    timeouts: {connect_s: 5, read_s: 180, total_s: 180}
+    slow_after_s: 110
+  qwen2.5:1.5b:
+    approved: true                        # AP-023 (Q1)
+    benchmark_ref: docs/benchmarks/2026-11-19-baseline.md
+    peak_ram_mb: 1208
+    num_ctx: 4096
+    reduced_num_ctx: 2048
+    timeouts: {connect_s: 5, read_s: 120, total_s: 120}
+    slow_after_s: 75
+  nomic-embed-text:
+    kind: embedding
+    approved: false                       # D-53 ruled (AP-023); approved once benchmarked in F.5
+    benchmark_ref: null
+    peak_ram_mb: null
+    num_ctx: 2048
+    timeouts: {connect_s: 5, read_s: 60, total_s: 60}
+    slow_after_s: 40
+
+slots:
+  instruct:    {model: qwen2.5:3b}
+  coder:       {model: qwen2.5-coder:3b}
+  review:      {model: null, inherit: coder}      # D-37; Spec §9.2
+  coder_large: {model: null, inherit: coder}      # Spec §9.2: a 7B only after a benchmark
+  fallback:    {model: qwen2.5:1.5b}
+  embedding:   {model: null}                      # D-53: set after the F.5 benchmark; never overridden per agent/operation
+
+fallback_ladders:                         # used only after resource failures (OOM, too slow, load failure)
+  instruct: [qwen2.5:1.5b]
+  coder: [qwen2.5:1.5b]
+  review: [qwen2.5:1.5b]
+  coder_large: [qwen2.5:1.5b]
+
+agents: {}                                # D-06 per-agent overrides ({slot: …} or {model: …}); empty by default
+operations: {}                            # D-37 per-operation overrides; empty by default

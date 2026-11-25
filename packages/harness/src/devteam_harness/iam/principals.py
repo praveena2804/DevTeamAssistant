@@ -57,6 +57,8 @@ class ServiceName(StrEnum):
     GITHUB_DEPLOYER = "github_deployer"
     CHANGE_IMPACT = "change_impact"
     SECRETS_MIGRATION = "secrets_migration"
+    RAG_INGESTOR = "rag_ingestor"  # Part F: embeddings for indexing and retrieval (HC-08)
+    EVALUATOR = "evaluator"  # Part F: prompt evaluation runs (HC-09)
 
 
 @dataclass(frozen=True, slots=True)

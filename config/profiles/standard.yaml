@@ -3,6 +3,7 @@ resources:
   max_parallel_deterministic: 2
   llm_context_tokens: 8192
   min_free_ram_mb: 2048
+  max_model_ram_mb: 8192
 sandbox:
   limits:
     memory_mb: 2048

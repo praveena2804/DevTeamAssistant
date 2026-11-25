@@ -1,0 +1,63 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "duration_ms": {
+      "minimum": 0,
+      "title": "Duration Ms",
+      "type": "integer"
+    },
+    "input_tokens": {
+      "minimum": 0,
+      "title": "Input Tokens",
+      "type": "integer"
+    },
+    "model_digest": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Model Digest"
+    },
+    "model_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{0,80}(:[A-Za-z0-9._-]{1,40})?$",
+      "title": "Model Id",
+      "type": "string"
+    },
+    "request_id": {
+      "pattern": "^mrq_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Request Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "vectors": {
+      "items": {
+        "items": {
+          "type": "number"
+        },
+        "type": "array"
+      },
+      "title": "Vectors",
+      "type": "array"
+    }
+  },
+  "required": [
+    "request_id",
+    "model_id",
+    "vectors",
+    "input_tokens",
+    "duration_ms"
+  ],
+  "title": "EmbedResponse",
+  "type": "object"
+}

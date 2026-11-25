@@ -28,17 +28,22 @@ logging:
 ollama:
   base_url: http://127.0.0.1:11434   # loopback only (Spec §9.1, roadmap P7)
   request_timeout_s: 600
-  keep_alive: 1m                     # unload the model soon after use (Spec §9.3; one model at a time)
-  models:                            # Part D (D-44): local models per slot, from the Part A benchmark
-    instruct: qwen2.5:3b
-    coder: qwen2.5-coder:3b
-    review: qwen2.5:3b
-    fallback: qwen2.5:1.5b
+  keep_alive: 1m                     # unload soon after use (Spec §9.3); 0s on low_memory (D-59)
+                                     # models per slot: config/models.yaml (Part F)
+
+llm:                                 # LLM Gateway (Part F; models and routing in config/models.yaml)
+  response_cache: false              # D-28: available, off by default
+  breaker_threshold: 3               # consecutive resource failures before a model is skipped
+  breaker_cooldown_s: 120
+  cancel_wait_s: 15                  # wait for a cancelled (timed-out) call to end before the next rung
+  unload_verify_s: 10                # /api/ps check after unloading a model
+  digest_refresh_s: 300              # how often the gateway re-reads installed model digests
 
 resources:
   max_parallel_deterministic: 1      # D-27 (recommended default; LLM and sandbox work always sequential)
   llm_context_tokens: 4096           # Spec §9.3 initial range 4096–8192
   min_free_ram_mb: 3072              # doctor warns below this
+  max_model_ram_mb: 4096             # largest model peak RAM a profile may route to (models.yaml rule 8)
 
 uploads:                             # HC-20 limits (Part B plan, approved AP-005)
   allowed_extensions: [".pdf", ".docx", ".txt", ".md"]   # D-22 (b)

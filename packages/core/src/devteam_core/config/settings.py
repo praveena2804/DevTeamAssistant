@@ -63,23 +63,13 @@ def is_loopback_host(host: str) -> bool:
         return False
 
 
-_MODEL_TAG = r"^[a-z0-9][a-z0-9._-]{0,80}(:[A-Za-z0-9._-]{1,40})?$"
-
-
-class OllamaModels(_Section):
-    """Local model per slot (Part D, D-44; Part A benchmark recommendation, docs/benchmarks)."""
-
-    instruct: str = Field(default="qwen2.5:3b", pattern=_MODEL_TAG)
-    coder: str = Field(default="qwen2.5-coder:3b", pattern=_MODEL_TAG)
-    review: str = Field(default="qwen2.5:3b", pattern=_MODEL_TAG)
-    fallback: str = Field(default="qwen2.5:1.5b", pattern=_MODEL_TAG)
-
-
 class OllamaSettings(_Section):
+    """Where the local Ollama runs. Which model serves which slot lives in ``config/models.yaml`` (Part F);
+    an ``ollama.models`` key is no longer accepted (unknown keys are rejected), so there is one source."""
+
     base_url: str = "http://127.0.0.1:11434"
     request_timeout_s: float = Field(default=600, gt=0, le=7200)
-    models: OllamaModels = Field(default_factory=OllamaModels)
-    keep_alive: str = Field(default="1m", pattern=r"^[0-9]{1,4}[smh]$")  # unload soon after use (Spec §9.3)
+    keep_alive: str = Field(default="1m", pattern=r"^[0-9]{1,4}[smh]$")  # D-59: 0s on low_memory
 
     @field_validator("base_url")
     @classmethod
@@ -100,6 +90,7 @@ class ResourceSettings(_Section):
     max_parallel_deterministic: int = Field(default=1, ge=1, le=8)
     llm_context_tokens: int = Field(default=4096, ge=512, le=131_072)
     min_free_ram_mb: int = Field(default=3072, ge=0)
+    max_model_ram_mb: int = Field(default=4096, ge=256, le=131_072)  # MODEL_ROUTING rule 8
 
 
 class FileToolSettings(_Section):
@@ -243,6 +234,17 @@ class SandboxSettings(_Section):
         return f"tcp://127.0.0.1:{parts.port}"
 
 
+class LlmSettings(_Section):
+    """LLM Gateway behaviour (Part F; HC-02/04/18). Models and routing: ``config/models.yaml``."""
+
+    response_cache: bool = False  # D-28: available, off by default
+    breaker_threshold: int = Field(default=3, ge=1, le=20)
+    breaker_cooldown_s: float = Field(default=120, gt=0, le=3600)
+    cancel_wait_s: float = Field(default=15, gt=0, le=120)  # wait for a cancelled call to end
+    unload_verify_s: float = Field(default=10, gt=0, le=120)  # /api/ps check after an unload
+    digest_refresh_s: float = Field(default=300, gt=0, le=86_400)
+
+
 class Settings(_Section):
     profile: ProfileName = "low_memory"
     root: Path
@@ -251,6 +253,7 @@ class Settings(_Section):
     database: DatabaseSettings = DatabaseSettings()
     logging: LoggingSettings = LoggingSettings()
     ollama: OllamaSettings = OllamaSettings()
+    llm: LlmSettings = LlmSettings()
     resources: ResourceSettings = ResourceSettings()
     uploads: UploadSettings = UploadSettings()
     auth: AuthSettings = AuthSettings()

@@ -111,3 +111,7 @@ I built Part E, the safe place where generated code will be built and tested. Do
 **Run 28 — Part E approved**
 
 You asked me to finish Part E completely. I ran every check again, fixed what they found, marked Part E as version 0.5.0, joined it into the main line of the project and labelled it, and uploaded all of it to GitHub, where I checked that everything matches what was tested here.
+
+**Run 29 — Part F planning**
+
+I wrote the plan for Part F, which completes how the platform talks to the local AI models and adds search over the uploaded documents. I first checked what earlier parts had already built, so the plan reuses that work instead of redoing it. An independent review of the first draft found eighteen problems, including work that belongs to a later part, and I corrected all of them. The plan lists the decisions I need from you, such as approving the AI models and choosing the document-search model. No code was written and nothing was committed or uploaded.

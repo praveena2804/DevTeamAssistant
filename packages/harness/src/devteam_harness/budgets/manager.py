@@ -139,6 +139,19 @@ class TaskBudget:
     def model_call_timeout_s(self) -> int:
         return self.profile.model_call_timeout_s
 
+    # the call scope the gateway records (Part F: shared with service JobBudgets)
+    @property
+    def project_id(self) -> str | None:
+        return self.task.project_id
+
+    @property
+    def run_id(self) -> str | None:
+        return self.task.run_id
+
+    @property
+    def task_id(self) -> str | None:
+        return self.task.task_id
+
     def elapsed_ms(self) -> int:
         return int((self._m._monotonic() - self._started) * 1000)
 

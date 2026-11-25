@@ -1,0 +1,11 @@
+# Model-call rate limits (Part F, HC-18; Part F plan §6.5). Validated at start-up; unknown keys rejected.
+# A call over its limit waits for the bucket to refill if that fits its call budget; otherwise it raises
+# `rate.limited` and the task waits for resources. Calls are never silently dropped.
+schema_version: 1
+max_wait_s: 30
+agents:                     # per agent role
+  default: {calls_per_minute: 12, burst: 3}
+services:                   # platform services (service principals)
+  rag_ingestor: {calls_per_minute: 120, burst: 16}
+  evaluator: {calls_per_minute: 12, burst: 3}
+  default: {calls_per_minute: 12, burst: 3}

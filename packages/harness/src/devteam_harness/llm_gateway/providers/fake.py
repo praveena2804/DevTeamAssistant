@@ -17,7 +17,7 @@ from typing import Union
 
 from devteam_core.contracts.llm import ModelRequest, Provider
 from devteam_harness.errors import FatalError
-from devteam_harness.llm_gateway.providers import ProviderReply
+from devteam_harness.llm_gateway.providers import CallTimeouts, ProviderReply
 
 Step = Union[str, BaseException, Callable[[ModelRequest], str]]  # noqa: UP007 - runtime alias
 
@@ -38,7 +38,9 @@ class FakeProvider:
         with self._lock:
             self._script.extend(steps)
 
-    def generate(self, request: ModelRequest) -> ProviderReply:
+    def generate(
+        self, request: ModelRequest, *, model: str | None = None, timeouts: CallTimeouts | None = None
+    ) -> ProviderReply:
         with self._lock:
             self.requests.append(request)
             self._active += 1
@@ -57,11 +59,14 @@ class FakeProvider:
                 text=text,
                 input_tokens=math.ceil(prompt_chars / 4),
                 output_tokens=max(1, math.ceil(len(text) / 4)),
-                model_id=self.model_id,
+                model_id=model or self.model_id,
             )
         finally:
             with self._lock:
                 self._active -= 1
+
+    def close(self) -> None:
+        return None
 
 
 __all__ = ["FakeProvider", "Step"]

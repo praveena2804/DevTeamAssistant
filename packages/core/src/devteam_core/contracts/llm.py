@@ -135,11 +135,121 @@ class OutputValidation(Contract):
         return self
 
 
+class RouteRule(StrEnum):
+    """Which routing rule chose the model (MODEL_ROUTING §3.2); recorded on every ``ModelCall``."""
+
+    OPERATION = "operation"
+    AGENT = "agent"
+    SLOT = "slot"
+    GLOBAL = "global"
+
+
+class RecoveryStep(StrEnum):
+    """Where on the recovery ladder a call ran (Spec §9.4; Part F plan §6.2)."""
+
+    NONE = "none"
+    REDUCED_CONTEXT = "reduced_context"
+    SMALLER_MODEL = "smaller_model"
+
+
+SERVICE_PRINCIPAL = r"^service:[a-z][a-z0-9_]{1,40}$"
+ModelTag = Annotated[str, StringConstraints(pattern=r"^[a-z0-9][a-z0-9._-]{0,80}(:[A-Za-z0-9._-]{1,40})?$")]
+EmbedPurpose = Annotated[str, StringConstraints(pattern=r"^rag\.(index|query)$")]
+MAX_EMBED_INPUTS = 64
+MAX_EMBED_CHARS = 8_000
+
+
+class EmbedRequest(Contract):
+    """An embedding call by a platform service (never an agent): indexing or a retrieval query (HC-08).
+
+    Texts live in memory only; records keep their SHA-256 (``ModelCall.input_hash``), never the text.
+    """
+
+    request_id: ModelRequestId
+    principal_id: Annotated[str, StringConstraints(pattern=SERVICE_PRINCIPAL)]
+    purpose: EmbedPurpose
+    project_id: Annotated[str, StringConstraints(pattern=r"^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$")]
+    texts: tuple[Annotated[str, StringConstraints(min_length=1, max_length=MAX_EMBED_CHARS)], ...] = Field(
+        min_length=1, max_length=MAX_EMBED_INPUTS
+    )
+
+
+class EmbedResponse(Contract):
+    request_id: ModelRequestId
+    model_id: ModelTag
+    model_digest: Sha256 | None = None
+    vectors: tuple[tuple[float, ...], ...]
+    input_tokens: int = Field(ge=0)
+    duration_ms: int = Field(ge=0)
+
+    @model_validator(mode="after")
+    def _shape(self) -> Self:
+        dims = {len(v) for v in self.vectors}
+        if len(dims) > 1 or 0 in dims:
+            raise ValueError("every embedding vector must have the same, non-zero dimension")
+        return self
+
+
+ModelCallId = Annotated[str, StringConstraints(pattern=r"^mcl_[0-7][0-9A-HJKMNP-TV-Z]{25}$")]
+
+
+class ModelCall(Contract):
+    """One model call (HC-05/GW-08), metadata only: **never prompt, input or answer text** (AC-F-01).
+
+    ``project_id`` is ``None`` only for platform service calls with no project (evaluation, inventory),
+    as for ``audit_events``. Exactly one of ``agent`` or ``service`` names who called.
+    """
+
+    call_id: ModelCallId
+    project_id: Annotated[str, StringConstraints(pattern=r"^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$")] | None = None
+    run_id: RunId | None = None
+    task_id: TaskId | None = None
+    agent: AgentRole | None = None
+    service: Annotated[str, StringConstraints(pattern=r"^[a-z][a-z0-9_]{1,40}$")] | None = None
+    kind: Annotated[str, StringConstraints(pattern=r"^(generate|embed)$")]
+    operation_id: Annotated[str, StringConstraints(pattern=r"^[a-z][a-z0-9_]{1,40}\.[a-z][a-z0-9_]{1,60}$")]
+    slot: ModelSlot
+    model_tag: ModelTag
+    model_digest: Sha256 | None = None
+    route_rule: RouteRule
+    recovery_step: RecoveryStep = RecoveryStep.NONE
+    prompt_id: Name | None = None
+    prompt_version: int | None = Field(default=None, ge=1)
+    prompt_hash: Sha256 | None = None
+    input_hash: Sha256
+    schema_name: SchemaName | None = None
+    cache_hit: bool = False
+    input_tokens: int = Field(ge=0)
+    output_tokens: int = Field(ge=0)
+    duration_ms: int = Field(ge=0)
+    free_ram_mb: int | None = Field(default=None, ge=0)
+    outcome: Annotated[str, StringConstraints(pattern=r"^(valid|invalid|error|refused)$")]
+    error_code: Annotated[str, StringConstraints(pattern=r"^[a-z][a-z0-9_.]{1,60}$")] | None = None
+    attempt: int = Field(default=1, ge=1, le=10)
+
+    @model_validator(mode="after")
+    def _who(self) -> Self:
+        if (self.agent is None) == (self.service is None):
+            raise ValueError("a model call is made by exactly one agent or one platform service")
+        if self.agent is not None and self.task_id is None:
+            raise ValueError("an agent's model call belongs to a task")
+        if self.kind == "embed" and self.slot is not ModelSlot.EMBEDDING:
+            raise ValueError("embeddings use the embedding slot")
+        if self.kind == "generate" and self.slot is ModelSlot.EMBEDDING:
+            raise ValueError("generation never uses the embedding slot")
+        if (self.outcome in {"error", "refused"}) != (self.error_code is not None):
+            raise ValueError("an error or refusal carries an error code; a completed call does not")
+        return self
+
+
 class ModelResponse(Contract):
     request_id: ModelRequestId
     provider: Provider
     model_id: Name
     model_digest: Sha256 | None = None
+    route_rule: RouteRule | None = None
+    recovery_step: RecoveryStep = RecoveryStep.NONE
+    cache_hit: bool = False
     output_text: str = Field(max_length=MAX_MESSAGE_CHARS)  # in memory only; never audited or traced
     parsed: dict[str, Any] | None = None
     usage: ModelUsage

@@ -83,6 +83,7 @@ def _passed(base: TemplateVerification) -> TemplateVerification:
 
 
 def test_tables_exist_and_downgrade_removes_only_them(db: Path) -> None:
+    downgrade(db, "0007_sandbox")  # later migrations (Part F) first, so only 0007's tables are compared
     engine = create_sqlite_engine(db)
     names = set(inspect(engine).get_table_names())
     assert {"sandbox_executions", "template_verifications", "resource_lock"} <= names

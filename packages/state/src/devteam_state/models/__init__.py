@@ -9,10 +9,12 @@ from typing import Any
 
 from sqlalchemy import (
     JSON,
+    Boolean,
     DateTime,
     ForeignKey,
     Index,
     Integer,
+    LargeBinary,
     MetaData,
     String,
     Text,
@@ -444,6 +446,84 @@ class ResourceLock(Base):
     heartbeat_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
+class ModelCallRow(Base):
+    """One model call (``ModelCall`` contract; Part F, AC-F-01). Metadata only, never content. Append-only.
+
+    ``project_id`` is NULL only for platform service calls without a project (evaluation).
+    """
+
+    __tablename__ = "model_calls"
+
+    id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    project_id: Mapped[str | None] = mapped_column(String(40), nullable=True, index=True)
+    run_id: Mapped[str | None] = mapped_column(String(40), nullable=True, index=True)
+    task_id: Mapped[str | None] = mapped_column(String(40), nullable=True, index=True)
+    agent: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    service: Mapped[str | None] = mapped_column(String(41), nullable=True)
+    kind: Mapped[str] = mapped_column(String(10))
+    operation_id: Mapped[str] = mapped_column(String(110))
+    slot: Mapped[str] = mapped_column(String(20))
+    model_tag: Mapped[str] = mapped_column(String(130))
+    model_digest: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    route_rule: Mapped[str] = mapped_column(String(12))
+    recovery_step: Mapped[str] = mapped_column(String(20))
+    prompt_id: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    prompt_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    prompt_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    input_hash: Mapped[str] = mapped_column(String(64))
+    schema_name: Mapped[str | None] = mapped_column(String(82), nullable=True)
+    cache_hit: Mapped[bool] = mapped_column(Boolean)
+    input_tokens: Mapped[int] = mapped_column(Integer)
+    output_tokens: Mapped[int] = mapped_column(Integer)
+    duration_ms: Mapped[int] = mapped_column(Integer)
+    free_ram_mb: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    outcome: Mapped[str] = mapped_column(String(10))
+    error_code: Mapped[str | None] = mapped_column(String(62), nullable=True)
+    attempt: Mapped[int] = mapped_column(Integer)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+
+
+class LlmResponseCacheRow(Base):
+    """D-28 response cache (off by default). Re-validated on every hit; scoped per project."""
+
+    __tablename__ = "llm_response_cache"
+
+    key: Mapped[str] = mapped_column(String(64), primary_key=True)
+    project_id: Mapped[str] = mapped_column(String(40), index=True)
+    model_digest: Mapped[str] = mapped_column(String(64))
+    prompt_hash: Mapped[str] = mapped_column(String(64))
+    output_text: Mapped[str] = mapped_column(Text)
+    input_tokens: Mapped[int] = mapped_column(Integer)
+    output_tokens: Mapped[int] = mapped_column(Integer)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    hits: Mapped[int] = mapped_column(Integer, server_default="0")
+
+
+class EmbeddingCacheRow(Base):
+    """Embedding cache: per project, embedding-model digest + text hash → vector (float32 bytes)."""
+
+    __tablename__ = "embedding_cache"
+
+    key: Mapped[str] = mapped_column(String(64), primary_key=True)
+    project_id: Mapped[str] = mapped_column(String(40), index=True)
+    model_digest: Mapped[str] = mapped_column(String(64))
+    dimensions: Mapped[int] = mapped_column(Integer)
+    vector: Mapped[bytes] = mapped_column(LargeBinary)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class ModelInventoryRow(Base):
+    """Installed local models as last seen by the worker (the API reads this, never Ollama)."""
+
+    __tablename__ = "model_inventory"
+
+    model_tag: Mapped[str] = mapped_column(String(130), primary_key=True)
+    digest: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    installed: Mapped[bool] = mapped_column(Boolean)
+    server_version: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    checked_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
 __all__ = [
     "NAMING_CONVENTION",
     "AgentOutputRow",
@@ -453,6 +533,10 @@ __all__ = [
     "AuditEvent",
     "Base",
     "DocumentChunk",
+    "EmbeddingCacheRow",
+    "LlmResponseCacheRow",
+    "ModelCallRow",
+    "ModelInventoryRow",
     "NodeEffect",
     "Principal",
     "PrincipalRole",
