@@ -307,6 +307,13 @@ forbidden_modules = ["devteam_harness.llm_gateway.providers.ollama"]
 allow_indirect_imports = true
 
 [[tool.importlinter.contracts]]
+name = "evaluation, RAG, context and memory never reach a model provider directly (AC-F-01)"
+type = "forbidden"
+source_modules = ["devteam_harness.evaluation"]
+forbidden_modules = ["devteam_harness.llm_gateway.providers", "httpx"]
+allow_indirect_imports = true
+
+[[tool.importlinter.contracts]]
 name = "the API never calls models or opens the vector store (D-57)"
 type = "forbidden"
 source_modules = ["devteam_api"]

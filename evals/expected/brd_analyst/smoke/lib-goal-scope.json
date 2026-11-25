@@ -1,0 +1,15 @@
+{
+  "max_citation": 2,
+  "required_terms": [
+    "lending"
+  ],
+  "forbidden_terms": [
+    "postgresql",
+    "angular",
+    "stripe",
+    "power apps"
+  ],
+  "expect_found": [
+    "goal"
+  ]
+}

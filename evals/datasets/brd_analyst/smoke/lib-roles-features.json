@@ -1,0 +1,9 @@
+{
+  "case_id": "lib-roles-features",
+  "operation_id": "brd_analyst.analyse_section",
+  "slot": "instruct",
+  "output_schema": "AnalysisDraft",
+  "data_label": "brd_material",
+  "data": "[1] Librarians manage the catalogue and loans. Members browse books and see their own loans.\n\n[2] FR-001 The librarian shall add, edit and remove books in the catalogue.\n\n[3] FR-002 The librarian shall register a loan of a book to a member.\n\n[4] FR-003 A member shall see the list of books currently on loan to them.",
+  "description": "Users, roles and functional requirements of the Library Lending BRD"
+}

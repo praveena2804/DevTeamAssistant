@@ -40,6 +40,8 @@ jobs:
         run: uv run lint-imports
       - name: Ten-agent check (L3)
         run: uv run python scripts/check_agent_count.py
+      - name: Eval gate (HC-09, AC-F-05; offline, no model)
+        run: uv run python scripts/check_eval_gate.py
       - name: Fast test suite with coverage
         run: >
           uv run pytest -m "not llm and not docker and not slow and not acceptance"

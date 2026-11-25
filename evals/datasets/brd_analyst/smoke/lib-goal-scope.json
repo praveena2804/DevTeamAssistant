@@ -1,0 +1,9 @@
+{
+  "case_id": "lib-goal-scope",
+  "operation_id": "brd_analyst.analyse_section",
+  "slot": "instruct",
+  "output_schema": "AnalysisDraft",
+  "data_label": "brd_material",
+  "data": "[1] The city library wants a simple web application to manage book lending for its members.\n\n[2] In scope: members, books, loans and returns. Out of scope: payments and e-books.",
+  "description": "Goal and scope of the Library Lending BRD"
+}

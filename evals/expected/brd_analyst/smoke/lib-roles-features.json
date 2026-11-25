@@ -1,0 +1,17 @@
+{
+  "max_citation": 4,
+  "required_terms": [
+    "loan",
+    "catalogue"
+  ],
+  "forbidden_terms": [
+    "postgresql",
+    "angular",
+    "stripe",
+    "power apps"
+  ],
+  "expect_found": [
+    "actors",
+    "features"
+  ]
+}

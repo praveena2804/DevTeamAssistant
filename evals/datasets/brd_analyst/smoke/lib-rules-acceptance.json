@@ -1,0 +1,9 @@
+{
+  "case_id": "lib-rules-acceptance",
+  "operation_id": "brd_analyst.analyse_section",
+  "slot": "instruct",
+  "output_schema": "AnalysisDraft",
+  "data_label": "brd_material",
+  "data": "[1] BR-001 A member may borrow at most five books at the same time.\n\n[2] BR-002 A loan lasts fourteen days and may be renewed once.\n\n[3] AC-001 Registering a sixth simultaneous loan for one member is refused with a clear message.",
+  "description": "Business rules and acceptance criteria of the Library Lending BRD"
+}

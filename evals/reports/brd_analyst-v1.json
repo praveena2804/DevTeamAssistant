@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "agent": "brd_analyst",
+  "prompt_id": "brd_analyst.system",
+  "prompt_version": 1,
+  "prompt_hash": "b76bde95ce7564cf01ca0bcb878f819254b6ae5b5821c45c39731e125eb2523a",
+  "model_tag": "qwen2.5:3b",
+  "model_digest": "357c53fb659c5076de1d65ccb0b397446227b71a42be9d1603d46168015c9e4b",
+  "dataset": "smoke",
+  "dataset_sha256": "44b0487acd011f9d12cf152e59675c51cf4ece3fb7800d26855d90dc52a04fb5",
+  "created_at": "2026-11-25T14:02:24.821717Z",
+  "cases": [
+    {
+      "case_id": "lib-goal-scope",
+      "valid": true,
+      "error_code": null,
+      "scores": {
+        "schema_valid": 1.0,
+        "citation_validity": 1.0,
+        "term_recall": 1.0,
+        "no_forbidden_terms": 1.0,
+        "checklist_recall": 1.0
+      },
+      "duration_ms": 48750
+    },
+    {
+      "case_id": "lib-roles-features",
+      "valid": true,
+      "error_code": null,
+      "scores": {
+        "schema_valid": 1.0,
+        "citation_validity": 1.0,
+        "term_recall": 1.0,
+        "no_forbidden_terms": 1.0,
+        "checklist_recall": 1.0
+      },
+      "duration_ms": 56438
+    },
+    {
+      "case_id": "lib-rules-acceptance",
+      "valid": true,
+      "error_code": null,
+      "scores": {
+        "schema_valid": 1.0,
+        "citation_validity": 1.0,
+        "term_recall": 1.0,
+        "no_forbidden_terms": 1.0,
+        "checklist_recall": 1.0
+      },
+      "duration_ms": 52890
+    }
+  ],
+  "totals": {
+    "checklist_recall": 1.0,
+    "citation_validity": 1.0,
+    "no_forbidden_terms": 1.0,
+    "schema_valid": 1.0,
+    "term_recall": 1.0,
+    "cases": 3.0
+  }
+}
