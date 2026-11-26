@@ -18,16 +18,16 @@
 
 | Item | Value |
 |---|---|
-| Current milestone | **M1 Harness & Orchestration** (C, D and E approved; F not started) |
-| Current part | **Part F: implemented, awaiting G-F** (AP-023/AP-024): branch `part/f-gateway-rag` pushed; not merged, tagged or released. Part E approved (v0.5.0) |
-| Overall status | Parts A–E approved (v0.1.0–v0.5.0). Spikes S-1, S-2, S-3 passed; AC-E-01…AC-E-04 met (`docs/parts/PART-E-COMPLETION-REPORT.md`) |
-| Last completed activity | Part E E.1–E.5 (Docker Engine in WSL2 with mutual TLS, disposable locked-down containers, Resource Guard, locked images, ten recipes, execute tools, starter kits, worker/API/UI integration, E2E-3) and release 0.5.0 (TR-0110…TR-0131) |
+| Current milestone | **M1 Harness & Orchestration** (C, D, E, F approved); **M2 Discovery** planning (Part G plan, awaiting review) |
+| Current part | **Part G: planning** (plan written, awaiting the owner's review). Part F **approved** (AP-025) on branch `part/f-gateway-rag` (pushed); not merged into `main`, not tagged, not released (owner instruction) |
+| Overall status | Parts A–E approved and released (v0.1.0–v0.5.0); Part F approved (AP-025), merge/version/tag pending an explicit owner instruction. AC-F-01…AC-F-05 met (`docs/parts/PART-F-COMPLETION-REPORT.md`) |
+| Last completed activity | Part F F.1–F.6 (model routing, ModelCall records, recovery ladder, limits, caches, prompt registry, evaluation and CI eval gate, RAG with in-process ChromaDB, Context Manager, project memory, read-only settings/status UI, E2E-F) and G-F approval (TR-0133…TR-0147) |
 | Code written | Parts A–D plus Part E: `devteam_harness.sandbox` (engine, TLS, spec, runner, guard, images, licences, recipes, results, service, tools), `budgets/resource_lease.py`, migration `0007_sandbox`, services `integration_builder`, `migration_runner`, `test_runner`, `templates`, `sandbox/images/**`, `templates/target_apps/**`, sandbox API and UI |
 | Dependencies installed | Python (uv, `uv.lock`), npm (`package-lock.json`), Gitleaks; Ollama 0.40.16 with `qwen2.5:3b`, `qwen2.5-coder:3b`, `qwen2.5:1.5b` (and others, unused) |
 | Git / GitHub operations | Pushed to `origin` (AP-022, TR-0132): `main` (Part E merged, final record), `part/b-intake`, `part/c-harness-core`, `part/d-orchestration`, `part/e-sandbox`; tags `v0.1.0`…`v0.5.0` and `part-a-approved`…`part-e-approved` identical locally and on GitHub. No force-push. The spec `.docx` is not committed (D-34) |
 | Tests executed | TR-0001…TR-0147 |
 | Blocking items | None for Part E. Open owner items: model selection (Part A, pending), D-21 (platform licence; D-52 depends on it) |
-| Next authorised action | **None.** Wait for the owner's G-F review of `docs/parts/PART-F-COMPLETION-REPORT.md`. Do not merge, tag or start Part G |
+| Next authorised action | **None.** Wait for the owner's review of `docs/parts/PART-G-PLAN.md`. Do not implement Part G, merge Part F, or tag |
 
 ---
 
@@ -53,8 +53,8 @@
 | C | Shared Contracts & Harness Core | M1 | **Approved** | G-C | 2026-11-20 (AP-007, AP-008) | 2026-11-23 (AP-013) | `v0.3.0`, `part-c-approved` (local) |
 | D | LangGraph Orchestration, Ten Agents & Head Agent Deterministic Core | M1 | **Approved** | G-D | 2026-11-23 (AP-015) | 2026-11-23 (AP-020) | `v0.4.0`, `part-d-approved` |
 | E | Isolated Execution Sandbox & Target-App Templates | M1 | **Approved** | G-E | 2026-11-23 (AP-021) | 2026-11-24 (AP-022) | `v0.5.0`, `part-e-approved` |
-| F | LLM Gateway, Model Routing, Context & Memory, and RAG | M1 | **Implemented, awaiting G-F** | G-F | 2026-11-25 (AP-023) | — | branch `part/f-gateway-rag` (pushed) |
-| G | Capability Catalog & Feasibility Gate | M2 | Not started | G-G | — | — | — |
+| F | LLM Gateway, Model Routing, Context & Memory, and RAG | M1 | **Approved** (not merged/tagged: owner instruction) | G-F | 2026-11-25 (AP-023) | 2026-11-26 (AP-025) | branch `part/f-gateway-rag` (pushed, `b0db053`) |
+| G | Capability Catalog & Feasibility Gate | M2 | **Planning** (plan awaiting review) | G-G | — | — | `docs/parts/PART-G-PLAN.md` |
 | H | BRD Analyst | M2 | Not started | G-H | — | — | — |
 | I | Requirements Finalizer, Clarification, Approval & Spec Freeze | M2 | Not started | G-I | — | — | — |
 | J | Head Agent Planner & Architecture Agent | M3 | Not started | G-J | — | — | — |
@@ -116,6 +116,7 @@ Only explicit owner approvals are recorded here.
 | AP-022 | 2026-11-24 | **G-E: Part E to be completed, merged, released and pushed.** Finish all regression/E2E/verification, static gates, security scans, dependency and licence audits; resolve failures without weakening security; complete documentation, reports, trackers and deviation records; verify acceptance criteria and Parts A–D; final clean build and regression; commit; **merge into `main`, update the version and create the release tags; push all completed commits, branches and tags to the configured remote** and verify the remote matches the verified local state. Recorded as the G-E approval (merge + `v0.5.0` + `part-e-approved`) and the push authorisation for this release | Owner | Owner message 2026-11-24 "Complete Part E fully, end to end … Merge into `main`, update the version and create the appropriate release tags. Push all completed commits, branches and tags to the configured Git remote …" | `docs/parts/PART-E-COMPLETION-REPORT.md` |
 | AP-023 | 2026-11-25 | **Part F plan approved (G-F planning) and implementation authorised.** All proposed Part F decisions approved as documented in `PART-F-PLAN.md` rev. 2: **Q1** models `qwen2.5:3b`, `qwen2.5-coder:3b`, fallback `qwen2.5:1.5b` approved; **D-06** (b); **D-28** (b), off by default, and a re-validated cache hit is not a prepared answer under D-38; **D-53** `nomic-embed-text`; **D-54** (a); **D-55** (a); **D-56** (a); **D-57** (a); **D-58** (a); **D-59** `0s` on `low_memory`; `respx` dev dependency. Complete all checkpoints, full regression, fix failures, commit and **push to the Part F branch**; no intermediate approvals. `PROJECT_EXPLAINED.md` (owner file) is left untouched | Owner | Owner message 2026-11-25 "G-F approved. All proposed Part F decisions are approved as documented in PART-F-PLAN.md … proceed with the complete Part F implementation … commit and push to the correct GitHub branch. Do not stop for intermediate approvals." | `docs/parts/PART-F-PLAN.md` |
 | AP-024 | 2026-11-25 | **ChromaDB accepted, in-process only (KI-045).** The F.5 step-0 audit found 4 advisories against chromadb 1.5.9 with no fixed version (PYSEC-2026-311/CVE-2026-45829, PYSEC-2026-3813/CVE-2026-45830, PYSEC-2026-3814/CVE-2026-45833, PYSEC-2026-3815/CVE-2026-45831), all in ChromaDB's HTTP server and RBAC auth provider. Owner chose "Accept, in-process only": add chromadb with a documented risk acceptance; ignore exactly these 4 IDs in pip-audit with the reason; tests and an import contract prove no server, auth provider or remote-code embedding function is used; re-check for a fix every part. `tqdm` (MPL-2.0 AND MIT, ChromaDB dependency) accepted with it | Owner | AskUserQuestion answer 2026-11-25: "Accept, in-process only (Recommended)" | `docs/architecture/rag.md` |
+| AP-025 | 2026-11-26 | **G-F approved: Part F approved** as reported (`docs/parts/PART-F-COMPLETION-REPORT.md`). Instructions: verify the repository state; push all completed Part F work to its branch and verify the remote; **do not merge into `main` and do not create a release or tag unless explicitly instructed**; then plan Part G (planning only) and stop for review | Owner | Owner message 2026-11-26: "Part F has been reviewed and approved … Do not merge into `main` or create a release/tag unless explicitly instructed … Start planning Part G … Stop after completing the Part G plan" | `docs/parts/PART-F-COMPLETION-REPORT.md`; `docs/parts/PART-G-PLAN.md` |
 
 *Roadmap v2.0: adopted as the working default under AP-003. An explicit formal "roadmap approved" statement has not been given, so it is recorded as adopted, not approved.*
 
@@ -127,8 +128,8 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 
 | ID | Topic | Status | Ruling | Date | Affected docs/sections |
 |---|---|---|---|---|---|
-| D-01 | Feasibility decision point | Open | — | — | Roadmap §6.5, §13 G; Plan §20 G |
-| D-02 | Coverage denominator | Open | — | — | Roadmap §13 G |
+| D-01 | Feasibility decision point | **Open — proposed in PART-G-PLAN §9** (awaiting owner) | Recommended (a) separate pause; proceed/cancel, "revise" = cancel reason + new run; substitution acceptance in the clarification form (Part I) | — | Roadmap §6.5, §13 G; Plan §20 G; PART-G-PLAN §9 |
+| D-02 | Coverage denominator | **Open — proposed in PART-G-PLAN §9** (awaiting owner) | Recommended (a) in-scope FR + BR; buildable = supported + approved substitution; partial separate | — | Roadmap §13 G; PART-G-PLAN §6.6, §9 |
 | D-03 | Approval-screen edit behaviour | Open | — | — | Roadmap §13 I |
 | D-04 | Target-app auth patterns | **Ruled (AP-021)** | (a) no authentication in Part E; `auth` slot reserved in the manifest | 2026-11-23 | Roadmap §13 E/K |
 | D-05 | Deterministic vs LLM share (Head/Architect) | Open | — | — | Roadmap §13 J |
@@ -186,6 +187,13 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | D-57 | Where RAG queries run (new) | **Ruled (AP-023)** | (a) worker/tools + owner script; the API never makes model calls | 2026-11-25 | PART-F-PLAN §9 |
 | D-58 | Move inline prompts to `prompts/` (new) | **Ruled (AP-023)** | (a) verbatim with identical hashes | 2026-11-25 | PART-F-PLAN §9 |
 | D-59 | Ollama `keep_alive` default (new) | **Ruled (AP-023)** | `0s` on `low_memory` | 2026-11-25 | PART-F-PLAN §9 |
+| D-60 | Technology need / integration → requirement links (new, Part G plan) | **Open — proposed** (awaiting owner) | Recommended (a) optional `requirement_ids` + whole-application layer rule + conservative rule for unlinked integration/auth | — | PART-G-PLAN §9 |
+| D-61 | `FeasibilityItem` v2 shape (new) | **Open — proposed** (awaiting owner) | Recommended (a) one item per subject with affected requirement keys + requirement-effects table (deviation from Spec §12 illustrative fields) | — | PART-G-PLAN §9 |
+| D-62 | Capabilities arriving in later parts; meaning of "supported" before K–L (new) | **Open — proposed** (awaiting owner) | Recommended (a) honest demotion "arrives in Part X" (PostgreSQL → SQLite offer; GitHub delivery not available yet); roadmap availability rule | — | PART-G-PLAN §9 |
+| D-63 | Below-threshold behaviour (new) | **Open — proposed** (awaiting owner) | Recommended (a) 50% default, configurable; "stop recommended"; proceed needs acknowledgement; disabled at 0% | — | PART-G-PLAN §9 |
+| D-64 | "SQL" rule output (new) | **Open — proposed** (awaiting owner) | Recommended (a) `supported_with_substitution` (SQLite, pending) + technology Gap | — | PART-G-PLAN §9 |
+| D-65 | G-G demo without analyst technology extraction (new; D-38) | **Open — proposed** (awaiting owner) | Recommended (a) fixture tests + labelled fixture evaluation script; no simulated agent output in runs | — | PART-G-PLAN §9 |
+| D-66 | Base branch for Part G (new) | **Open — proposed** (awaiting owner) | Recommended (a) merge Part F + v0.6.0 + tags on explicit instruction, then branch from `main`; or (b) branch from `part/f-gateway-rag` | — | PART-G-PLAN §9 |
 
 ---
 
@@ -321,6 +329,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | CH-0126 | 2026-11-25 | F.5 | Migration `0009_rag_index` (new: `document_chunks.chunker_version`, `rag_collections`, `rag_index_documents`, `rag_index_jobs`); models; `repositories/rag.py` (new); `devteam_harness/rag/{__init__,store,ingest,retrieve}.py` (new; `ChromaVectorStore` the only `chromadb` importer), `context/__init__.py`, `memory/__init__.py` (new); `tools/builtin.py` (`search_project_knowledge` v2: source filter, configurable 30 s timeout, project from the task, fails closed without a store); `config/defaults.yaml` + `settings.py` (`rag:`, `context:`); `config/models.yaml` (embedding slot `nomic-embed-text` approved after the benchmark); `docs/benchmarks/2026-11-25-embedding.md` (new); `runtime.py` (retriever/ingestor, `rag_store` parameter, chunker version from services); worker (`run_index_job_once`, `refresh_models`, model inventory in the run loop) and `main.py` (supplies `ChromaVectorStore(data/chroma)`); `devteam_services/intake` (records the chunker version per chunk); API `routers/documents.py` (queues an index job after an extracted upload); `packages/harness/pyproject.toml` + `uv.lock` (`chromadb>=1.5.9,<1.6`); `pyproject.toml` (contracts: only `rag.store` imports ChromaDB; rag/context/memory never reach a provider; API never imports the store or ChromaDB); `.github/workflows/security.yml` (4 advisory IDs ignored with reason, KI-045); `orchestration/safety.py` (OTEL exporter variables refused); `docs/THIRD_PARTY_LICENSES.md` (§1 tqdm, §2 regenerated: 134 packages); tests `tests/security/test_rag.py`, `tests/security/test_rag_chroma.py` (new), `apps/worker/tests/test_worker.py` (+2), updated `test_tool_layer.py`, `test_tracing.py`, `test_third_party_licences.py`, `test_system.py`, `test_migrations.py`, `packages/harness/tests/test_router.py` (DV-032, DV-033) | F.5 RAG, Context Manager, project memory | PART-F-PLAN §5 F.5; HS-23; D-53, D-54, D-57 | TR-0140…TR-0143 | Done (F.5 commit) |
 | CH-0127 | 2026-11-25 | F.6 | API `routers/settings.py`, `routers/knowledge.py` (new; read-only settings, index status/rebuild queue, run model calls), `main.py` (registered), `openapi.json`; web `api/client.ts`, `api/schema.d.ts`, `pages/SettingsPage.tsx`, `components/KnowledgePanel.tsx`, `components/ModelCallsTable.tsx`, `pages/PartF.test.tsx` (new), `App.tsx`, `Layout.tsx`, `ProjectPage.tsx`, `TracePage.tsx`; tests `tests/integration/test_settings_api.py`, `tests/e2e/test_e2e_f_rag.py` (new), `tests/security/test_api_security.py` (2 modules + 1 mutating route); docs `docs/architecture/{llm-gateway,rag,context-memory}.md`, `docs/runbooks/models-and-rag.md` (new), `docs/architecture/MODEL_ROUTING.md` (status), `README.md`, `CHANGELOG.md` (Unreleased Part F), `docs/parts/PART-F-COMPLETION-REPORT.md` (new); progress tracker Run 30 | F.6 settings/status, E2E, docs, validation | PART-F-PLAN §5 F.6; AC-F-01…05 | TR-0144…TR-0146 | Done (F.6 commit) |
 | CH-0128 | 2026-11-26 | F.6 push record | `docs/IMPLEMENTATION_TRACKER.md` (TR-0147), `docs/parts/PART-F-COMPLETION-REPORT.md` §9/§10 (pushed hash) | Record push and remote verification | Owner instruction (push the part branch) | TR-0147 | Done |
+| CH-0129 | 2026-11-26 | G planning | `docs/parts/PART-G-PLAN.md` (new, revision 1); `docs/IMPLEMENTATION_TRACKER.md` (AP-025 G-F approval; §1 status; §2 board F approved / G planning; §4 D-01, D-02 proposed, D-60…D-66 new; §11; §12 M1 complete, M2 planning); `docs/PROJECT_PROGRESS_TRACKER.md` (Run 31) | Record G-F approval; plan Part G | Owner message 2026-11-26 (AP-025); Roadmap §13 G; Working Plan §20 G | — | Done (plan commit; awaiting review) |
 | CH-0044 | 2026-11-20 | C | `docs/parts/PART-C-PLAN.md` (status table; §2 rewritten as §2.0 rulings + §2.1 full F-1…F-11 table with values, defaults, min/max, rationale, dependents; new §10 checkpoint breakdown; confirmation line); `CLAUDE.md` §11 (stale "Git not authorised" sentence aligned with AP-005); this tracker (§1, §3 AP-007, §4 D-18/D-26/D-30/D-32, §11) | Record AP-007; owner asked for the full F table. First-draft error corrected: context 8,000 tokens exceeded the benchmarked 4,096 window | AP-007 | — | Done (plan awaiting F approval) |
 | CH-0043 | 2026-11-19 | C | `docs/parts/PART-C-PLAN.md` (created, on branch `part/c-harness-core`, uncommitted until approval) | Part C plan: scope C.1–C.4, decisions D-18/D-18a/D-26/D-30/D-32, flagged field values F-1…F-11, design, tests, demo, risks | Roadmap §13 C; Plan §20 C | — | Awaiting owner approval |
 | CH-0042 | 2026-11-19 | B | Version 0.1.0 → 0.2.0 in all `pyproject.toml` files, `apps/web/package.json`, lock files; `CHANGELOG.md` (0.2.0 section); `README.md`; this tracker; `docs/PROJECT_PROGRESS_TRACKER.md` (Run 10); local Git: release commit on `part/b-intake`, merged into `main` (`--no-ff`), tags `v0.2.0` + `part-b-approved` | Part B release after G-B | AP-006 | TR-0035 | Done |
@@ -466,6 +475,7 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | CH-0126 | Created/Modified | see §5 CH-0126 | `Ingestor.index_project/drop_project`, `Retriever.search`, `ChromaVectorStore`, `VectorStore`, `ContextManager.assemble`, `budgets_for_roles`, `ProjectMemory.facts`; `Worker.run_index_job_once/refresh_models`; rag repository functions; `SearchArgs` v2, `SearchHit`; `RagSettings`, `ContextSettings`; `OTEL_PREFIXES` | F.5 | AC-F-03; HS-23 |
 | CH-0127 | Created/Modified | see §5 CH-0127 | routes `settings.models/profile/limits/evals`, `knowledge.index_status/rebuild/model_calls`; `SettingsPage`, `KnowledgePanel`, `ModelCallsTable` | F.6 | D-55, D-57 |
 | CH-0128 | Modified | see §5 CH-0128 | TR-0147 row; report §9, §10 | F.6 | — |
+| CH-0129 | Created/Modified | see §5 CH-0129 | `PART-G-PLAN.md` §0–§13; tracker §1, §2, §3 AP-025, §4, §11, §12 | G planning | AP-025 |
 | CH-0051 | Modified | `settings.py`; `config/defaults.yaml`; `config/profiles/test.yaml` | `SecretsSettings`, `Settings.secrets`, `_memory_secrets_only_in_tests`; `secrets:` sections | D-18 | AP-007 |
 | CH-0052 | Created | `config/guardrails/*.yaml` (4) | Whole files | HC-01 | HS-08 |
 | CH-0053 | Created / Modified | `iam/principals.py`; `iam/__init__.py` | Whole file; exports | HC-15 | HS-07 |
@@ -758,13 +768,14 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 **Pending:**
 
 1. **Part E complete** (G-E, AP-022): released as `0.5.0`, merged into `main`, tagged and pushed (see §1 and TR-0131/TR-0132).
-1a. **Part F implemented** (F.1–F.6, AP-023/AP-024) on `part/f-gateway-rag`, pushed as that branch; completion report written. Waiting for the owner's G-F review (merge, version 0.6.0 and tags only after approval). KI-045 (ChromaDB advisories) to re-check each part.
+1a. **Part F approved** (G-F, AP-025) on `part/f-gateway-rag` (pushed). Merge into `main`, version 0.6.0 and tags `v0.6.0`/`part-f-approved` **only on an explicit owner instruction**. KI-045 (ChromaDB advisories) to re-check each part.
+1b. **Part G plan** written (`docs/parts/PART-G-PLAN.md`), awaiting the owner's review and decisions.
 2. Owner items (never assumed): model selection (Part A, pending); KI-037 review of tier-3 MPL-2.0 packages (`lightningcss`, `certifi`); KI-039 `autoMemoryReclaim=gradual` in `%USERPROFILE%\.wslconfig` (owner-managed, D-45); D-21 (platform licence; D-52 depends on it); D-26/D-33 confirmation; D-31 final ruling; D-34 (commit the spec .docx; until ruled it is **not** committed).
 3. KI-034: the real `data/state.db` is at 0004 and is backed up and migrated to 0007 at the next API start.
 4. KI-042: type errors in older test files (`mypy tests`, not a gate).
 5. Roadmap v2.1 amendment for D-35/D-36/D-37 (DV-003), on owner approval.
 
-**Next authorised action:** **None.** Wait for the owner's G-F review of `docs/parts/PART-F-COMPLETION-REPORT.md`; do not merge, tag or start Part G.
+**Next authorised action:** **None.** Wait for the owner's review of `docs/parts/PART-G-PLAN.md` (G-G planning approval); do not implement Part G, merge Part F into `main`, or tag.
 
 ---
 
@@ -773,8 +784,8 @@ The full decision descriptions are in roadmap §20. This log tracks status only.
 | Milestone | Parts | Status | Completed on | Report |
 |---|---|---|---|---|
 | M0 Foundation | A, B | **Complete** (A and B approved) | 2026-11-19 | `docs/parts/PART-A-COMPLETION-REPORT.md`, `docs/parts/PART-B-COMPLETION-REPORT.md` |
-| M1 Harness & Orchestration | C, D, E, F | **In progress** (C, D, E approved; F not started) | — | `docs/parts/PART-C-COMPLETION-REPORT.md`, `docs/parts/PART-D-COMPLETION-REPORT.md`, `docs/parts/PART-E-COMPLETION-REPORT.md` |
-| M2 Discovery | G, H, I | Not started | — | — |
+| M1 Harness & Orchestration | C, D, E, F | **Complete** (C, D, E, F approved; Part F merge/tag pending owner instruction) | 2026-11-26 | `docs/parts/PART-C-COMPLETION-REPORT.md`, `docs/parts/PART-D-COMPLETION-REPORT.md`, `docs/parts/PART-E-COMPLETION-REPORT.md`, `docs/parts/PART-F-COMPLETION-REPORT.md` |
+| M2 Discovery | G, H, I | In planning (Part G plan awaiting review) | — | — |
 | M3 Build | J, K, L | Not started | — | — |
 | M4 Verify & Deliver | M, N, O, P | Not started | — | — |
 | M5 Evolve & Harden | Q, R | Not started | — | — |
