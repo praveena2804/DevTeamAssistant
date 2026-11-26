@@ -1,0 +1,341 @@
+# Capability Catalog (Spec §13; roadmap §13 Part G; PART-G-PLAN §6.1-§6.2).
+#
+# What the platform can build. Checked at start-up against capabilities.schema.json, the closed
+# CatalogKey enum (devteam_core.contracts.catalog), the starter kits and the recipe registry; an invalid
+# file stops the worker and the API (fail closed).
+#
+# The declared `status` is never trusted on its own: an entry is effectively available only when its
+# starter kit exists, its recipes are registered and a passing, current template verification exists.
+# Otherwise it is demoted, with the reason shown in the report and on the Settings page.
+#
+# Changing this file is a reviewed code change: a new key needs a CatalogKey member and tests.
+# Aliases are exact, lower-case phrases matched against the names the BRD Analyst extracts (never raw
+# BRD text); they are unique within a category.
+version: 1
+
+# Spec §13.2 "SQL" rule: wording that names no engine. It is never mapped to an enterprise product;
+# SQLite is offered (pending the user's acceptance) and a clarification gap is raised.
+ambiguous_database_aliases:
+  - sql
+  - a sql database
+  - sql database
+  - relational database
+  - a relational database
+  - rdbms
+  - database
+  - a database
+  - db
+
+entries:
+  # ------------------------------------------------------------------------------------------ frontend
+  - key: html_css_js
+    display_name: HTML, CSS and JavaScript
+    category: frontend
+    status: supported
+    templates: [html_fastapi_sqlite]
+    generation_adapter: html_frontend
+    build_recipe: static_validation
+    test_recipes: [pytest_api]
+    runtime_requirements: [a modern web browser]
+    known_limitations: [plain pages served by the generated FastAPI backend; no frontend framework]
+    aliases: [html, html/css/js, html css javascript, html css js, javascript, vanilla javascript, plain html, static html, web page, web pages]
+    documentation_ref: capability_catalog/README.md
+  - key: react_vite
+    display_name: React (Vite, TypeScript)
+    category: frontend
+    status: supported
+    compatible_versions: ["19"]
+    templates: [react_fastapi_sqlite]
+    generation_adapter: react_frontend
+    build_recipe: npm_build
+    test_recipes: [tsc_check, vitest_run]
+    runtime_requirements: [a modern web browser]
+    aliases: [react, reactjs, react.js, react js, react vite, vite react, react typescript]
+    documentation_ref: capability_catalog/README.md
+  - key: angular
+    display_name: Angular
+    category: frontend
+    status: unsupported
+    known_limitations: [no Angular starter kit, generator or verification recipe]
+    substitutions: [react_vite, html_css_js]
+    aliases: [angular, angularjs, angular.js]
+    documentation_ref: capability_catalog/README.md
+  - key: vue
+    display_name: Vue
+    category: frontend
+    status: unsupported
+    known_limitations: [no Vue starter kit, generator or verification recipe]
+    substitutions: [react_vite, html_css_js]
+    aliases: [vue, vuejs, vue.js, nuxt]
+    documentation_ref: capability_catalog/README.md
+  - key: power_apps_canvas
+    display_name: Power Apps canvas app
+    category: frontend
+    status: unsupported
+    required_credentials: [Microsoft 365 / Power Platform licence]
+    network_requirement: credentialed
+    known_limitations: [a proprietary, licensed low-code platform; it cannot be generated or tested locally]
+    substitutions: [react_vite, html_css_js]
+    aliases: [power apps, powerapps, power apps canvas, canvas app, microsoft power apps]
+    documentation_ref: capability_catalog/README.md
+
+  # ------------------------------------------------------------------------------------------- backend
+  - key: fastapi_python
+    display_name: FastAPI (Python)
+    category: backend
+    status: supported
+    compatible_versions: ["3.12", "0.165"]
+    templates: [html_fastapi_sqlite, react_fastapi_sqlite]
+    generation_adapter: fastapi_backend
+    build_recipe: ruff_check
+    test_recipes: [pytest_api, pytest_db]
+    runtime_requirements: [Python 3.12]
+    aliases: [fastapi, python, python fastapi, fastapi python, python 3, rest api in python]
+    documentation_ref: capability_catalog/README.md
+  - key: dotnet
+    display_name: .NET / C#
+    category: backend
+    status: unsupported
+    known_limitations: [no .NET starter kit, generator or verification recipe]
+    substitutions: [fastapi_python]
+    aliases: [.net, dotnet, asp.net, asp.net core, c#, csharp, .net core]
+    documentation_ref: capability_catalog/README.md
+  - key: java_spring
+    display_name: Java / Spring
+    category: backend
+    status: unsupported
+    known_limitations: [no Java starter kit, generator or verification recipe]
+    substitutions: [fastapi_python]
+    aliases: [java, spring, spring boot, java spring, java spring boot]
+    documentation_ref: capability_catalog/README.md
+  - key: power_automate
+    display_name: Power Automate
+    category: backend
+    status: unsupported
+    required_credentials: [Microsoft 365 / Power Platform licence]
+    network_requirement: credentialed
+    known_limitations: [a proprietary, licensed workflow service; it cannot be generated or tested locally]
+    substitutions: [fastapi_python]
+    aliases: [power automate, microsoft flow, power automate flow]
+    documentation_ref: capability_catalog/README.md
+
+  # ------------------------------------------------------------------------------------------ database
+  - key: sqlite
+    display_name: SQLite
+    category: database
+    status: supported
+    compatible_versions: ["3"]
+    templates: [html_fastapi_sqlite, react_fastapi_sqlite]
+    generation_adapter: sqlalchemy_sqlite
+    build_recipe: alembic_upgrade
+    test_recipes: [pytest_db]
+    runtime_requirements: [none (file database)]
+    known_limitations: [single-user local database; the default database (Spec §13.2)]
+    aliases: [sqlite, sqlite3, sqlite 3]
+    documentation_ref: capability_catalog/README.md
+  - key: postgresql_docker_local
+    display_name: PostgreSQL (local Docker, testing)
+    category: database
+    status: supported_for_local_testing
+    runtime_requirements: [local Docker engine]
+    known_limitations: [local testing only (D-16)]
+    substitutions: [sqlite]
+    aliases: [postgresql, postgres, postgre sql, postgresql docker, local postgresql]
+    documentation_ref: capability_catalog/README.md
+    available_from_part: K
+  - key: user_provided_postgresql
+    display_name: PostgreSQL provided by the user
+    category: database
+    status: later_change_request
+    required_credentials: [database connection string]
+    network_requirement: credentialed
+    known_limitations: [can be added later as a change request (Spec §14)]
+    substitutions: [sqlite]
+    aliases: [our postgresql server, existing postgresql, company postgresql]
+    documentation_ref: capability_catalog/README.md
+  - key: supabase_hosted
+    display_name: Supabase (hosted PostgreSQL)
+    category: database
+    status: later_change_request
+    required_credentials: [Supabase project keys]
+    network_requirement: credentialed
+    known_limitations: [hosted service; can be added later as a change request (Spec §14)]
+    substitutions: [sqlite]
+    aliases: [supabase, supabase postgresql]
+    documentation_ref: capability_catalog/README.md
+  - key: sql_server
+    display_name: Microsoft SQL Server
+    category: database
+    status: unsupported
+    required_credentials: [SQL Server licence and connection]
+    network_requirement: credentialed
+    known_limitations: [licensed enterprise database; not supported]
+    substitutions: [sqlite]
+    aliases: [sql server, mssql, ms sql, microsoft sql server, sqlserver, t-sql]
+    documentation_ref: capability_catalog/README.md
+  - key: oracle
+    display_name: Oracle Database
+    category: database
+    status: unsupported
+    required_credentials: [Oracle licence and connection]
+    network_requirement: credentialed
+    known_limitations: [licensed enterprise database; not supported]
+    substitutions: [sqlite]
+    aliases: [oracle, oracle database, oracle db]
+    documentation_ref: capability_catalog/README.md
+  - key: azure_sql
+    display_name: Azure SQL
+    category: database
+    status: unsupported
+    required_credentials: [Azure subscription]
+    network_requirement: credentialed
+    known_limitations: [paid cloud database; not supported (NFR-013)]
+    substitutions: [sqlite]
+    aliases: [azure sql, azure sql database, sql azure]
+    documentation_ref: capability_catalog/README.md
+
+  # ---------------------------------------------------------------------------------------- deployment
+  - key: github_public_repo
+    display_name: GitHub public repository
+    category: deployment
+    status: supported
+    known_limitations: [published only after the separate public-visibility approval and a clean secret scan]
+    aliases: [github, github repository, github repo, public github repository]
+    documentation_ref: capability_catalog/README.md
+    available_from_part: P
+  - key: github_actions_ci
+    display_name: GitHub Actions (CI)
+    category: deployment
+    status: supported
+    known_limitations: [continuous integration only; no paid runners]
+    aliases: [github actions, github ci, ci on github]
+    documentation_ref: capability_catalog/README.md
+    available_from_part: P
+  - key: github_pages
+    display_name: GitHub Pages (static frontend only)
+    category: deployment
+    status: supported_for_static_frontend
+    known_limitations: [static frontend only; the FastAPI backend is not hosted]
+    aliases: [github pages, gh pages]
+    documentation_ref: capability_catalog/README.md
+    available_from_part: P
+  - key: power_apps
+    display_name: Power Apps (deployment platform)
+    category: deployment
+    status: unsupported
+    required_credentials: [Microsoft 365 / Power Platform licence]
+    network_requirement: credentialed
+    known_limitations: [a proprietary, licensed platform; the platform delivers source code through GitHub instead (once available, Part P)]
+    aliases: [power apps, powerapps, microsoft power apps, power platform]
+    documentation_ref: capability_catalog/README.md
+  - key: azure
+    display_name: Microsoft Azure hosting
+    category: deployment
+    status: unsupported
+    required_credentials: [Azure subscription]
+    network_requirement: credentialed
+    known_limitations: [paid cloud hosting (NFR-013)]
+    aliases: [azure, microsoft azure, azure app service]
+    documentation_ref: capability_catalog/README.md
+  - key: aws
+    display_name: Amazon Web Services hosting
+    category: deployment
+    status: unsupported
+    required_credentials: [AWS account]
+    network_requirement: credentialed
+    known_limitations: [paid cloud hosting (NFR-013)]
+    aliases: [aws, amazon web services, ec2, aws lambda]
+    documentation_ref: capability_catalog/README.md
+  - key: sharepoint
+    display_name: SharePoint
+    category: deployment
+    status: unsupported
+    required_credentials: [Microsoft 365 tenant]
+    network_requirement: credentialed
+    known_limitations: [a proprietary, licensed platform]
+    aliases: [sharepoint, sharepoint online]
+    documentation_ref: capability_catalog/README.md
+  - key: paid_hosting
+    display_name: Paid hosting
+    category: deployment
+    status: unsupported
+    required_credentials: [hosting account]
+    network_requirement: credentialed
+    known_limitations: [paid services are out of scope (NFR-013)]
+    aliases: [heroku, vercel, netlify, paid hosting, google cloud, gcp, digitalocean]
+    documentation_ref: capability_catalog/README.md
+
+  # --------------------------------------------------------------------------------------- integration
+  - key: public_rest_no_credentials
+    display_name: Public REST API without credentials
+    category: integration
+    status: supported
+    templates: [html_fastapi_sqlite, react_fastapi_sqlite]
+    build_recipe: pytest_api
+    network_requirement: public_no_credentials
+    known_limitations: [the sandbox has no network, so calls are tested against local stubs only (Spec §3.4)]
+    aliases: [public api, public rest api, open api without key, public web service]
+    documentation_ref: capability_catalog/README.md
+  - key: sso
+    display_name: Single sign-on
+    category: integration
+    status: unsupported
+    required_credentials: [identity provider tenant]
+    network_requirement: credentialed
+    known_limitations: [needs an external identity provider and credentials]
+    aliases: [sso, single sign-on, single sign on, saml]
+    documentation_ref: capability_catalog/README.md
+  - key: sap
+    display_name: SAP
+    category: integration
+    status: unsupported
+    required_credentials: [SAP system access]
+    network_requirement: credentialed
+    known_limitations: [licensed enterprise system]
+    aliases: [sap, sap erp, sap s/4hana]
+    documentation_ref: capability_catalog/README.md
+  - key: payment_gateway
+    display_name: Payment gateway
+    category: integration
+    status: unsupported
+    required_credentials: [payment provider keys]
+    network_requirement: credentialed
+    known_limitations: [needs credentials and handles money; not supported]
+    aliases: [payment gateway, stripe, paypal, razorpay, payments]
+    documentation_ref: capability_catalog/README.md
+  - key: credentialed_api
+    display_name: API that needs credentials
+    category: integration
+    status: unsupported
+    required_credentials: [API key or account]
+    network_requirement: credentialed
+    known_limitations: [needs secrets the platform does not hold for generated apps]
+    aliases: [private api, api with key, authenticated api, third-party api with key]
+    documentation_ref: capability_catalog/README.md
+
+  # ---------------------------------------------------------------------------------------------- auth
+  - key: no_auth
+    display_name: No authentication
+    category: auth
+    status: supported
+    templates: [html_fastapi_sqlite, react_fastapi_sqlite]
+    build_recipe: pytest_api
+    known_limitations: [no login; an authentication slot is reserved for a later extension (D-04)]
+    aliases: [no login, no authentication, no auth, open access]
+    documentation_ref: capability_catalog/README.md
+  - key: enterprise_identity_provider
+    display_name: Enterprise identity provider
+    category: auth
+    status: unsupported
+    required_credentials: [identity provider tenant]
+    network_requirement: credentialed
+    known_limitations: [needs an external identity provider (D-04)]
+    aliases: [azure ad, entra id, active directory, okta, ldap, oauth, oidc, microsoft login, google login]
+    documentation_ref: capability_catalog/README.md
+  - key: local_password_rbac
+    display_name: Local username/password with roles
+    category: auth
+    status: unsupported
+    known_limitations: [no authentication starter kit yet; the slot is reserved (D-04)]
+    aliases: [login, username and password, password login, user login, role-based access, rbac, roles and permissions]
+    documentation_ref: capability_catalog/README.md

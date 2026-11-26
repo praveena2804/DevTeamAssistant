@@ -1,13 +1,34 @@
 {
   "$defs": {
-    "Provenance": {
+    "GapCategory": {
+      "description": "The 13 mandatory completeness-checklist categories (Spec §6.2).",
       "enum": [
-        "brd_fact",
-        "user_answer",
-        "assumption",
-        "recommendation"
+        "goal",
+        "actors",
+        "features",
+        "workflows",
+        "data",
+        "rules",
+        "permissions",
+        "login",
+        "technology",
+        "integrations",
+        "deployment",
+        "acceptance_criteria",
+        "non_functional"
       ],
-      "title": "Provenance",
+      "title": "GapCategory",
+      "type": "string"
+    },
+    "GapKind": {
+      "description": "Spec §6.2: conflicting, ambiguous, duplicate and missing statements.",
+      "enum": [
+        "missing",
+        "unclear",
+        "conflicting",
+        "duplicate"
+      ],
+      "title": "GapKind",
       "type": "string"
     },
     "SourceRef": {
@@ -117,69 +138,27 @@
       ],
       "title": "SourceRef",
       "type": "object"
-    },
-    "TechnologyLayer": {
-      "description": "Spec §6.2: frontend, backend, language, framework, runtime, database, auth, deployment.",
-      "enum": [
-        "frontend",
-        "backend",
-        "language",
-        "framework",
-        "runtime",
-        "database",
-        "authentication",
-        "deployment",
-        "other"
-      ],
-      "title": "TechnologyLayer",
-      "type": "string"
     }
   },
   "additionalProperties": false,
+  "description": "A gap the Feasibility Gate raises for the clarification form (Part I).\n\nNo criticality here: criticality is decided by the Requirements Policy Engine (Spec §5.4.2, Part I).",
   "properties": {
-    "answer_id": {
-      "anyOf": [
-        {
-          "pattern": "^ca_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
-          "type": "string"
-        },
-        {
-          "type": "null"
-        }
-      ],
-      "default": null,
-      "title": "Answer Id"
+    "category": {
+      "$ref": "#/$defs/GapCategory"
     },
-    "layer": {
-      "$ref": "#/$defs/TechnologyLayer"
-    },
-    "name": {
-      "maxLength": 200,
+    "description": {
+      "maxLength": 2000,
       "minLength": 1,
-      "title": "Name",
+      "title": "Description",
       "type": "string"
     },
-    "project_id": {
-      "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
-      "title": "Project Id",
+    "gap_id": {
+      "pattern": "^gap_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Gap Id",
       "type": "string"
     },
-    "provenance": {
-      "$ref": "#/$defs/Provenance"
-    },
-    "rationale": {
-      "anyOf": [
-        {
-          "maxLength": 2000,
-          "minLength": 1,
-          "type": "string"
-        },
-        {
-          "type": "null"
-        }
-      ],
-      "default": null,
-      "title": "Rationale"
+    "kind": {
+      "$ref": "#/$defs/GapKind"
     },
     "schema_version": {
       "const": 1,
@@ -195,34 +174,14 @@
       "maxItems": 50,
       "title": "Source Refs",
       "type": "array"
-    },
-    "tech_id": {
-      "pattern": "^tec_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
-      "title": "Tech Id",
-      "type": "string"
-    },
-    "version_spec": {
-      "anyOf": [
-        {
-          "maxLength": 200,
-          "minLength": 1,
-          "type": "string"
-        },
-        {
-          "type": "null"
-        }
-      ],
-      "default": null,
-      "title": "Version Spec"
     }
   },
   "required": [
-    "provenance",
-    "tech_id",
-    "project_id",
-    "layer",
-    "name"
+    "gap_id",
+    "category",
+    "kind",
+    "description"
   ],
-  "title": "TechnologyNeed",
+  "title": "FeasibilityGap",
   "type": "object"
 }

@@ -41,6 +41,7 @@ from devteam_core.contracts.agents import (
     ArchitectInput,
     BackendDeveloperInput,
     BrdAnalystInput,
+    BrdAnalystOutput,
     BuildTaskInput,
     DatabaseDeveloperInput,
     DebuggerReviewerInput,
@@ -69,6 +70,7 @@ from devteam_core.contracts.orchestration import (
     NodeKind,
     NodeName,
     RunMode,
+    ServiceOutcomeStatus,
     is_allowed_transition,
 )
 from devteam_core.contracts.statuses import AgentRole, ApprovalType, GateName, RunStatus, Stage, TaskStatus
@@ -91,6 +93,8 @@ from devteam_orchestration.steps import (
 from devteam_state.machines import transition_run
 from devteam_state.models import AgentTaskRow, AuditEvent, RunEventRow
 from devteam_state.repositories import audit, documents, runs
+from devteam_state.repositories import audit as audit_repo
+from devteam_state.repositories import feasibility as feasibility_repo
 from devteam_state.repositories import orchestration as orch
 from devteam_state.repositories import spec_versions as specs
 
@@ -100,6 +104,9 @@ _EVENT_CODE = re.compile(r"^[a-z][a-z0-9_.]{0,63}$")
 T = TaskStatus
 GUARD = "service:build_entry_guard"
 ANALYSIS_PIECES = 12  # one bounded batch for the Part D analyst (Part H analyses every chunk)
+ACKNOWLEDGED = "feasibility.low_coverage_acknowledged"  # written by the run command, read by the gate (D-63)
+DECISION_REASON = "feasibility.decision_reason"  # cancel | revise (D-01)
+REVISE_REASON = "cancelled to revise the BRD: upload the revised BRD and start a new run"
 
 # --------------------------------------------------------------------------------------------- state
 
@@ -127,6 +134,7 @@ class GraphState(TypedDict, total=False):
     spec_version_id: str
     spec_checksum: str
     feasibility_approval_id: str
+    feasibility_report_id: str
     project_approval_id: str
     publish_approval_id: str
     publish_declined: bool
@@ -161,6 +169,7 @@ class StateUpdate(BaseModel):
     spec_version_id: _Id | None = None
     spec_checksum: _Sha | None = None
     feasibility_approval_id: _Id | None = None
+    feasibility_report_id: _Id | None = None
     project_approval_id: _Id | None = None
     publish_approval_id: _Id | None = None
     publish_declined: bool | None = None
@@ -502,13 +511,77 @@ class Nodes:
         return {"analysis_task_id": task_id}
 
     def feasibility(self, state: GraphState) -> dict[str, Any]:
-        stand_in(self.rt, state, N.FEASIBILITY)
-        return {}
+        """Part G: the real Feasibility Gate service (deterministic; no model); one report per analysis.
+
+        Idempotent on resume: the effect ledger names the report once it is stored, and a crash between
+        storing the report and confirming the effect finds that report again instead of writing another.
+        """
+        rt, project_id, run_id = self.rt, state["project_id"], state["run_id"]
+        analysis_task_id = state["analysis_task_id"]
+        key = orch.effect_key(run_id, N.FEASIBILITY.value, f"report_{analysis_task_id}")
+        with rt.sessions.begin() as session:
+            effect = orch.begin_effect(
+                session,
+                project_id=project_id,
+                run_id=run_id,
+                node=N.FEASIBILITY.value,
+                key=key,
+                clock=rt.clock,
+            )
+            report_id = effect.result_ref
+            if report_id is None:
+                existing = feasibility_repo.latest_report(session, project_id, run_id)
+                if existing is not None and existing.report.analysis_task_id == analysis_task_id:
+                    report_id = existing.report.report_id  # stored before a crash: reuse it
+        if report_id is None:
+            report_id = self._evaluate_feasibility(project_id, run_id, analysis_task_id)
+        with rt.sessions.begin() as session:
+            effect = orch.begin_effect(
+                session,
+                project_id=project_id,
+                run_id=run_id,
+                node=N.FEASIBILITY.value,
+                key=key,
+                clock=rt.clock,
+            )
+            if effect.result_ref is None:
+                orch.advance_effect(session, key, "confirmed", result_ref=report_id, clock=rt.clock)
+        emit(
+            rt,
+            ServiceStepRecorded(
+                **_base(rt, state), node=N.FEASIBILITY, status=ServiceOutcomeStatus.PERFORMED, stand_in=False
+            ),
+        )
+        return {"feasibility_report_id": report_id}
+
+    def _evaluate_feasibility(self, project_id: str, run_id: str, analysis_task_id: str) -> str:
+        rt = self.rt
+        raw = stored_output(rt, project_id, analysis_task_id)
+        if raw is None:
+            raise StepError("feasibility.no_analysis", "the BRD analysis has no stored output to check")
+        try:
+            analysis = BrdAnalystOutput.model_validate(raw)
+        except ValidationError:
+            raise StepError("feasibility.bad_analysis", "the stored BRD analysis is not valid") from None
+        with rt.sessions() as session:
+            snapshot = rt.catalog_snapshot(session)
+        stored = rt.feasibility_gate().evaluate(
+            project_id=project_id,
+            run_id=run_id,
+            analysis_task_id=analysis_task_id,
+            analysis=analysis,
+            snapshot=snapshot,
+            write=rt.files_for(project_id).write_text,
+        )
+        return stored.report.report_id
 
     def requirements_finalizer(self, state: GraphState) -> dict[str, Any]:
         rt, project_id, run_id = self.rt, state["project_id"], state["run_id"]
         analysis = stored_output(rt, project_id, state["analysis_task_id"]) or {}
-        keys = tuple(r["requirement_id"] for r in analysis.get("requirements", []))
+        analysed = tuple(r["requirement_id"] for r in analysis.get("requirements", []))
+        # Part G: requirements blocked by feasibility leave the scope before the spec is drafted (reason kept)
+        blocked, item_ids = self._feasibility_scope(state)
+        keys = tuple(k for k in analysed if k not in blocked)
 
         def build(task_id: str) -> AgentTask:
             return AgentTask(
@@ -523,7 +596,9 @@ class Nodes:
             )
 
         task_id = ensure_task(rt, node=N.REQUIREMENTS_FINALIZER.value, scope="consolidate", build=build)
-        given = RequirementsFinalizerInput(project_id=project_id, run_id=run_id, requirement_ids=keys)
+        given = RequirementsFinalizerInput(
+            project_id=project_id, run_id=run_id, requirement_ids=keys, feasibility_item_ids=item_ids
+        )
         outcome = run_task(
             rt,
             project_id=project_id,
@@ -540,6 +615,8 @@ class Nodes:
             "excluded": sorted(excluded),
             "analysis_task_id": state["analysis_task_id"],
             "finalizer_task_id": task_id,
+            "blocked_by_feasibility": sorted(k for k in analysed if k in blocked),
+            "feasibility_report_id": state.get("feasibility_report_id"),
         }
         key = orch.effect_key(run_id, N.REQUIREMENTS_FINALIZER.value, "spec_draft")
         with rt.sessions.begin() as session:
@@ -568,6 +645,17 @@ class Nodes:
             "draft_spec_checksum": checksum,
             "route": N.PROJECT_APPROVAL.value,
         }
+
+    def _feasibility_scope(self, state: GraphState) -> tuple[frozenset[str], tuple[str, ...]]:
+        """Blocked keys and item IDs of the feasibility report the gate decision was made on."""
+        report_id = state.get("feasibility_report_id")
+        if not report_id:
+            raise StepError("feasibility.no_report", "no feasibility report is recorded for this run")
+        with self.rt.sessions() as session:
+            stored = feasibility_repo.get_report(session, state["project_id"], report_id)
+        if stored is None or stored.report.run_id != state["run_id"]:
+            raise StepError("feasibility.no_report", "the feasibility report does not belong to this run")
+        return frozenset(stored.report.blocked_keys), tuple(i.item_id for i in stored.items)[:500]
 
     def freeze_spec(self, state: GraphState) -> dict[str, Any]:
         rt, project_id, run_id = self.rt, state["project_id"], state["run_id"]
@@ -617,12 +705,17 @@ class Nodes:
         def run(state: GraphState) -> dict[str, Any]:
             from langgraph.types import interrupt  # noqa: PLC0415 - only nodes call interrupt()
 
-            raw = interrupt({"gate": gate.value, "run_id": state["run_id"]})
+            payload: dict[str, Any] = {"gate": gate.value, "run_id": state["run_id"]}
+            if gate is GateName.FEASIBILITY_DECISION:
+                payload["report_id"] = state.get("feasibility_report_id")  # a reference only
+            raw = interrupt(payload)
             return self._decide(state, name, gate, raw)
 
         return run
 
-    def _decide(self, state: GraphState, name: NodeName, gate: GateName, raw: Any) -> dict[str, Any]:
+    def _decide(  # noqa: PLR0912 - one branch per gate rule
+        self, state: GraphState, name: NodeName, gate: GateName, raw: Any
+    ) -> dict[str, Any]:
         rt = self.rt
         try:
             resume = GateResume.model_validate(raw)
@@ -661,7 +754,14 @@ class Nodes:
                 raise StepError(exc.code, f"the decision could not be verified ({exc.code})") from None
             if gate is GateName.PUBLISH_APPROVAL:
                 return {"route": N.FINAL_REPORT.value, "publish_declined": True}
+            if gate is GateName.FEASIBILITY_DECISION and self._revise(state, resume.approval_id):
+                return _finish("cancelled", "feasibility.revise", REVISE_REASON)
             return _finish("cancelled", "gate.declined", f"{gate.value.replace('_', ' ')} was declined")
+        if gate is GateName.FEASIBILITY_DECISION:
+            problem = self._proceed_problem(state)
+            if problem is not None:
+                _audit(rt, state, "feasibility.proceed_refused", "denied", code=problem[0])
+                return _finish("blocked", problem[0], problem[1])
         field = {
             GateName.FEASIBILITY_DECISION: "feasibility_approval_id",
             GateName.PROJECT_APPROVAL: "project_approval_id",
@@ -673,6 +773,46 @@ class Nodes:
             GateName.PUBLISH_APPROVAL: N.GITHUB_DEPLOYER,
         }[gate]
         return {field: resume.approval_id, "route": approved_next.value}
+
+    def _proceed_problem(self, state: GraphState) -> tuple[str, str] | None:
+        """D-63, re-checked at the gate (the run command checks first): never proceed at "nothing to build";
+        below the threshold only with the human's recorded acknowledgement of this very report."""
+        report_id = state.get("feasibility_report_id")
+        with self.rt.sessions() as session:
+            stored = (
+                feasibility_repo.get_report(session, state["project_id"], report_id) if report_id else None
+            )
+            if stored is None or stored.report.run_id != state["run_id"]:
+                return "feasibility.no_report", "no feasibility report is recorded for this run"
+            report = stored.report
+            if not report.proceed_allowed:
+                return (
+                    "feasibility.proceed_disabled",
+                    "nothing in scope can be built, so the run cannot proceed",
+                )
+            if report.needs_acknowledgement:
+                event = audit_repo.latest_for_target(
+                    session,
+                    actions=(ACKNOWLEDGED,),
+                    target_type="feasibility_report",
+                    target_id=report.report_id,
+                )
+                if event is None or event.project_id != state["project_id"]:
+                    return (
+                        "feasibility.acknowledgement_missing",
+                        "coverage is below the threshold and the low coverage was not acknowledged",
+                    )
+        return None
+
+    def _revise(self, state: GraphState, approval_id: str | None) -> bool:
+        """D-01: a declined feasibility decision is a cancellation; "revise" names why (a new run follows)."""
+        with self.rt.sessions() as session:
+            event = audit_repo.latest_for_target(
+                session, actions=(DECISION_REASON,), target_type="approval", target_id=approval_id or "-"
+            )
+        if event is None or event.project_id != state["project_id"]:
+            return False
+        return (event.details or {}).get("reason") == "revise"
 
     # ----------------------------------------------------------------------------------- build
 

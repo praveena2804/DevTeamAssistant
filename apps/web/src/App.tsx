@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { ActivityPage } from "./pages/ActivityPage";
 import { ExtractionReviewPage } from "./pages/ExtractionReviewPage";
+import { FeasibilityPage } from "./pages/FeasibilityPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { ProjectPage } from "./pages/ProjectPage";
 import { ProjectsPage } from "./pages/ProjectsPage";
@@ -31,6 +32,7 @@ export function App() {
         <Route path="projects/:projectId/activity" element={<ActivityPage />} />
         <Route path="projects/:projectId/runs/:runId" element={<RunPage />} />
         <Route path="projects/:projectId/runs/:runId/trace" element={<TracePage />} />
+        <Route path="projects/:projectId/runs/:runId/feasibility" element={<FeasibilityPage />} />
         <Route path="projects/:projectId/runs/:runId/history" element={<RunHistoryPage />} />
         <Route path="activity" element={<ActivityPage />} />
         <Route path="sandbox" element={<SandboxPage />} />

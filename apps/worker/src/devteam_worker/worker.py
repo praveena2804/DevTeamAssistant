@@ -34,6 +34,7 @@ from devteam_core.logging import get_logger
 from devteam_harness.errors import HarnessError, ResourceUnavailableError
 from devteam_orchestration.execution import Advance, advance
 from devteam_orchestration.runtime import Runtime
+from devteam_services.catalog import record_status_changes
 from devteam_services.templates import refresh_stale, run_verification
 from devteam_state.models import Run, RunJob
 from devteam_state.repositories import audit
@@ -264,6 +265,17 @@ class Worker:
 
     # ------------------------------------------------------------------------- sandbox (Part E)
 
+    def record_catalog_status(self) -> int | None:
+        """Part G: audit Capability Catalog demotions/restorations once per change (after stale marking)."""
+        if self.rt.catalog is None:
+            return None
+        try:
+            with self.rt.sessions.begin() as session:
+                return record_status_changes(session, self.rt.catalog_snapshot(session), clock=self.rt.clock)
+        except Exception:  # housekeeping must never stop the run worker; feasibility recomputes it anyway
+            _log.exception("catalog_status_record_failed")
+            return None
+
     def refresh_sandbox(self, *, sweep: bool = False) -> dict[str, Any]:
         """Check the WSL engine (and, at start, remove leftovers of crashed runs); write the status file the
         API reads, so the API itself never contacts Docker."""
@@ -290,6 +302,7 @@ class Worker:
                 except Exception:  # sandbox housekeeping must never stop the run worker
                     _log.exception("sandbox_stale_refresh_failed")
                     status["stale_marked"] = None
+                status["catalog_changes"] = self.record_catalog_status()
         status["checked_at"] = self.rt.clock.now().isoformat(timespec="seconds")
         target = self.rt.settings.data_dir / SANDBOX_STATUS_FILE
         target.parent.mkdir(parents=True, exist_ok=True)

@@ -47,6 +47,10 @@ rag:                                 # Part F (HC-08): retrieval over project kn
   index_job_max_calls: 2000
   index_job_minutes: 30
 
+feasibility:                         # Part G: Feasibility Gate (D-02, D-63)
+  min_coverage_pct: 50               # below it: "stop recommended"; proceeding needs an acknowledgement
+  report_dir: reports                # workspaces/<project_id>/reports/FEASIBILITY_REPORT.md
+
 context:                             # Part F: Context Manager budgets (tokens) per role group
   discovery_retrieval_tokens: 1536
   discovery_memory_tokens: 256

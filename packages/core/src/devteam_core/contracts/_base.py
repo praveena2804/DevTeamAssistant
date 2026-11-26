@@ -57,6 +57,7 @@ QuestionId = Annotated[str, _id("cq")]
 AnswerId = Annotated[str, _id("ca")]
 DecisionId = Annotated[str, _id("dec")]
 FeasibilityItemId = Annotated[str, _id("fea")]
+FeasibilityReportId = Annotated[str, _id("fsr")]  # Part G
 RoleId = Annotated[str, _id("rol")]
 PermissionId = Annotated[str, _id("prm")]
 EntityId = Annotated[str, _id("ent")]

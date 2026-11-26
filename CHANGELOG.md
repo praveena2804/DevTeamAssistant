@@ -4,6 +4,31 @@ One section per approved part (roadmap §8). Entries are added at gate approval;
 
 **Versioning:** SemVer, pre-1.0. Each approved part bumps the minor version (Part A = 0.1.0, B = 0.2.0, …, R = 0.18.0); fixes to an approved part bump the patch version. The accepted MVP is `1.0.0-mvp`. Git tags: `vX.Y.Z` plus `part-<letter>-approved` (roadmap §16.2).
 
+## Unreleased — Part G: Capability Catalog & Feasibility Gate (awaiting G-G)
+
+### Added
+
+- Capability Catalog: `capability_catalog/capabilities.yaml` (every Spec §13.1 field, 32 entries), generated
+  JSON Schema, closed `CatalogKey` enum; validated at start-up of the worker and the API (fail closed)
+- Effective catalog status: an entry is available only with an installed starter kit, registered recipes and a
+  passing, current template verification; otherwise demoted with the reason (audited once per change)
+- Feasibility Gate service (`service:feasibility_gate`, no model): deterministic mapping, status rules,
+  dependency propagation (D-60), coverage (D-02) with a 50% threshold (`feasibility.min_coverage_pct`, D-63),
+  the "SQL" rule (D-64), substitution offers that apply only with an item-bound approval (AC-G-04)
+- Migration `0010_feasibility`: append-only feasibility reports, items and requirement effects;
+  `approvals.subject_ref`
+- The graph's `feasibility` node is real (replaces the Part D stand-in); the feasibility decision accepts
+  `acknowledge_low_coverage` and `reason` (`cancel` | `revise`); blocked requirements leave the scope
+- API `GET …/runs/{run_id}/feasibility`, `…/feasibility/report.md`, `GET /api/settings/catalog`; Feasibility
+  page and a Capability Catalog section in Settings
+- `scripts/evaluate_feasibility_fixture.py` (labelled fixture evaluation, D-65); docs
+  `docs/architecture/feasibility.md`, `docs/runbooks/capability-catalog.md`
+
+### Changed
+
+- Contracts: `FeasibilityItem` v2 (D-61), `TechnologyNeed` and `Integration` v2 (optional `requirement_ids`;
+  model-proposed `catalog_key` validated); v1 needs and integrations are read unchanged
+
 ## Unreleased — Part F: LLM Gateway, Model Routing, Context & Memory, and RAG (awaiting G-F)
 
 ### Added (checkpoints F.1–F.2)

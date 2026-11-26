@@ -9,7 +9,9 @@ It fails closed (``RuntimeConfigError``) when:
 * cloud tracing is configured (``ensure_local_only``, D-30);
 * a configuration file is missing or invalid (guardrails, budgets, approvals);
 * the agent registry does not hold exactly the ten agents, or a spec disagrees with the central policy;
-* any of the ten agents has no behaviour.
+* any of the ten agents has no behaviour;
+* the Capability Catalog is invalid (Part G: schema, closed key enum, starter kit, recipe or document
+  references).
 
 Whether Ollama is reachable and the configured models are installed is checked by :func:`check_models`
 (the worker calls it at start). A run never substitutes anything when the model is missing: the agent
@@ -61,7 +63,17 @@ from devteam_harness.tools import ToolLayer, build_default_registry
 from devteam_harness.tools.files import ControlledFileService, FileLimits
 from devteam_orchestration.prompts import build_prompt_registry
 from devteam_orchestration.safety import ensure_local_only
+from devteam_services.catalog import (
+    CatalogError,
+    CatalogSnapshot,
+    LoadedCatalog,
+    default_fingerprint,
+    effective_catalog,
+    load_catalog,
+)
 from devteam_services.extractor import CHUNKER_VERSION
+from devteam_services.feasibility import FeasibilityGate
+from devteam_services.integration_builder import templates_root
 
 PROVIDER_GRACE_S = 15  # the HTTP timeout outlives the gateway's F-9d timeout slightly
 
@@ -110,6 +122,7 @@ class Runtime:
     gateway: LLMGateway | None = None  # Part F: the one door to models, also for service jobs (RAG)
     retriever: Retriever | None = None  # Part F.5: project-isolated retrieval (search tool)
     ingestor: Ingestor | None = None  # Part F.5: indexing (worker jobs); None without a vector store
+    catalog: LoadedCatalog | None = None  # Part G: validated Capability Catalog (start-up check)
 
     def workspace(self, project_id: str) -> Path:
         root = self.settings.workspaces_dir.resolve()
@@ -120,6 +133,25 @@ class Runtime:
 
     def files_for(self, project_id: str) -> ControlledFileService:
         return ControlledFileService(self.workspace(project_id), self.file_limits)
+
+    def catalog_snapshot(self, session: Session) -> CatalogSnapshot:
+        """Effective catalog status now (recomputed every time: a verification can go stale between runs)."""
+        if self.catalog is None:
+            raise RuntimeConfigError("the Capability Catalog was not loaded")
+        return effective_catalog(
+            self.catalog, session, kits_root=templates_root(), fingerprint=default_fingerprint(self.settings)
+        )
+
+    def feasibility_gate(self) -> FeasibilityGate:
+        """Part G: the deterministic Feasibility Gate service (principal ``service:feasibility_gate``)."""
+        options = self.settings.feasibility
+        return FeasibilityGate(
+            self.sessions,
+            self.approvals,
+            threshold_pct=options.min_coverage_pct,
+            report_dir=options.report_dir,
+            clock=self.clock,
+        )
 
     def close(self) -> None:
         self.provider.close()
@@ -137,20 +169,26 @@ def build_runtime(
     config = config_dir or (find_repo_root() / "config")
     guardrails = load_guardrails(config)
     budgets = load_budgets(config)
+    try:
+        catalog = load_catalog()  # Part G: fail closed on an invalid Capability Catalog
+    except CatalogError as exc:
+        raise RuntimeConfigError(str(exc)) from None
     approvals = ApprovalService(load_approval_rules(config), sessions, clock=clock)
     sink = DatabaseAuditSink(sessions)
     tracer = Tracer(sessions)
     # Part F: model catalogue and router (config/models.yaml; MODEL_ROUTING.md); start-up rules 1-9.
     try:
-        catalog = load_model_catalog(config, max_model_ram_mb=settings.resources.max_model_ram_mb)
+        model_catalog = load_model_catalog(config, max_model_ram_mb=settings.resources.max_model_ram_mb)
     except ConfigError as exc:
         raise RuntimeConfigError(str(exc)) from None
-    router = Router(catalog)
+    router = Router(model_catalog)
     timeout = min(
         settings.ollama.request_timeout_s,
         max(p.model_call_timeout_s for p in budgets.profiles.values()) + PROVIDER_GRACE_S,
     )
-    slot_models: dict[ModelSlot, str] = {s: m for s in CHAT_SLOTS if (m := catalog.slot_model(s)) is not None}
+    slot_models: dict[ModelSlot, str] = {
+        s: m for s in CHAT_SLOTS if (m := model_catalog.slot_model(s)) is not None
+    }
     provider = OllamaProvider(
         settings.ollama.base_url,
         slot_models,
@@ -195,7 +233,7 @@ def build_runtime(
             cancel_wait_s=llm.cancel_wait_s,
             unload_verify_s=llm.unload_verify_s,
             digest_refresh_s=llm.digest_refresh_s,
-            ram_margin_mb=catalog.ram_margin_mb,
+            ram_margin_mb=model_catalog.ram_margin_mb,
         ),
     )
     # Part F.5: retrieval over project knowledge (HC-08). The vector store is supplied by the caller (D-54);
@@ -265,6 +303,7 @@ def build_runtime(
         gateway=gateway,
         retriever=retriever,
         ingestor=ingestor,
+        catalog=catalog,
     )
 
 

@@ -622,6 +622,7 @@
     },
     "Integration": {
       "additionalProperties": false,
+      "description": "v2 (Part G, D-60): optional ``requirement_ids``. v1 payloads (without the new field) still validate.\n\n``catalog_key`` is a model-*proposed* key: the Feasibility Gate accepts it only if it is a ``CatalogKey``\nmember of the right category, and rejects and audits anything else (never added to the catalog).",
       "properties": {
         "answer_id": {
           "anyOf": [
@@ -689,9 +690,19 @@
           "default": null,
           "title": "Rationale"
         },
+        "requirement_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^(FR|NFR|BR)-[0-9]{3,4}$",
+            "type": "string"
+          },
+          "maxItems": 500,
+          "title": "Requirement Ids",
+          "type": "array"
+        },
         "schema_version": {
-          "const": 1,
-          "default": 1,
+          "const": 2,
+          "default": 2,
           "title": "Schema Version",
           "type": "integer"
         },
@@ -1161,6 +1172,7 @@
     },
     "TechnologyNeed": {
       "additionalProperties": false,
+      "description": "v2 (Part G, D-60): optional ``requirement_ids`` and model-proposed ``catalog_key``.",
       "properties": {
         "answer_id": {
           "anyOf": [
@@ -1174,6 +1186,20 @@
           ],
           "default": null,
           "title": "Answer Id"
+        },
+        "catalog_key": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Catalog Key"
         },
         "layer": {
           "$ref": "#/$defs/TechnologyLayer"
@@ -1206,9 +1232,19 @@
           "default": null,
           "title": "Rationale"
         },
+        "requirement_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^(FR|NFR|BR)-[0-9]{3,4}$",
+            "type": "string"
+          },
+          "maxItems": 500,
+          "title": "Requirement Ids",
+          "type": "array"
+        },
         "schema_version": {
-          "const": 1,
-          "default": 1,
+          "const": 2,
+          "default": 2,
           "title": "Schema Version",
           "type": "integer"
         },

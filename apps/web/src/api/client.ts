@@ -40,6 +40,10 @@ export type ModelsSettings = Schemas["ModelsOut"];
 export type ProfileSettings = Schemas["ProfileOut"];
 export type LimitsSettings = Schemas["LimitsOut"];
 export type PromptStatus = Schemas["PromptStatusOut"];
+export type CatalogSettings = Schemas["CatalogOut"];
+export type Feasibility = Schemas["FeasibilityOut"];
+export type FeasibilityItem = Schemas["FeasibilityItemOut"];
+export type CatalogEntry = Schemas["CatalogEntryOut"];
 export type IndexStatus = Schemas["IndexStatusOut"];
 export type IndexJob = Schemas["IndexJobOut"];
 export type ModelCall = Schemas["ModelCallOut"];
@@ -166,11 +170,22 @@ export const controlRun = (projectId: string, runId: string, action: "pause" | "
   request<Run>(`${runPath(projectId, runId)}/${action}`, { method: "POST" });
 export const getGate = (projectId: string, runId: string, signal?: AbortSignal) =>
   request<GateInfo>(`${runPath(projectId, runId)}/gate`, opt(signal));
-export const decideGate = (projectId: string, runId: string, gate: string, decision: "approved" | "rejected") =>
+export type GateOptions = { acknowledge_low_coverage?: boolean; reason?: "cancel" | "revise" };
+export const decideGate = (
+  projectId: string,
+  runId: string,
+  gate: string,
+  decision: "approved" | "rejected",
+  options: GateOptions = {},
+) =>
   request<GateDecisionOut>(`${runPath(projectId, runId)}/gates/${encodeURIComponent(gate)}/decision`, {
     method: "POST",
-    json: { decision },
+    json: { decision, ...options },
   });
+export const getFeasibility = (projectId: string, runId: string, signal?: AbortSignal) =>
+  request<Feasibility>(`${runPath(projectId, runId)}/feasibility`, opt(signal));
+export const feasibilityReportUrl = (projectId: string, runId: string) =>
+  `${runPath(projectId, runId)}/feasibility/report.md`;
 export const listRunTasks = (projectId: string, runId: string, signal?: AbortSignal) =>
   request<RunTask[]>(`${runPath(projectId, runId)}/tasks`, opt(signal));
 export const listRunEvents = (projectId: string, runId: string, after: number, signal?: AbortSignal) =>
@@ -196,6 +211,7 @@ export const getVerification = (verificationId: string, signal?: AbortSignal) =>
 export const getModelSettings = (signal?: AbortSignal) => request<ModelsSettings>("/api/settings/models", opt(signal));
 export const getProfileSettings = (signal?: AbortSignal) => request<ProfileSettings>("/api/settings/profile", opt(signal));
 export const getLimitSettings = (signal?: AbortSignal) => request<LimitsSettings>("/api/settings/limits", opt(signal));
+export const getCatalog = (signal?: AbortSignal) => request<CatalogSettings>("/api/settings/catalog", opt(signal));
 export const getEvalStatus = (signal?: AbortSignal) => request<PromptStatus[]>("/api/settings/evals", opt(signal));
 export const getIndexStatus = (projectId: string, signal?: AbortSignal) =>
   request<IndexStatus>(`/api/projects/${encodeURIComponent(projectId)}/knowledge/index`, opt(signal));

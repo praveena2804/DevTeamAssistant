@@ -16,6 +16,7 @@ from devteam_api.middleware.request_context import RequestContextMiddleware
 from devteam_api.routers import (
     audit,
     documents,
+    feasibility,
     knowledge,
     projects,
     runs,
@@ -31,6 +32,7 @@ from devteam_harness.approvals import ApprovalService, load_approval_rules
 from devteam_harness.iam import LOCAL_HUMAN_ROLES, Principal, load_api_token, session_value
 from devteam_harness.ratelimit import RateLimiter
 from devteam_harness.secrets import secrets_manager_from_settings
+from devteam_services.catalog import load_catalog
 from devteam_services.intake import IntakeService
 from devteam_services.workspace import WorkspaceManager
 from devteam_state import create_sqlite_engine, ensure_state_schema, session_factory
@@ -91,6 +93,8 @@ def create_app(
         # Part D: gate decisions are recorded through the Approval Service (HC-13)
         app.state.approval_rules = load_approval_rules(resolved.root / "config")
         app.state.approvals = ApprovalService(app.state.approval_rules, app.state.session_factory)
+        # Part G: the Capability Catalog is validated at start-up; an invalid one stops the API (fail closed)
+        app.state.catalog = load_catalog()
         _log.info("api_started", profile=resolved.profile, version=__version__)
         try:
             yield
@@ -128,4 +132,5 @@ def create_app(
     app.include_router(sandbox.router)
     app.include_router(settings_router.router)  # Part F.6 (read-only, D-55)
     app.include_router(knowledge.router)  # Part F.5/F.6 (status and queue only, D-57)
+    app.include_router(feasibility.router)  # Part G (read-only report; decisions via the gate route)
     return app

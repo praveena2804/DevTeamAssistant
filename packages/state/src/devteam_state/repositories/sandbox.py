@@ -226,6 +226,23 @@ def latest_verifications(session: Session) -> dict[str, TemplateVerification]:
     return latest
 
 
+def latest_finished_verifications(session: Session) -> dict[str, TemplateVerification]:
+    """The newest *finished* verification per template (passed, failed, blocked or stale).
+
+    Queued and running requests are ignored: an older result stays authoritative until a new one finishes
+    (Part G effective catalog status).
+    """
+    rows = session.scalars(
+        select(TemplateVerificationRow)
+        .where(TemplateVerificationRow.status.in_(["passed", "failed", "blocked", "stale"]))
+        .order_by(TemplateVerificationRow.requested_at.desc(), TemplateVerificationRow.id.desc())
+    ).all()
+    latest: dict[str, TemplateVerification] = {}
+    for row in rows:
+        latest.setdefault(row.template_id, _to_contract(row))
+    return latest
+
+
 def has_active_verification(session: Session, template_id: str) -> bool:
     return (
         session.scalars(

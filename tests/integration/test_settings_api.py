@@ -110,3 +110,41 @@ def test_model_calls_of_a_run_are_metadata_only(client: TestClient, isolated_set
     missing = client.get(f"/api/projects/{project_id}/runs/run_01JD3X5Q0000000000000000AA/model-calls",
                          headers=bearer(client))  # fmt: skip
     assert missing.status_code == 404
+
+
+# ------------------------------------------------------------------------------- Part G: catalog (G.1)
+
+
+def test_the_catalog_shows_declared_and_effective_status_with_reasons(client: TestClient) -> None:
+    body = client.get("/api/settings/catalog", headers=bearer(client)).json()
+    entries = {e["key"]: e for e in body["entries"]}
+    assert len(entries) == 32 and len(body["catalog_hash"]) == 64
+    react = entries["react_vite"]
+    assert react["declared_status"] == "supported" and react["effective_status"] == "demoted"
+    assert "never been verified" in react["reason"]  # this throw-away database has no verification
+    assert entries["postgresql_docker_local"]["reason"] == "not available yet: arrives in Part K"
+    assert entries["angular"]["effective_status"] == "unsupported"
+    assert entries["angular"]["substitutions"] == ["react_vite", "html_css_js"]
+    assert body["demoted"] == 10
+
+
+def test_the_catalog_is_read_only(client: TestClient) -> None:
+    for method in ("post", "put", "patch", "delete"):
+        assert getattr(client, method)("/api/settings/catalog", headers=bearer(client)).status_code == 405
+
+
+def test_the_api_refuses_to_start_with_an_invalid_catalog(
+    isolated_settings: Settings, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from devteam_api import main  # noqa: PLC0415
+    from devteam_services.catalog import CatalogError  # noqa: PLC0415
+
+    def broken() -> None:
+        raise CatalogError("capabilities.yaml: react_vite: unknown recipe 'rm_rf'")
+
+    monkeypatch.setattr(main, "load_catalog", broken)
+    with (
+        pytest.raises(CatalogError, match="rm_rf"),
+        TestClient(main.create_app(isolated_settings, configure_logs=False, token_provider=lambda: "t" * 43)),
+    ):
+        pass

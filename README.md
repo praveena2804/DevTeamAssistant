@@ -25,6 +25,11 @@ DevTeam AI is a local-first, BRD-driven software development platform.
 >   recovery ladder for out-of-memory and slow models, a content-free record of every model call, rate limits,
 >   a file-based prompt registry with a CI evaluation gate, and project-isolated document search (local
 >   `nomic-embed-text` embeddings in an in-process ChromaDB). Agents start using search in Part H.
+> - Part G (built on branch `part/g-catalog-feasibility`, awaiting approval G-G): a Capability Catalog of what
+>   the platform can build, whose "supported" entries count only when their starter kit is verified, and a
+>   Feasibility Gate that checks a BRD's technologies against it, blocks what cannot be built, offers (never
+>   applies) alternatives, shows the coverage and asks you to proceed or cancel. Until Part H the BRD Analyst
+>   extracts no technologies, so a real run's report says "no technology needs identified".
 >
 > See `docs/IMPLEMENTATION_TRACKER.md` for the authoritative
 > status and `docs/PROJECT_PROGRESS_TRACKER.md` for a plain-English run history.
@@ -48,6 +53,7 @@ DevTeam AI is a local-first, BRD-driven software development platform.
 | `docs/architecture/sandbox.md` | How sandbox runs work and which controls apply |
 | `docs/architecture/llm-gateway.md`, `rag.md`, `context-memory.md` | Model path, routing, records, search index, context budgets (Part F) |
 | `docs/runbooks/models-and-rag.md` | Models, search index, evaluations and prompts: day-to-day tasks |
+| `docs/architecture/feasibility.md`, `docs/runbooks/capability-catalog.md` | Capability Catalog and Feasibility Gate (Part G) |
 | `CLAUDE.md` | Engineering rules for coding agents |
 
 ## Architecture

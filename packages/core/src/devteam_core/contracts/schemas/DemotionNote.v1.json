@@ -1,0 +1,68 @@
+{
+  "$defs": {
+    "CatalogKey": {
+      "description": "Every capability the platform knows. Adding one is a reviewed code change (enum + YAML + tests).",
+      "enum": [
+        "html_css_js",
+        "react_vite",
+        "angular",
+        "vue",
+        "power_apps_canvas",
+        "fastapi_python",
+        "dotnet",
+        "java_spring",
+        "power_automate",
+        "sqlite",
+        "postgresql_docker_local",
+        "user_provided_postgresql",
+        "supabase_hosted",
+        "sql_server",
+        "oracle",
+        "azure_sql",
+        "github_public_repo",
+        "github_actions_ci",
+        "github_pages",
+        "power_apps",
+        "azure",
+        "aws",
+        "sharepoint",
+        "paid_hosting",
+        "public_rest_no_credentials",
+        "sso",
+        "sap",
+        "payment_gateway",
+        "credentialed_api",
+        "no_auth",
+        "enterprise_identity_provider",
+        "local_password_rbac"
+      ],
+      "title": "CatalogKey",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A catalog entry that was demoted when the report was made (shown in the report).",
+  "properties": {
+    "key": {
+      "$ref": "#/$defs/CatalogKey"
+    },
+    "reason": {
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "key",
+    "reason"
+  ],
+  "title": "DemotionNote",
+  "type": "object"
+}

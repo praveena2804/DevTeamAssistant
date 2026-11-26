@@ -1,4 +1,5 @@
-"""Read-only platform settings (Part F.6; D-55): models, hardware profile, limits, eval-gate status.
+"""Read-only platform settings (Part F.6; D-55): models, hardware profile, limits, eval-gate status, and
+(Part G) the Capability Catalog with each entry's declared status, effective status and demotion reason.
 
 Everything comes from configuration files and SQLite: the model inventory (installed tags and digests) is
 written by the worker, so the API never contacts Ollama or the vector store (D-57). Nothing here edits
@@ -22,6 +23,8 @@ from devteam_core.config.models import load_model_catalog
 from devteam_core.contracts.statuses import AgentRole, ModelSlot
 from devteam_harness.evaluation import check_report, report_paths
 from devteam_harness.prompts.files import code_root, load_prompt_config
+from devteam_services.catalog import LoadedCatalog, default_fingerprint, effective_catalog
+from devteam_services.integration_builder import templates_root
 from devteam_state.repositories import model_calls as model_calls_repo
 
 router = APIRouter(
@@ -83,6 +86,26 @@ class PromptStatusOut(_Out):
     active_version: int
     eval_required: bool
     report: str  # "matches" | "none" | problem text
+
+
+class CatalogEntryOut(_Out):
+    key: str
+    display_name: str
+    category: str
+    declared_status: str
+    effective_status: str
+    reason: str | None
+    templates: list[str]
+    substitutions: list[str]
+    known_limitations: list[str]
+    available_from_part: str | None
+    verification_ids: list[str]
+
+
+class CatalogOut(_Out):
+    catalog_hash: str
+    entries: list[CatalogEntryOut]
+    demoted: int
 
 
 def _settings(request: Request) -> Settings:
@@ -161,3 +184,24 @@ def evals(request: Request, _: ProjectUser) -> list[PromptStatusOut]:
             )
         )  # fmt: skip
     return rows
+
+
+@router.get("/catalog", response_model=CatalogOut, name="settings.catalog")
+def catalog(request: Request, db: DbSession, _: ProjectUser) -> CatalogOut:
+    """Declared and effective status of every catalog entry (computed now; read-only, never edited here)."""
+    settings = _settings(request)
+    loaded: LoadedCatalog = request.app.state.catalog
+    snapshot = effective_catalog(
+        loaded, db, kits_root=templates_root(), fingerprint=default_fingerprint(settings)
+    )
+    entries = [
+        CatalogEntryOut(
+            key=item.key.value, display_name=item.entry.display_name, category=item.entry.category.value,
+            declared_status=item.entry.status.value, effective_status=item.status.value, reason=item.reason,
+            templates=list(item.entry.templates), substitutions=[s.value for s in item.entry.substitutions],
+            known_limitations=list(item.entry.known_limitations),
+            available_from_part=item.entry.available_from_part, verification_ids=list(item.verification_ids),
+        )
+        for item in snapshot.entries.values()
+    ]  # fmt: skip
+    return CatalogOut(catalog_hash=snapshot.catalog_hash, entries=entries, demoted=len(snapshot.demoted()))

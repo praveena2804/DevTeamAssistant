@@ -12,7 +12,7 @@ Rules enforced here hold wherever a record is created (agent output, API, servic
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import Self
+from typing import Any, Literal, Self
 
 from pydantic import Field, model_validator
 
@@ -29,6 +29,7 @@ from devteam_core.contracts._base import (
     EntityId,
     EvidenceId,
     FeasibilityItemId,
+    FeasibilityReportId,
     GapId,
     IntegrationId,
     Name,
@@ -53,6 +54,7 @@ from devteam_core.contracts._base import (
     WorkflowId,
 )
 from devteam_core.contracts.base import NeverAssumed, Provenance, Sourced, SourceRef
+from devteam_core.contracts.catalog import CatalogKey
 from devteam_core.contracts.statuses import ApprovalType, FeasibilityStatus
 
 _MANY = 500  # structural cap on list sizes inside one record
@@ -232,6 +234,14 @@ class RelationshipKind(StrEnum):
     MANY_TO_MANY = "many_to_many"
 
 
+def _from_v1(data: Any) -> Any:
+    """Part G v2 only *adds* optional fields to TechnologyNeed and Integration: a stored v1 payload is read as
+    v2 with the new fields at their defaults (nothing else changes)."""
+    if isinstance(data, dict) and data.get("schema_version") == 1:
+        return {**data, "schema_version": 2}
+    return data
+
+
 # ---------------------------------------------------------------------------------------- baseline
 
 
@@ -312,19 +322,44 @@ class Workflow(NeverAssumed):
 
 
 class Integration(NeverAssumed):
+    """v2 (Part G, D-60): optional ``requirement_ids``. v1 payloads (without the new field) still validate.
+
+    ``catalog_key`` is a model-*proposed* key: the Feasibility Gate accepts it only if it is a ``CatalogKey``
+    member of the right category, and rejects and audits anything else (never added to the catalog).
+    """
+
+    schema_version: Literal[2] = 2  # type: ignore[assignment]  # v2; v1 payloads are upgraded on read
+
+    @model_validator(mode="before")
+    @classmethod
+    def _upgrade_v1(cls, data: Any) -> Any:
+        return _from_v1(data)
+
     integration_id: IntegrationId
     project_id: ProjectId
     name: Name
     description: Text
-    catalog_key: Name | None = None  # validated against the Capability Catalog in Part G
+    catalog_key: Name | None = None  # validated against the Capability Catalog (Part G)
+    requirement_ids: tuple[TraceKey, ...] = Field(default=(), max_length=_MANY)  # filled from Part H
 
 
 class TechnologyNeed(NeverAssumed):
+    """v2 (Part G, D-60): optional ``requirement_ids`` and model-proposed ``catalog_key``."""
+
+    schema_version: Literal[2] = 2  # type: ignore[assignment]  # v2; v1 payloads are upgraded on read
+
+    @model_validator(mode="before")
+    @classmethod
+    def _upgrade_v1(cls, data: Any) -> Any:
+        return _from_v1(data)
+
     tech_id: TechnologyNeedId
     project_id: ProjectId
     layer: TechnologyLayer
     name: Name
     version_spec: Name | None = None
+    catalog_key: Name | None = None  # validated against the Capability Catalog (Part G)
+    requirement_ids: tuple[TraceKey, ...] = Field(default=(), max_length=_MANY)  # filled from Part H
 
 
 class AcceptanceCriterion(NeverAssumed):
@@ -360,20 +395,76 @@ class Gap(Contract):
         return self
 
 
+class FeasibilitySubjectKind(StrEnum):
+    """What a feasibility item is about (Spec §5.3: technology, integration, authentication, deployment).
+
+    Authentication and deployment needs are technology needs with that layer.
+    """
+
+    TECHNOLOGY_NEED = "technology_need"
+    INTEGRATION = "integration"
+
+
+class SubstitutionState(StrEnum):
+    """Offered by the Feasibility Gate; applied only with a verified, item-bound approval (AC-G-04)."""
+
+    NONE = "none"
+    OFFERED = "offered"
+    APPROVED = "approved"
+
+
+class FeasibilityGap(Contract):
+    """A gap the Feasibility Gate raises for the clarification form (Part I).
+
+    No criticality here: criticality is decided by the Requirements Policy Engine (Spec §5.4.2, Part I).
+    """
+
+    gap_id: GapId
+    category: GapCategory
+    kind: GapKind
+    description: ShortText
+    source_refs: tuple[SourceRef, ...] = Field(default=(), max_length=50)
+
+
 class FeasibilityItem(Contract):
+    """v2 (Part G, D-61): one item per subject (technology need or integration) with the requirements it
+    affects. Spec §12's illustrative ``requirement_id`` is derivable: see ``RequirementEffect``.
+
+    v1 (Part C) had one ``requirement_id`` per item and a free-text alternative; it was never stored.
+    """
+
+    schema_version: Literal[2] = 2  # type: ignore[assignment]  # v2, see docstring
     item_id: FeasibilityItemId
     project_id: ProjectId
-    requirement_id: TraceKey
+    report_id: FeasibilityReportId
+    subject_kind: FeasibilitySubjectKind
+    subject_id: RecordRef
+    subject_name: Name
+    layer: TechnologyLayer | None = None  # technology needs only
+    version_spec: Name | None = None
+    catalog_key: CatalogKey | None = None  # None: not found in the catalog
     status: FeasibilityStatus
     reason: ShortText | None = None
-    alternative: ShortText | None = None
+    alternative: CatalogKey | None = None  # the offered substitution
+    substitution: SubstitutionState = SubstitutionState.NONE
+    requirement_ids: tuple[TraceKey, ...] = Field(default=(), max_length=_MANY)  # affected requirements
+    whole_application: bool = False  # affects every in-scope requirement (layer or conservative rule)
+    gap: FeasibilityGap | None = None
+    source_refs: tuple[SourceRef, ...] = Field(default=(), max_length=50)
 
     @model_validator(mode="after")
     def _explained(self) -> Self:
-        if self.status is FeasibilityStatus.SUPPORTED_WITH_SUBSTITUTION and self.alternative is None:
+        substituted = self.status is FeasibilityStatus.SUPPORTED_WITH_SUBSTITUTION
+        if substituted and self.alternative is None:
             raise ValueError("a substitution must name the alternative (it is never silent)")
+        if substituted != (self.substitution is not SubstitutionState.NONE):
+            raise ValueError("only a substitution item carries a substitution state")
+        if not substituted and self.alternative is not None:
+            raise ValueError("an alternative is offered only through a substitution item")
         if self.status is not FeasibilityStatus.SUPPORTED and self.reason is None:
             raise ValueError("partial/not supported/substitution items must state the reason")
+        if (self.layer is None) != (self.subject_kind is FeasibilitySubjectKind.INTEGRATION):
+            raise ValueError("technology needs carry their layer; integrations do not")
         return self
 
 
@@ -544,6 +635,7 @@ DOMAIN_RECORDS: tuple[type[Contract], ...] = (
     AcceptanceCriterion,
     Constraint,
     Gap,
+    FeasibilityGap,
     FeasibilityItem,
     ClarificationQuestion,
     ClarificationAnswer,
@@ -577,7 +669,9 @@ __all__ = [
     "EntityDefinition",
     "EntityRelationship",
     "EvidenceStatus",
+    "FeasibilityGap",
     "FeasibilityItem",
+    "FeasibilitySubjectKind",
     "Gap",
     "GapCategory",
     "GapKind",
@@ -595,6 +689,7 @@ __all__ = [
     "RuleVerificationStatus",
     "SecretReference",
     "SpecVersion",
+    "SubstitutionState",
     "TechnologyLayer",
     "TechnologyNeed",
     "TestResult",

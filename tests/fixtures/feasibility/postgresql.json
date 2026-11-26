@@ -1,0 +1,432 @@
+{
+  "acceptance_criteria": [],
+  "business_rules": [
+    {
+      "answer_id": null,
+      "description": "A member may borrow at most five books.",
+      "project_id": "prj_01KFE0000000000000000000PG",
+      "provenance": "brd_fact",
+      "rationale": null,
+      "requirement_ids": [
+        "FR-001"
+      ],
+      "rule_id": "BR-001",
+      "schema_version": 1,
+      "source_refs": [
+        {
+          "chunk_id": "chk_00000000000000000000000006",
+          "document_id": "doc_01KFE0000000000000000000PG",
+          "page_end": null,
+          "page_start": 2,
+          "paragraph_end": null,
+          "paragraph_start": null,
+          "quote": "at most five books",
+          "schema_version": 1,
+          "section": null
+        }
+      ],
+      "verification_status": "unverified"
+    }
+  ],
+  "checklist": [
+    {
+      "category": "goal",
+      "schema_version": 1,
+      "source_refs": [
+        {
+          "chunk_id": "chk_00000000000000000000000007",
+          "document_id": "doc_01KFE0000000000000000000PG",
+          "page_end": null,
+          "page_start": 2,
+          "paragraph_end": null,
+          "paragraph_start": null,
+          "quote": "overview",
+          "schema_version": 1,
+          "section": null
+        }
+      ],
+      "status": "found"
+    },
+    {
+      "category": "actors",
+      "schema_version": 1,
+      "source_refs": [
+        {
+          "chunk_id": "chk_00000000000000000000000007",
+          "document_id": "doc_01KFE0000000000000000000PG",
+          "page_end": null,
+          "page_start": 2,
+          "paragraph_end": null,
+          "paragraph_start": null,
+          "quote": "overview",
+          "schema_version": 1,
+          "section": null
+        }
+      ],
+      "status": "found"
+    },
+    {
+      "category": "features",
+      "schema_version": 1,
+      "source_refs": [
+        {
+          "chunk_id": "chk_00000000000000000000000007",
+          "document_id": "doc_01KFE0000000000000000000PG",
+          "page_end": null,
+          "page_start": 2,
+          "paragraph_end": null,
+          "paragraph_start": null,
+          "quote": "overview",
+          "schema_version": 1,
+          "section": null
+        }
+      ],
+      "status": "found"
+    },
+    {
+      "category": "workflows",
+      "schema_version": 1,
+      "source_refs": [
+        {
+          "chunk_id": "chk_00000000000000000000000007",
+          "document_id": "doc_01KFE0000000000000000000PG",
+          "page_end": null,
+          "page_start": 2,
+          "paragraph_end": null,
+          "paragraph_start": null,
+          "quote": "overview",
+          "schema_version": 1,
+          "section": null
+        }
+      ],
+      "status": "found"
+    },
+    {
+      "category": "data",
+      "schema_version": 1,
+      "source_refs": [
+        {
+          "chunk_id": "chk_00000000000000000000000007",
+          "document_id": "doc_01KFE0000000000000000000PG",
+          "page_end": null,
+          "page_start": 2,
+          "paragraph_end": null,
+          "paragraph_start": null,
+          "quote": "overview",
+          "schema_version": 1,
+          "section": null
+        }
+      ],
+      "status": "found"
+    },
+    {
+      "category": "rules",
+      "schema_version": 1,
+      "source_refs": [
+        {
+          "chunk_id": "chk_00000000000000000000000007",
+          "document_id": "doc_01KFE0000000000000000000PG",
+          "page_end": null,
+          "page_start": 2,
+          "paragraph_end": null,
+          "paragraph_start": null,
+          "quote": "overview",
+          "schema_version": 1,
+          "section": null
+        }
+      ],
+      "status": "found"
+    },
+    {
+      "category": "permissions",
+      "schema_version": 1,
+      "source_refs": [
+        {
+          "chunk_id": "chk_00000000000000000000000007",
+          "document_id": "doc_01KFE0000000000000000000PG",
+          "page_end": null,
+          "page_start": 2,
+          "paragraph_end": null,
+          "paragraph_start": null,
+          "quote": "overview",
+          "schema_version": 1,
+          "section": null
+        }
+      ],
+      "status": "found"
+    },
+    {
+      "category": "login",
+      "schema_version": 1,
+      "source_refs": [
+        {
+          "chunk_id": "chk_00000000000000000000000007",
+          "document_id": "doc_01KFE0000000000000000000PG",
+          "page_end": null,
+          "page_start": 2,
+          "paragraph_end": null,
+          "paragraph_start": null,
+          "quote": "overview",
+          "schema_version": 1,
+          "section": null
+        }
+      ],
+      "status": "found"
+    },
+    {
+      "category": "technology",
+      "schema_version": 1,
+      "source_refs": [
+        {
+          "chunk_id": "chk_00000000000000000000000007",
+          "document_id": "doc_01KFE0000000000000000000PG",
+          "page_end": null,
+          "page_start": 2,
+          "paragraph_end": null,
+          "paragraph_start": null,
+          "quote": "overview",
+          "schema_version": 1,
+          "section": null
+        }
+      ],
+      "status": "found"
+    },
+    {
+      "category": "integrations",
+      "schema_version": 1,
+      "source_refs": [
+        {
+          "chunk_id": "chk_00000000000000000000000007",
+          "document_id": "doc_01KFE0000000000000000000PG",
+          "page_end": null,
+          "page_start": 2,
+          "paragraph_end": null,
+          "paragraph_start": null,
+          "quote": "overview",
+          "schema_version": 1,
+          "section": null
+        }
+      ],
+      "status": "found"
+    },
+    {
+      "category": "deployment",
+      "schema_version": 1,
+      "source_refs": [
+        {
+          "chunk_id": "chk_00000000000000000000000007",
+          "document_id": "doc_01KFE0000000000000000000PG",
+          "page_end": null,
+          "page_start": 2,
+          "paragraph_end": null,
+          "paragraph_start": null,
+          "quote": "overview",
+          "schema_version": 1,
+          "section": null
+        }
+      ],
+      "status": "found"
+    },
+    {
+      "category": "acceptance_criteria",
+      "schema_version": 1,
+      "source_refs": [
+        {
+          "chunk_id": "chk_00000000000000000000000007",
+          "document_id": "doc_01KFE0000000000000000000PG",
+          "page_end": null,
+          "page_start": 2,
+          "paragraph_end": null,
+          "paragraph_start": null,
+          "quote": "overview",
+          "schema_version": 1,
+          "section": null
+        }
+      ],
+      "status": "found"
+    },
+    {
+      "category": "non_functional",
+      "schema_version": 1,
+      "source_refs": [
+        {
+          "chunk_id": "chk_00000000000000000000000007",
+          "document_id": "doc_01KFE0000000000000000000PG",
+          "page_end": null,
+          "page_start": 2,
+          "paragraph_end": null,
+          "paragraph_start": null,
+          "quote": "overview",
+          "schema_version": 1,
+          "section": null
+        }
+      ],
+      "status": "found"
+    }
+  ],
+  "constraints": [],
+  "entities": [],
+  "gaps": [],
+  "integrations": [],
+  "permissions": [],
+  "project_id": "prj_01KFE0000000000000000000PG",
+  "requirements": [
+    {
+      "answer_id": null,
+      "description": "Members can borrow books.",
+      "priority": "unspecified",
+      "project_id": "prj_01KFE0000000000000000000PG",
+      "provenance": "brd_fact",
+      "rationale": null,
+      "requirement_id": "FR-001",
+      "schema_version": 1,
+      "source_refs": [
+        {
+          "chunk_id": "chk_00000000000000000000000001",
+          "document_id": "doc_01KFE0000000000000000000PG",
+          "page_end": null,
+          "page_start": 1,
+          "paragraph_end": null,
+          "paragraph_start": null,
+          "quote": "Members can borrow books.",
+          "schema_version": 1,
+          "section": null
+        }
+      ],
+      "status": "extracted",
+      "type": "functional"
+    },
+    {
+      "answer_id": null,
+      "description": "Members can return books.",
+      "priority": "unspecified",
+      "project_id": "prj_01KFE0000000000000000000PG",
+      "provenance": "brd_fact",
+      "rationale": null,
+      "requirement_id": "FR-002",
+      "schema_version": 1,
+      "source_refs": [
+        {
+          "chunk_id": "chk_00000000000000000000000002",
+          "document_id": "doc_01KFE0000000000000000000PG",
+          "page_end": null,
+          "page_start": 1,
+          "paragraph_end": null,
+          "paragraph_start": null,
+          "quote": "Members can return books.",
+          "schema_version": 1,
+          "section": null
+        }
+      ],
+      "status": "extracted",
+      "type": "functional"
+    },
+    {
+      "answer_id": null,
+      "description": "Members pay late fees online.",
+      "priority": "unspecified",
+      "project_id": "prj_01KFE0000000000000000000PG",
+      "provenance": "brd_fact",
+      "rationale": null,
+      "requirement_id": "FR-003",
+      "schema_version": 1,
+      "source_refs": [
+        {
+          "chunk_id": "chk_00000000000000000000000003",
+          "document_id": "doc_01KFE0000000000000000000PG",
+          "page_end": null,
+          "page_start": 1,
+          "paragraph_end": null,
+          "paragraph_start": null,
+          "quote": "Members pay late fees online.",
+          "schema_version": 1,
+          "section": null
+        }
+      ],
+      "status": "extracted",
+      "type": "functional"
+    },
+    {
+      "answer_id": null,
+      "description": "Staff sign in with their company account.",
+      "priority": "unspecified",
+      "project_id": "prj_01KFE0000000000000000000PG",
+      "provenance": "brd_fact",
+      "rationale": null,
+      "requirement_id": "FR-004",
+      "schema_version": 1,
+      "source_refs": [
+        {
+          "chunk_id": "chk_00000000000000000000000004",
+          "document_id": "doc_01KFE0000000000000000000PG",
+          "page_end": null,
+          "page_start": 2,
+          "paragraph_end": null,
+          "paragraph_start": null,
+          "quote": "Staff sign in with their company account.",
+          "schema_version": 1,
+          "section": null
+        }
+      ],
+      "status": "extracted",
+      "type": "functional"
+    },
+    {
+      "answer_id": null,
+      "description": "Pages load within two seconds.",
+      "priority": "unspecified",
+      "project_id": "prj_01KFE0000000000000000000PG",
+      "provenance": "brd_fact",
+      "rationale": null,
+      "requirement_id": "NFR-001",
+      "schema_version": 1,
+      "source_refs": [
+        {
+          "chunk_id": "chk_00000000000000000000000005",
+          "document_id": "doc_01KFE0000000000000000000PG",
+          "page_end": null,
+          "page_start": 2,
+          "paragraph_end": null,
+          "paragraph_start": null,
+          "quote": "Pages load within two seconds.",
+          "schema_version": 1,
+          "section": null
+        }
+      ],
+      "status": "extracted",
+      "type": "non_functional"
+    }
+  ],
+  "roles": [],
+  "run_id": "run_01KFE0000000000000000000PG",
+  "schema_version": 1,
+  "technology_needs": [
+    {
+      "answer_id": null,
+      "catalog_key": null,
+      "layer": "database",
+      "name": "PostgreSQL",
+      "project_id": "prj_01KFE0000000000000000000PG",
+      "provenance": "brd_fact",
+      "rationale": null,
+      "requirement_ids": [],
+      "schema_version": 2,
+      "source_refs": [
+        {
+          "chunk_id": "chk_0000000000000000000000000b",
+          "document_id": "doc_01KFE0000000000000000000PG",
+          "page_end": null,
+          "page_start": 3,
+          "paragraph_end": null,
+          "paragraph_start": null,
+          "quote": "Use PostgreSQL.",
+          "schema_version": 1,
+          "section": null
+        }
+      ],
+      "tech_id": "tec_01KFE000000000000000000001",
+      "version_spec": null
+    }
+  ],
+  "workflows": []
+}

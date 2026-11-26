@@ -9,6 +9,7 @@ import {
   type PromptStatus,
 } from "../api/client";
 import { useLoad } from "../api/useLoad";
+import { CatalogPanel } from "../components/CatalogPanel";
 
 /**
  * Part F: read-only platform settings (D-55). Models and routing come from config/models.yaml; whether a
@@ -113,6 +114,7 @@ export function SettingsPage() {
           ))}
         </tbody>
       </table>
+      <CatalogPanel />
     </section>
   );
 }

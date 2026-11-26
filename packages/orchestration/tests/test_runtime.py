@@ -185,3 +185,17 @@ def test_the_debugger_repairs_through_the_real_gateway(tmp_path: Path) -> None:
         assert text.startswith("> Written by the Debugger & Code Reviewer agent with a local AI model")
     finally:
         env.close()
+
+
+def test_an_invalid_capability_catalog_fails_closed(offline: Env, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Part G (AC-G-02): the runtime (and so the worker) refuses to start with an invalid catalog."""
+    from devteam_orchestration import runtime  # noqa: PLC0415
+    from devteam_services.catalog import CatalogError  # noqa: PLC0415
+
+    def broken() -> None:
+        raise CatalogError("capabilities.yaml is invalid at entries.0.key: not a CatalogKey")
+
+    assert offline.rt.catalog is not None  # control: the shipped catalog is loaded
+    monkeypatch.setattr(runtime, "load_catalog", broken)
+    with pytest.raises(RuntimeConfigError, match="not a CatalogKey"):
+        build_runtime(offline.settings, offline.sessions)

@@ -7,7 +7,9 @@ Recording (:meth:`ApprovalService.record`) refuses, and audits as ``approval.den
 - an approval type that must be bound to a spec version but is not (no version or no checksum);
 - a run that does not exist in the project;
 - a second decision for the same run, type and spec version (double submission). The database
-  enforces this too (unique ``decision_key``), and approvals are append-only (triggers).
+  enforces this too (unique ``decision_key``), and approvals are append-only (triggers);
+- (Part G) a substitution approval that is not bound to exactly one feasibility item (``subject_ref``
+  ``substitution:<item_id>@<item_checksum>``), or a subject on any other approval type.
 
 Verifying (:meth:`ApprovalService.verify`) is what a gate or guard calls before acting. It refuses, and
 audits as ``approval.verify_failed``:
@@ -16,6 +18,8 @@ audits as ``approval.verify_failed``:
 - an approval for another project, run or type;
 - a decision other than ``approved``;
 - a different spec version (mismatch) or checksum (stale) when the type is spec-bound;
+- (Part G) a different subject (another item, or the same item after it changed) when the type is
+  subject-bound;
 - a row that was not written by this service: its ``approval.recorded`` audit event must exist, carry
   a valid hash, and match the row field by field, and the decider must be a stored human principal.
 
@@ -25,6 +29,7 @@ There are no API endpoints yet; they come with each gate (I, N, P).
 from __future__ import annotations
 
 import hashlib
+import re
 from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import UTC
@@ -63,6 +68,9 @@ MUST_BIND = frozenset(
     }
 )
 SERVICE = "service:approval_service"
+# Part G (AC-G-04): these types are always bound to one subject (a feasibility item and its checksum).
+MUST_SUBJECT = frozenset({ApprovalType.SUBSTITUTION})
+SUBJECT_REF = re.compile(r"^substitution:fea_[0-7][0-9A-HJKMNP-TV-Z]{25}@[0-9a-f]{64}$")
 
 
 class _Strict(BaseModel):
@@ -187,6 +195,7 @@ class ApprovalService:
         decision: ApprovalDecision,
         spec_version_id: str | None = None,
         spec_checksum: str | None = None,
+        subject_ref: str | None = None,
     ) -> Approval:
         rule = self._rules.rules[approval_type]
         principal_id = getattr(principal, "id", None)
@@ -208,12 +217,17 @@ class ApprovalService:
             raise refuse("approval.wrong_role", f"{approval_type.value} needs one of the configured roles")
         if rule.bind_spec and (spec_version_id is None or spec_checksum is None):
             raise refuse("approval.unbound", f"{approval_type.value} must name the spec version and checksum")
+        if approval_type in MUST_SUBJECT and (subject_ref is None or not SUBJECT_REF.fullmatch(subject_ref)):
+            raise refuse("approval.unbound", f"{approval_type.value} must name exactly one feasibility item")
+        if approval_type not in MUST_SUBJECT and subject_ref is not None:
+            raise refuse("approval.unexpected_subject", f"{approval_type.value} is not bound to a subject")
+        context["subject_ref"] = subject_ref
 
         approval_id = new_id("apr", self._clock)
         try:
             with self._sessions.begin() as session:
                 problem = self._record_problem(
-                    session, principal.id, project_id, run_id, approval_type, spec_version_id
+                    session, principal.id, project_id, run_id, approval_type, spec_version_id or subject_ref
                 )
                 if problem is None:
                     now = self._clock.now()
@@ -236,7 +250,7 @@ class ApprovalService:
                         project_id=project_id,
                         target_type="approval",
                         target_id=approval_id,
-                        details=_evidence(contract, self._clock),
+                        details=_evidence(contract, self._clock, subject_ref),
                         clock=self._clock,
                     )
                     add_approval(
@@ -248,11 +262,14 @@ class ApprovalService:
                             approval_type=approval_type.value,
                             spec_version_id=spec_version_id,
                             spec_checksum=spec_checksum,
-                            decision_key=approval_decision_key(run_id, approval_type.value, spec_version_id),
+                            decision_key=approval_decision_key(
+                                run_id, approval_type.value, spec_version_id or subject_ref
+                            ),
                             decision=decision.value,
                             decided_by=principal.id,
                             decided_at=now,
                             audit_event_id=event.id,
+                            subject_ref=subject_ref,
                         ),
                     )
                     return contract
@@ -289,6 +306,7 @@ class ApprovalService:
         spec_version_id: str | None = None,
         spec_checksum: str | None = None,
         verifier: str = SERVICE,
+        subject_ref: str | None = None,
     ) -> Approval:
         """Return the approval if, and only if, it authorises exactly this action now."""
         rule = self._rules.rules[approval_type]
@@ -297,6 +315,8 @@ class ApprovalService:
             problem = self._verify_problem(
                 session, row, project_id, run_id, approval_type, rule, spec_version_id, spec_checksum
             )
+            if problem is None and row is not None:
+                problem = _subject_problem(row, approval_type, subject_ref)
             contract = _to_contract(row) if row is not None and problem is None else None
         if problem is not None or contract is None:
             code, message = problem or ("approval.unknown", "no such approval")
@@ -343,7 +363,18 @@ class ApprovalService:
         return None
 
 
-def _evidence(contract: Approval, clock: Clock) -> dict[str, object]:
+def _subject_problem(
+    row: ApprovalRow, approval_type: ApprovalType, subject_ref: str | None
+) -> tuple[str, str] | None:
+    """Part G: a subject-bound approval authorises only its own subject (item and checksum)."""
+    if approval_type not in MUST_SUBJECT and row.subject_ref is None:
+        return None
+    if subject_ref is None or row.subject_ref != subject_ref:
+        return "approval.subject_mismatch", "the approval was given for another item, or the item changed"
+    return None
+
+
+def _evidence(contract: Approval, clock: Clock, subject_ref: str | None = None) -> dict[str, object]:
     event = ApprovalRecorded(
         event_id=new_id("evt", clock),
         ts=contract.decided_at,
@@ -357,6 +388,8 @@ def _evidence(contract: Approval, clock: Clock) -> dict[str, object]:
     details = event.model_dump(mode="json", exclude={"schema_version", "ts", "event_id"})
     details["spec_version_id"] = contract.spec_version_id
     details["spec_checksum"] = contract.spec_checksum
+    if subject_ref is not None:  # Part G; earlier evidence is unchanged
+        details["subject_ref"] = subject_ref
     return details
 
 
@@ -376,6 +409,7 @@ def _has_evidence(session: Session, row: ApprovalRow) -> bool:
         "actor": row.decided_by,
         "spec_version_id": row.spec_version_id,
         "spec_checksum": row.spec_checksum,
+        "subject_ref": row.subject_ref,
     }
     if any(d.get(key) != value for key, value in expected.items()):
         return False
@@ -387,6 +421,7 @@ def _has_evidence(session: Session, row: ApprovalRow) -> bool:
 
 __all__ = [
     "MUST_BIND",
+    "MUST_SUBJECT",
     "ApprovalDeniedError",
     "ApprovalRule",
     "ApprovalRules",

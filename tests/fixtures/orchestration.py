@@ -24,6 +24,7 @@ from devteam_orchestration.runtime import Runtime, build_runtime
 from devteam_services.intake import IncomingFile, IntakeService
 from devteam_services.workspace import WorkspaceManager
 from devteam_state import create_sqlite_engine, session_factory, upgrade
+from devteam_state.repositories import orchestration as orch
 from devteam_state.repositories import principals, projects, runs
 from tests.fixtures.brds import brd_markdown
 
@@ -65,6 +66,7 @@ class Env:
         decision: ApprovalDecision = ApprovalDecision.APPROVED,
         spec_version_id: str | None = None,
         spec_checksum: str | None = None,
+        subject_ref: str | None = None,
     ) -> str:
         return self.rt.approvals.record(
             self.owner,
@@ -74,7 +76,37 @@ class Env:
             decision=decision,
             spec_version_id=spec_version_id,
             spec_checksum=spec_checksum,
+            subject_ref=subject_ref,
         ).approval_id
+
+    def store_analysis(self, task_id: str, analysis: dict[str, Any] | None = None) -> None:
+        """Part G: a stored BRD analysis for a test that starts after the analyst step (default: no needs)."""
+        from devteam_core.contracts.agents import BrdAnalystOutput  # noqa: PLC0415
+        from devteam_core.contracts.records import GapCategory  # noqa: PLC0415
+
+        payload = analysis or {
+            "project_id": self.project_id,
+            "run_id": self.run_id,
+            "checklist": [{"category": c.value, "status": "missing_or_unclear"} for c in GapCategory],
+        }
+        from devteam_core.contracts.statuses import AgentRole  # noqa: PLC0415
+        from devteam_core.contracts.tasks import AgentTask  # noqa: PLC0415
+
+        valid = BrdAnalystOutput.model_validate(payload).model_dump(mode="json")
+        with self.sessions.begin() as session:
+            if runs.get_task(session, self.project_id, task_id) is None:
+                runs.add_task(
+                    session,
+                    AgentTask(
+                        task_id=task_id, project_id=self.project_id, run_id=self.run_id,
+                        agent_type=AgentRole.BRD_ANALYST, operation_id="brd_analyst.analyse_section",
+                        objective="Analyse the BRD", done_criteria=("checklist returned",),
+                    ),
+                )  # fmt: skip
+            orch.save_agent_output(
+                session, project_id=self.project_id, run_id=self.run_id, task_id=task_id,
+                agent_type="brd_analyst", payload=valid,
+            )  # fmt: skip
 
     def close(self) -> None:
         if self.checkpointer is not None:

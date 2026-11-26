@@ -1,0 +1,238 @@
+{
+  "$defs": {
+    "CatalogKey": {
+      "description": "Every capability the platform knows. Adding one is a reviewed code change (enum + YAML + tests).",
+      "enum": [
+        "html_css_js",
+        "react_vite",
+        "angular",
+        "vue",
+        "power_apps_canvas",
+        "fastapi_python",
+        "dotnet",
+        "java_spring",
+        "power_automate",
+        "sqlite",
+        "postgresql_docker_local",
+        "user_provided_postgresql",
+        "supabase_hosted",
+        "sql_server",
+        "oracle",
+        "azure_sql",
+        "github_public_repo",
+        "github_actions_ci",
+        "github_pages",
+        "power_apps",
+        "azure",
+        "aws",
+        "sharepoint",
+        "paid_hosting",
+        "public_rest_no_credentials",
+        "sso",
+        "sap",
+        "payment_gateway",
+        "credentialed_api",
+        "no_auth",
+        "enterprise_identity_provider",
+        "local_password_rbac"
+      ],
+      "title": "CatalogKey",
+      "type": "string"
+    },
+    "CoverageRecommendation": {
+      "enum": [
+        "proceed",
+        "stop_recommended",
+        "nothing_to_build",
+        "not_applicable"
+      ],
+      "title": "CoverageRecommendation",
+      "type": "string"
+    },
+    "DemotionNote": {
+      "additionalProperties": false,
+      "description": "A catalog entry that was demoted when the report was made (shown in the report).",
+      "properties": {
+        "key": {
+          "$ref": "#/$defs/CatalogKey"
+        },
+        "reason": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "key",
+        "reason"
+      ],
+      "title": "DemotionNote",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "analysis_task_id": {
+      "pattern": "^tsk_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Analysis Task Id",
+      "type": "string"
+    },
+    "blocked_keys": {
+      "default": [],
+      "items": {
+        "pattern": "^(FR|NFR|BR)-[0-9]{3,4}$",
+        "type": "string"
+      },
+      "maxItems": 500,
+      "title": "Blocked Keys",
+      "type": "array"
+    },
+    "catalog_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Catalog Hash",
+      "type": "string"
+    },
+    "coverage_pct": {
+      "anyOf": [
+        {
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Coverage Pct"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "demoted": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/DemotionNote"
+      },
+      "maxItems": 100,
+      "title": "Demoted",
+      "type": "array"
+    },
+    "denominator": {
+      "minimum": 0,
+      "title": "Denominator",
+      "type": "integer"
+    },
+    "item_count": {
+      "minimum": 0,
+      "title": "Item Count",
+      "type": "integer"
+    },
+    "needs_identified": {
+      "title": "Needs Identified",
+      "type": "boolean"
+    },
+    "numerator": {
+      "minimum": 0,
+      "title": "Numerator",
+      "type": "integer"
+    },
+    "partial_keys": {
+      "default": [],
+      "items": {
+        "pattern": "^(FR|NFR|BR)-[0-9]{3,4}$",
+        "type": "string"
+      },
+      "maxItems": 500,
+      "title": "Partial Keys",
+      "type": "array"
+    },
+    "pending_keys": {
+      "default": [],
+      "items": {
+        "pattern": "^(FR|NFR|BR)-[0-9]{3,4}$",
+        "type": "string"
+      },
+      "maxItems": 500,
+      "title": "Pending Keys",
+      "type": "array"
+    },
+    "project_id": {
+      "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Project Id",
+      "type": "string"
+    },
+    "recommendation": {
+      "$ref": "#/$defs/CoverageRecommendation"
+    },
+    "report_checksum": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Report Checksum",
+      "type": "string"
+    },
+    "report_id": {
+      "pattern": "^fsr_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Report Id",
+      "type": "string"
+    },
+    "report_path": {
+      "maxLength": 240,
+      "title": "Report Path",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^run_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "threshold_pct": {
+      "maximum": 100,
+      "minimum": 1,
+      "title": "Threshold Pct",
+      "type": "integer"
+    },
+    "verification_ids": {
+      "default": [],
+      "items": {
+        "pattern": "^tvf_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+        "type": "string"
+      },
+      "maxItems": 50,
+      "title": "Verification Ids",
+      "type": "array"
+    }
+  },
+  "required": [
+    "report_id",
+    "project_id",
+    "run_id",
+    "analysis_task_id",
+    "catalog_hash",
+    "numerator",
+    "denominator",
+    "threshold_pct",
+    "recommendation",
+    "item_count",
+    "needs_identified",
+    "report_path",
+    "report_checksum",
+    "created_at"
+  ],
+  "title": "FeasibilityReport",
+  "type": "object"
+}

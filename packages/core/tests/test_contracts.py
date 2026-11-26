@@ -50,7 +50,7 @@ ABSTRACT_BASES = {
     _RunEvent,
 }
 # Contracts whose schema_version has been bumped (tracker records every bump).
-BUMPED = {"RunState": 2}
+BUMPED = {"RunState": 2, "FeasibilityItem": 2, "TechnologyNeed": 2, "Integration": 2}  # Part G: D-60, D-61
 
 CANONICAL_AGENTS = (
     "brd_analyst",

@@ -204,8 +204,8 @@ def read_gate(project_id: str, run_id: str, request: Request, db: DbSession, _: 
     info = GateInfo(run_id=run.id, gate=gate.value, approval_type=approval_type.value, roles=roles)
     notes = {
         GateName.FEASIBILITY_DECISION: [
-            "Feasibility was not evaluated: the Capability Catalog arrives in Part G.",
-            "Approve to continue to the requirements step, or reject to cancel the run.",
+            "Read the feasibility report before deciding: it lists what can be built and what cannot.",
+            "Proceed continues with the buildable scope only; or cancel (or revise the BRD, then a new run).",
         ],
         GateName.PROJECT_APPROVAL: [
             "Approving freezes exactly this specification version; building can start only after it.",
@@ -251,7 +251,10 @@ def decide_gate(  # noqa: PLR0917 - FastAPI injects every parameter
     principal: ProjectUser,
 ) -> GateDecisionOut:
     load_run(db, project_id, run_id)
-    scope.set(target_type="run", target_id=run_id, gate=gate[:40], decision=body.decision)
+    scope.set(
+        target_type="run", target_id=run_id, gate=gate[:40], decision=body.decision,
+        acknowledge_low_coverage=body.acknowledge_low_coverage, reason=body.reason,
+    )  # fmt: skip
     if gate not in {g.value for g in GateName}:
         raise api_error(status.HTTP_404_NOT_FOUND, "gate.not_found", "Unknown gate.")
     db.commit()  # release the read transaction: the decision is recorded in its own transactions
@@ -264,6 +267,8 @@ def decide_gate(  # noqa: PLR0917 - FastAPI injects every parameter
             run_id=run_id,
             gate=GateName(gate),
             decision=ApprovalDecision(body.decision),
+            acknowledge_low_coverage=body.acknowledge_low_coverage,
+            reason=body.reason,
         )
     except commands.CommandError as exc:
         raise _command_error(exc) from None

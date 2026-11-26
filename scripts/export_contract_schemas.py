@@ -6,6 +6,9 @@ Usage:
 
 The committed files under ``packages/core/src/devteam_core/contracts/schemas/`` are the contract
 snapshot. ``packages/core/tests/test_contract_schemas.py`` fails when they drift from the code.
+
+Part G: the same run also writes (or checks) ``capability_catalog/schemas/capabilities.schema.json``, the
+schema of the Capability Catalog file, which the catalog loader compares at start-up.
 """
 
 from __future__ import annotations
@@ -13,6 +16,7 @@ from __future__ import annotations
 import argparse
 
 from devteam_core.contracts import SCHEMA_DIR, export_json_schemas, render_schema
+from devteam_services.catalog import CATALOG_DIR, SCHEMA_FILE, code_root, render_catalog_schema
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -25,19 +29,29 @@ def main(argv: list[str] | None = None) -> int:
     stale = sorted(n for n, text in wanted.items() if existing.get(n) != text)
     orphaned = sorted(set(existing) - set(wanted))
 
+    catalog_schema = code_root() / CATALOG_DIR / SCHEMA_FILE
+    catalog_text = render_catalog_schema()
+    catalog_current = catalog_schema.is_file() and catalog_schema.read_text(encoding="utf-8") == catalog_text
+
     if args.check:
+        if not catalog_current:
+            print(f"stale or missing: {CATALOG_DIR}/{SCHEMA_FILE}")
         for name in stale:
             print(f"stale or missing: {name}")
         for name in orphaned:
             print(f"orphaned: {name}")
         print(f"{len(wanted)} contract schemas; {len(stale)} stale; {len(orphaned)} orphaned")
-        return 1 if stale or orphaned else 0
+        return 1 if stale or orphaned or not catalog_current else 0
 
     SCHEMA_DIR.mkdir(parents=True, exist_ok=True)
     for name in stale:
         (SCHEMA_DIR / name).write_text(wanted[name], encoding="utf-8", newline="\n")
     for name in orphaned:
         (SCHEMA_DIR / name).unlink()
+    if not catalog_current:
+        catalog_schema.parent.mkdir(parents=True, exist_ok=True)
+        catalog_schema.write_text(catalog_text, encoding="utf-8", newline="\n")
+        print(f"wrote {CATALOG_DIR}/{SCHEMA_FILE}")
     print(f"wrote {len(stale)} of {len(wanted)} contract schemas; removed {len(orphaned)} orphaned")
     return 0
 

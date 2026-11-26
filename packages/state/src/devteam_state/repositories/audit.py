@@ -140,3 +140,19 @@ def list_events(
         )
     )
     return items, int(total)
+
+
+def latest_for_target(
+    session: Session, *, actions: tuple[str, ...], target_type: str, target_id: str
+) -> AuditEvent | None:
+    """The newest event with one of ``actions`` for this target (e.g. the last catalog status change)."""
+    return session.scalars(
+        select(AuditEvent)
+        .where(
+            AuditEvent.action.in_(actions),
+            AuditEvent.target_type == target_type,
+            AuditEvent.target_id == target_id,
+        )
+        .order_by(AuditEvent.seq.desc(), AuditEvent.ts.desc())
+        .limit(1)
+    ).first()

@@ -250,6 +250,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/projects/{project_id}/runs/{run_id}/feasibility": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Run.Feasibility */
+        get: operations["run_feasibility_api_projects__project_id__runs__run_id__feasibility_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{project_id}/runs/{run_id}/feasibility/report.md": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Run.Feasibility Report */
+        get: operations["run_feasibility_report_api_projects__project_id__runs__run_id__feasibility_report_md_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/projects/{project_id}/runs/{run_id}/gate": {
         parameters: {
             query?: never;
@@ -490,6 +524,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/settings/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Settings.Catalog
+         * @description Declared and effective status of every catalog entry (computed now; read-only, never edited here).
+         */
+        get: operations["settings_catalog_api_settings_catalog_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/settings/evals": {
         parameters: {
             query?: never;
@@ -659,6 +713,40 @@ export interface components {
              */
             files: string[];
         };
+        /** CatalogEntryOut */
+        CatalogEntryOut: {
+            /** Available From Part */
+            available_from_part: string | null;
+            /** Category */
+            category: string;
+            /** Declared Status */
+            declared_status: string;
+            /** Display Name */
+            display_name: string;
+            /** Effective Status */
+            effective_status: string;
+            /** Key */
+            key: string;
+            /** Known Limitations */
+            known_limitations: string[];
+            /** Reason */
+            reason: string | null;
+            /** Substitutions */
+            substitutions: string[];
+            /** Templates */
+            templates: string[];
+            /** Verification Ids */
+            verification_ids: string[];
+        };
+        /** CatalogOut */
+        CatalogOut: {
+            /** Catalog Hash */
+            catalog_hash: string;
+            /** Demoted */
+            demoted: number;
+            /** Entries */
+            entries: components["schemas"]["CatalogEntryOut"][];
+        };
         /** ChunkOut */
         ChunkOut: {
             /** Id */
@@ -702,6 +790,13 @@ export interface components {
              * @enum {string}
              */
             status: "ok" | "error";
+        };
+        /** DemotedOut */
+        DemotedOut: {
+            /** Key */
+            key: string;
+            /** Reason */
+            reason: string;
         };
         /** DocumentDetail */
         DocumentDetail: {
@@ -783,6 +878,15 @@ export interface components {
             /** Warnings */
             warnings: components["schemas"]["WarningOut"][];
         };
+        /** EffectOut */
+        EffectOut: {
+            /** Cause Item Ids */
+            cause_item_ids: string[];
+            /** Effect */
+            effect: string;
+            /** Requirement Key */
+            requirement_key: string;
+        };
         /** ErrorDetail */
         ErrorDetail: {
             /** Code */
@@ -793,6 +897,80 @@ export interface components {
         /** ErrorResponse */
         ErrorResponse: {
             detail: components["schemas"]["ErrorDetail"];
+        };
+        /** FeasibilityItemOut */
+        FeasibilityItemOut: {
+            /** Alternative */
+            alternative: string | null;
+            /** Catalog Key */
+            catalog_key: string | null;
+            gap: components["schemas"]["GapOut"] | null;
+            /** Item Id */
+            item_id: string;
+            /** Layer */
+            layer: string | null;
+            /** Reason */
+            reason: string | null;
+            /** Requirement Ids */
+            requirement_ids: string[];
+            /** Source */
+            source: string | null;
+            /** Status */
+            status: string;
+            /** Subject Kind */
+            subject_kind: string;
+            /** Subject Name */
+            subject_name: string;
+            /** Substitution */
+            substitution: string;
+            /** Version Spec */
+            version_spec: string | null;
+            /** Whole Application */
+            whole_application: boolean;
+        };
+        /** FeasibilityOut */
+        FeasibilityOut: {
+            /** Blocked Keys */
+            blocked_keys: string[];
+            /** Catalog Hash */
+            catalog_hash: string;
+            /** Coverage Pct */
+            coverage_pct: number | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Demoted */
+            demoted: components["schemas"]["DemotedOut"][];
+            /** Denominator */
+            denominator: number;
+            /** Effects */
+            effects: components["schemas"]["EffectOut"][];
+            /** Items */
+            items: components["schemas"]["FeasibilityItemOut"][];
+            /** Needs Acknowledgement */
+            needs_acknowledgement: boolean;
+            /** Needs Identified */
+            needs_identified: boolean;
+            /** Numerator */
+            numerator: number;
+            /** Partial Keys */
+            partial_keys: string[];
+            /** Pending Keys */
+            pending_keys: string[];
+            /** Proceed Allowed */
+            proceed_allowed: boolean;
+            /** Recommendation */
+            recommendation: string;
+            /** Report Id */
+            report_id: string;
+            /** Run Id */
+            run_id: string;
+            /** Threshold Pct */
+            threshold_pct: number;
+            /** Verification Ids */
+            verification_ids: string[];
         };
         /** FileRef */
         FileRef: {
@@ -831,13 +1009,32 @@ export interface components {
              */
             warnings: components["schemas"]["WarningOut"][];
         };
-        /** GateDecisionIn */
+        /** GapOut */
+        GapOut: {
+            /** Category */
+            category: string;
+            /** Description */
+            description: string;
+            /** Kind */
+            kind: string;
+        };
+        /**
+         * GateDecisionIn
+         * @description v2 (Part G, D-01, D-63): the new fields are optional and apply to the feasibility decision only.
+         */
         GateDecisionIn: {
+            /**
+             * Acknowledge Low Coverage
+             * @default false
+             */
+            acknowledge_low_coverage: boolean;
             /**
              * Decision
              * @enum {string}
              */
             decision: "approved" | "rejected";
+            /** Reason */
+            reason?: ("cancel" | "revise") | null;
         };
         /** GateDecisionOut */
         GateDecisionOut: {
@@ -2790,6 +2987,142 @@ export interface operations {
             };
         };
     };
+    run_feasibility_api_projects__project_id__runs__run_id__feasibility_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeasibilityOut"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Origin or role not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description No feasibility report */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    run_feasibility_report_api_projects__project_id__runs__run_id__feasibility_report_md_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description FEASIBILITY_REPORT.md */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/markdown": unknown;
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Origin or role not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description No feasibility report */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     run_gate_api_projects__project_id__runs__run_id__gate_get: {
         parameters: {
             query?: never;
@@ -3793,6 +4126,53 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Origin or role not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    settings_catalog_api_settings_catalog_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogOut"];
+                };
             };
             /** @description Not signed in */
             401: {

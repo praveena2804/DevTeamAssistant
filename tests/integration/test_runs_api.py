@@ -15,10 +15,14 @@ from sqlalchemy import select
 
 from devteam_core.config import Settings
 from devteam_core.contracts.statuses import RunStatus
+from devteam_core.ids import new_id
+from devteam_harness.approvals import ApprovalService, load_approval_rules
+from devteam_services.feasibility import FeasibilityGate
 from devteam_state import create_sqlite_engine, session_factory
 from devteam_state.models import Run, RunJob
-from tests.conftest import audit_rows, bearer, create_project, upload
+from tests.conftest import REPO_ROOT, audit_rows, bearer, create_project, upload
 from tests.fixtures import brds
+from tests.fixtures.feasibility_engine import fixture, snapshot
 
 pytestmark = pytest.mark.integration
 
@@ -123,6 +127,20 @@ def test_a_running_run_is_paused_or_cancelled_cooperatively(
     assert ("resume", "queued", {}) in _jobs(isolated_settings, run["id"])
 
 
+def _evaluate(settings: Settings, project_id: str, run_id: str) -> None:
+    engine = create_sqlite_engine(settings.state_db_path)
+    sessions = session_factory(engine)
+    try:
+        approvals = ApprovalService(load_approval_rules(REPO_ROOT / "config"), sessions)
+        FeasibilityGate(sessions, approvals).evaluate(
+            project_id=project_id, run_id=run_id, analysis_task_id=new_id("tsk"),
+            analysis=fixture("all_supported", project_id, run_id), snapshot=snapshot(),
+            write=lambda _p, _t: None,
+        )  # fmt: skip
+    finally:
+        engine.dispose()
+
+
 def test_gate_decisions_go_through_the_approval_service(
     client: TestClient, isolated_settings: Settings
 ) -> None:
@@ -139,7 +157,12 @@ def test_gate_decisions_go_through_the_approval_service(
 
     gate = client.get(f"{base}/gate", headers=bearer(client)).json()
     assert gate["gate"] == "feasibility_decision" and gate["approval_type"] == "feasibility_decision"
-    assert any("not evaluated" in note for note in gate["notes"])
+    assert any("feasibility report" in note for note in gate["notes"])
+    no_report = client.post(
+        f"{base}/gates/feasibility_decision/decision", json={"decision": "approved"}, headers=bearer(client)
+    )
+    assert no_report.json()["detail"]["code"] == "feasibility.no_report"  # Part G: decided on a report
+    _evaluate(isolated_settings, project_id, run["id"])
 
     wrong = client.post(
         f"{base}/gates/project_approval/decision", json={"decision": "approved"}, headers=bearer(client)

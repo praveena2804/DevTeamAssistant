@@ -140,12 +140,18 @@ function GatePanel({ projectId, run, onDecided }: { projectId: string; run: RunD
         </>
       )}
       {info.spec_checksum && <p className="muted">Specification fingerprint: {info.spec_checksum.slice(0, 16)}…</p>}
-      <button type="button" onClick={() => void decide(info, "approved")} disabled={busy}>
-        Approve
-      </button>{" "}
-      <button type="button" onClick={() => void decide(info, "rejected")} disabled={busy}>
-        Reject
-      </button>
+      {info.gate === "feasibility_decision" ? (
+        <Link to={`/projects/${projectId}/runs/${run.id}/feasibility`}>Open the feasibility report and decide</Link>
+      ) : (
+        <>
+          <button type="button" onClick={() => void decide(info, "approved")} disabled={busy}>
+            Approve
+          </button>{" "}
+          <button type="button" onClick={() => void decide(info, "rejected")} disabled={busy}>
+            Reject
+          </button>
+        </>
+      )}
       {error && <ErrorNotice error={error} />}
     </section>
   );

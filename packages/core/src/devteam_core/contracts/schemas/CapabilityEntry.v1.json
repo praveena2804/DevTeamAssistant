@@ -1,0 +1,243 @@
+{
+  "$defs": {
+    "CapabilityCategory": {
+      "enum": [
+        "frontend",
+        "backend",
+        "database",
+        "deployment",
+        "integration",
+        "auth"
+      ],
+      "title": "CapabilityCategory",
+      "type": "string"
+    },
+    "CatalogKey": {
+      "description": "Every capability the platform knows. Adding one is a reviewed code change (enum + YAML + tests).",
+      "enum": [
+        "html_css_js",
+        "react_vite",
+        "angular",
+        "vue",
+        "power_apps_canvas",
+        "fastapi_python",
+        "dotnet",
+        "java_spring",
+        "power_automate",
+        "sqlite",
+        "postgresql_docker_local",
+        "user_provided_postgresql",
+        "supabase_hosted",
+        "sql_server",
+        "oracle",
+        "azure_sql",
+        "github_public_repo",
+        "github_actions_ci",
+        "github_pages",
+        "power_apps",
+        "azure",
+        "aws",
+        "sharepoint",
+        "paid_hosting",
+        "public_rest_no_credentials",
+        "sso",
+        "sap",
+        "payment_gateway",
+        "credentialed_api",
+        "no_auth",
+        "enterprise_identity_provider",
+        "local_password_rbac"
+      ],
+      "title": "CatalogKey",
+      "type": "string"
+    },
+    "CatalogStatus": {
+      "description": "Declared status (Spec §13.1/§13.2). Never used on its own: see ``EffectiveStatus``.",
+      "enum": [
+        "supported",
+        "supported_for_local_testing",
+        "supported_for_static_frontend",
+        "later_change_request",
+        "unsupported"
+      ],
+      "title": "CatalogStatus",
+      "type": "string"
+    },
+    "GenerationAdapter": {
+      "description": "Closed list of generation methods. Recorded now; the generators arrive in Parts K-L.",
+      "enum": [
+        "html_frontend",
+        "react_frontend",
+        "fastapi_backend",
+        "sqlalchemy_sqlite",
+        "none"
+      ],
+      "title": "GenerationAdapter",
+      "type": "string"
+    },
+    "NetworkRequirement": {
+      "enum": [
+        "none",
+        "public_no_credentials",
+        "credentialed"
+      ],
+      "title": "NetworkRequirement",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One catalog entry: every Spec §13.1 field.",
+  "properties": {
+    "aliases": {
+      "default": [],
+      "items": {
+        "pattern": "^[a-z0-9.][a-z0-9 .+#/-]{0,58}[a-z0-9+#]$|^[a-z0-9]$",
+        "type": "string"
+      },
+      "maxItems": 50,
+      "title": "Aliases",
+      "type": "array"
+    },
+    "available_from_part": {
+      "anyOf": [
+        {
+          "pattern": "^[H-R]$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Available From Part"
+    },
+    "build_recipe": {
+      "anyOf": [
+        {
+          "pattern": "^[a-z][a-z0-9_]{2,39}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Build Recipe"
+    },
+    "category": {
+      "$ref": "#/$defs/CapabilityCategory"
+    },
+    "compatible_versions": {
+      "default": [],
+      "items": {
+        "pattern": "^[0-9]{1,4}(\\.[0-9]{1,4}){0,2}$",
+        "type": "string"
+      },
+      "maxItems": 20,
+      "title": "Compatible Versions",
+      "type": "array"
+    },
+    "display_name": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Display Name",
+      "type": "string"
+    },
+    "documentation_ref": {
+      "maxLength": 240,
+      "title": "Documentation Ref",
+      "type": "string"
+    },
+    "generation_adapter": {
+      "$ref": "#/$defs/GenerationAdapter",
+      "default": "none"
+    },
+    "key": {
+      "$ref": "#/$defs/CatalogKey"
+    },
+    "known_limitations": {
+      "default": [],
+      "items": {
+        "maxLength": 2000,
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 20,
+      "title": "Known Limitations",
+      "type": "array"
+    },
+    "network_requirement": {
+      "$ref": "#/$defs/NetworkRequirement",
+      "default": "none"
+    },
+    "required_credentials": {
+      "default": [],
+      "items": {
+        "maxLength": 200,
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 20,
+      "title": "Required Credentials",
+      "type": "array"
+    },
+    "runtime_requirements": {
+      "default": [],
+      "items": {
+        "maxLength": 2000,
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 20,
+      "title": "Runtime Requirements",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "status": {
+      "$ref": "#/$defs/CatalogStatus"
+    },
+    "substitutions": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/CatalogKey"
+      },
+      "maxItems": 10,
+      "title": "Substitutions",
+      "type": "array"
+    },
+    "templates": {
+      "default": [],
+      "items": {
+        "pattern": "^[a-z][a-z0-9_]{2,63}$",
+        "type": "string"
+      },
+      "maxItems": 10,
+      "title": "Templates",
+      "type": "array"
+    },
+    "test_recipes": {
+      "default": [],
+      "items": {
+        "pattern": "^[a-z][a-z0-9_]{2,39}$",
+        "type": "string"
+      },
+      "maxItems": 20,
+      "title": "Test Recipes",
+      "type": "array"
+    }
+  },
+  "required": [
+    "key",
+    "display_name",
+    "category",
+    "status",
+    "documentation_ref"
+  ],
+  "title": "CapabilityEntry",
+  "type": "object"
+}

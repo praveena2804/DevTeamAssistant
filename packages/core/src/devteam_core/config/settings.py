@@ -256,6 +256,13 @@ class RagSettings(_Section):
     index_job_minutes: float = Field(default=30, gt=0, le=600)
 
 
+class FeasibilitySettings(_Section):
+    """Feasibility Gate (Part G; D-02, D-63): coverage threshold and the report folder in the workspace."""
+
+    min_coverage_pct: int = Field(default=50, ge=1, le=100)
+    report_dir: str = Field(default="reports", pattern=r"^[a-z][a-z0-9_]{0,30}$")
+
+
 class ContextSettings(_Section):
     """Context Manager token budgets per role group (Part F plan §6.5): retrieval and memory caps."""
 
@@ -277,6 +284,7 @@ class Settings(_Section):
     ollama: OllamaSettings = OllamaSettings()
     llm: LlmSettings = LlmSettings()
     rag: RagSettings = RagSettings()
+    feasibility: FeasibilitySettings = FeasibilitySettings()
     context: ContextSettings = ContextSettings()
     resources: ResourceSettings = ResourceSettings()
     uploads: UploadSettings = UploadSettings()

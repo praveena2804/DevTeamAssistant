@@ -279,8 +279,10 @@ def test_the_guard_node_blocks_the_run_when_the_spec_is_not_approved(env: Env) -
 
 
 def _to_feasibility_gate(env: Env) -> None:
-    # the analysis step is recorded as done with no stored output: the finalizer then has no keys
-    _at(env, N.FEASIBILITY, {"services_done": [], "analysis_task_id": "tsk_" + "0" * 26})
+    # Part G (DV-035): the analysis step is recorded as done with a stored analysis that lists nothing, so the
+    # real feasibility node runs (honest "no technology needs identified" report); the finalizer has no keys
+    env.store_analysis("tsk_" + "0" * 26)
+    _at(env, N.BRD_ANALYST, {"services_done": [], "analysis_task_id": "tsk_" + "0" * 26})
     with env.sessions.begin() as session:
         run = runs.get_run(session, env.project_id, env.run_id)
         assert run is not None
@@ -296,9 +298,12 @@ def test_a_gate_interrupts_without_writing_first_and_records_the_wait(env: Env) 
     assert run.status == RunStatus.WAITING_FOR_HUMAN.value
     assert run.pending_gate == "feasibility_decision"
     with env.sessions() as session:
-        kinds = [e.kind for e in session.scalars(select(RunEventRow).where(RunEventRow.run_id == env.run_id))]
+        events = list(session.scalars(select(RunEventRow).where(RunEventRow.run_id == env.run_id)))
+    kinds = [e.kind for e in events]
     assert kinds.count("gate.opened") == 1
-    assert "node.started" not in kinds  # the gate itself wrote nothing before interrupt()
+    # the gate itself wrote nothing before interrupt() (Part G: the feasibility service node ran before it)
+    started = [e.payload.get("node") for e in events if e.kind == "node.started"]
+    assert "feasibility_decision" not in started and started == ["feasibility"]
     again = advance(env.rt, env.graph, project_id=env.project_id, run_id=env.run_id, kind="resume")
     assert again.result == "waiting_for_human"  # a plain resume cannot pass a gate
 
@@ -343,7 +348,9 @@ def test_an_unverifiable_gate_decision_blocks_the_run_and_is_audited(env: Env, c
     if case == "forged":
         payload["approval_id"] = "apr_" + "7" * 26
     elif case == "wrong_type":
-        payload["approval_id"] = env.approve(ApprovalType.SUBSTITUTION)
+        payload["approval_id"] = env.approve(  # Part G: a substitution approval is item-bound (DV-035)
+            ApprovalType.SUBSTITUTION, subject_ref=f"substitution:fea_{'0' * 26}@{'a' * 64}"
+        )
     elif case == "other_run":
         with env.sessions.begin() as session:
             other = runs.create_run(

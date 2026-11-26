@@ -9,17 +9,21 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from typing import Any
 
 from devteam_core.contracts import Contract, llm
 from devteam_core.contracts import agents as a
+from devteam_core.contracts import catalog as cat
 from devteam_core.contracts import drafts as dr
 from devteam_core.contracts import events as ev
+from devteam_core.contracts import feasibility as fz
 from devteam_core.contracts import orchestration as o
 from devteam_core.contracts import records as r
 from devteam_core.contracts import sandbox as sb
 from devteam_core.contracts import tools as t
 from devteam_core.contracts.base import Provenance, SourceRef
+from devteam_core.contracts.catalog import CatalogKey
 from devteam_core.contracts.errors import ErrorCategory, ErrorRef
 from devteam_core.contracts.state import RunState
 from devteam_core.contracts.statuses import (
@@ -216,6 +220,15 @@ def _event_base() -> dict[str, Any]:
     }
 
 
+def _catalog_sample() -> cat.CapabilityCatalog:
+    """The shipped catalog file is the most realistic valid sample (it lists every CatalogKey)."""
+    import yaml  # noqa: PLC0415
+
+    root = Path(__file__).resolve().parents[2]
+    data = yaml.safe_load((root / "capability_catalog" / "capabilities.yaml").read_text(encoding="utf-8"))
+    return cat.CapabilityCatalog.model_validate(data)
+
+
 def _samples() -> dict[str, Callable[[], Contract]]:
     the_task = task()
     debug_task = task(AgentRole.DEBUGGER_REVIEWER)
@@ -286,9 +299,71 @@ def _samples() -> dict[str, Callable[[], Contract]]:
         "FeasibilityItem": lambda: r.FeasibilityItem(
             item_id=new_id("fea"),
             project_id=PROJECT,
-            requirement_id="FR-001",
-            status=FeasibilityStatus.SUPPORTED,
+            report_id=new_id("fsr"),
+            subject_kind=r.FeasibilitySubjectKind.TECHNOLOGY_NEED,
+            subject_id=new_id("tec"),
+            subject_name="Angular",
+            layer=r.TechnologyLayer.FRONTEND,
+            catalog_key=CatalogKey.ANGULAR,
+            status=FeasibilityStatus.SUPPORTED_WITH_SUBSTITUTION,
+            reason="Angular is not supported",
+            alternative=CatalogKey.REACT_VITE,
+            substitution=r.SubstitutionState.OFFERED,
+            requirement_ids=("FR-001",),
+            whole_application=True,
+            source_refs=(source(),),
         ),
+        "FeasibilityGap": lambda: r.FeasibilityGap(
+            gap_id=GAP,
+            category=r.GapCategory.TECHNOLOGY,
+            kind=r.GapKind.UNCLEAR,
+            description="Engine not specified",
+            source_refs=(source(),),
+        ),
+        "RequirementEffect": lambda: fz.RequirementEffect(
+            report_id=new_id("fsr"),
+            project_id=PROJECT,
+            requirement_key="FR-001",
+            effect=fz.RequirementEffectKind.BLOCKED,
+            cause_item_ids=(new_id("fea"),),
+        ),
+        "DemotionNote": lambda: fz.DemotionNote(
+            key=CatalogKey.POSTGRESQL_DOCKER_LOCAL, reason="not available yet: arrives in Part K"
+        ),
+        "FeasibilityReport": lambda: fz.FeasibilityReport(
+            report_id=new_id("fsr"),
+            project_id=PROJECT,
+            run_id=RUN,
+            analysis_task_id=new_id("tsk"),
+            catalog_hash=SHA,
+            verification_ids=(new_id("tvf"),),
+            numerator=1,
+            denominator=3,
+            coverage_pct=33.3,
+            threshold_pct=50,
+            recommendation=fz.CoverageRecommendation.STOP_RECOMMENDED,
+            item_count=1,
+            needs_identified=True,
+            blocked_keys=("FR-002", "BR-001"),
+            report_path="reports/FEASIBILITY_REPORT.md",
+            report_checksum=SHA_2,
+            created_at=NOW,
+        ),
+        "CapabilityEntry": lambda: cat.CapabilityEntry(
+            key=CatalogKey.REACT_VITE,
+            display_name="React",
+            category=cat.CapabilityCategory.FRONTEND,
+            status=cat.CatalogStatus.SUPPORTED,
+            compatible_versions=("19",),
+            templates=("react_fastapi_sqlite",),
+            generation_adapter=cat.GenerationAdapter.REACT_FRONTEND,
+            build_recipe="npm_build",
+            test_recipes=("vitest_run",),
+            substitutions=(),
+            aliases=("react",),
+            documentation_ref="capability_catalog/README.md",
+        ),
+        "CapabilityCatalog": _catalog_sample,
         "ClarificationQuestion": question,
         "ClarificationAnswer": lambda: r.ClarificationAnswer(
             answer_id=new_id("ca"),

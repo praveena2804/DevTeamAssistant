@@ -326,6 +326,18 @@ type = "forbidden"
 source_modules = ["devteam_api"]
 forbidden_modules = ["devteam_harness.llm_gateway", "devteam_harness.rag.store", "chromadb"]
 allow_indirect_imports = true
+# ---- Part G: the Capability Catalog and the Feasibility Gate are deterministic (no model, network or sandbox)
+
+[[tool.importlinter.contracts]]
+name = "the Capability Catalog and the Feasibility Gate never call a model, the network, the sandbox or the vector store (Part G)"
+type = "forbidden"
+source_modules = ["devteam_services.catalog", "devteam_services.feasibility"]
+forbidden_modules = [
+    "devteam_harness.llm_gateway", "devteam_harness.rag", "devteam_harness.sandbox.engine",
+    "devteam_harness.sandbox.service", "httpx", "requests", "docker", "chromadb",
+]
+allow_indirect_imports = true  # the verification fingerprint helper is shared with Part E (never runs anything)
+
 # ---- Part D.1: orchestration and worker boundaries (roadmap 7.1, Part D plan 3.1)
 
 [[tool.importlinter.contracts]]

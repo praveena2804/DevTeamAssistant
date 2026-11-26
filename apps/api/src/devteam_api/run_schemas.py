@@ -57,8 +57,12 @@ class GateInfo(BaseModel):
 
 
 class GateDecisionIn(BaseModel):
+    """v2 (Part G, D-01, D-63): the new fields are optional and apply to the feasibility decision only."""
+
     model_config = _STRICT
     decision: Literal["approved", "rejected"]
+    acknowledge_low_coverage: bool = False  # proceeding below the coverage threshold
+    reason: Literal["cancel", "revise"] | None = None  # why a feasibility decision is declined
 
 
 class GateDecisionOut(BaseModel):

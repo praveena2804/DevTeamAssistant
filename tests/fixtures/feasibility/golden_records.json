@@ -1,0 +1,319 @@
+{
+  "effects": [
+    {
+      "cause_item_ids": [
+        "fea_01KFE000000000000000000003"
+      ],
+      "effect": "pending_substitution",
+      "project_id": "prj_01KFE0000000000000000000PG",
+      "report_id": "fsr_01KFE0000000000000000000G1",
+      "requirement_key": "FR-001",
+      "schema_version": 1
+    },
+    {
+      "cause_item_ids": [
+        "fea_01KFE000000000000000000003"
+      ],
+      "effect": "pending_substitution",
+      "project_id": "prj_01KFE0000000000000000000PG",
+      "report_id": "fsr_01KFE0000000000000000000G1",
+      "requirement_key": "FR-002",
+      "schema_version": 1
+    },
+    {
+      "cause_item_ids": [
+        "fea_01KFE000000000000000000005"
+      ],
+      "effect": "blocked",
+      "project_id": "prj_01KFE0000000000000000000PG",
+      "report_id": "fsr_01KFE0000000000000000000G1",
+      "requirement_key": "FR-003",
+      "schema_version": 1
+    },
+    {
+      "cause_item_ids": [
+        "fea_01KFE000000000000000000004"
+      ],
+      "effect": "blocked",
+      "project_id": "prj_01KFE0000000000000000000PG",
+      "report_id": "fsr_01KFE0000000000000000000G1",
+      "requirement_key": "FR-004",
+      "schema_version": 1
+    },
+    {
+      "cause_item_ids": [],
+      "effect": "buildable",
+      "project_id": "prj_01KFE0000000000000000000PG",
+      "report_id": "fsr_01KFE0000000000000000000G1",
+      "requirement_key": "NFR-001",
+      "schema_version": 1
+    },
+    {
+      "cause_item_ids": [
+        "fea_01KFE000000000000000000003"
+      ],
+      "effect": "pending_substitution",
+      "project_id": "prj_01KFE0000000000000000000PG",
+      "report_id": "fsr_01KFE0000000000000000000G1",
+      "requirement_key": "BR-001",
+      "schema_version": 1
+    }
+  ],
+  "items": [
+    {
+      "alternative": null,
+      "catalog_key": "react_vite",
+      "gap": null,
+      "item_id": "fea_01KFE000000000000000000001",
+      "layer": "frontend",
+      "project_id": "prj_01KFE0000000000000000000PG",
+      "reason": "version 18 requested; the starter kit provides 19",
+      "report_id": "fsr_01KFE0000000000000000000G1",
+      "requirement_ids": [
+        "FR-001",
+        "FR-002",
+        "FR-003",
+        "FR-004",
+        "BR-001"
+      ],
+      "schema_version": 2,
+      "source_refs": [
+        {
+          "chunk_id": "chk_0000000000000000000000000b",
+          "document_id": "doc_01KFE0000000000000000000PG",
+          "page_end": null,
+          "page_start": 3,
+          "paragraph_end": null,
+          "paragraph_start": null,
+          "quote": "A React 18 web front end.",
+          "schema_version": 1,
+          "section": null
+        }
+      ],
+      "status": "partial",
+      "subject_id": "tec_01KFE000000000000000000001",
+      "subject_kind": "technology_need",
+      "subject_name": "React 18",
+      "substitution": "none",
+      "version_spec": null,
+      "whole_application": true
+    },
+    {
+      "alternative": null,
+      "catalog_key": "fastapi_python",
+      "gap": null,
+      "item_id": "fea_01KFE000000000000000000002",
+      "layer": "backend",
+      "project_id": "prj_01KFE0000000000000000000PG",
+      "reason": null,
+      "report_id": "fsr_01KFE0000000000000000000G1",
+      "requirement_ids": [
+        "FR-001",
+        "FR-002",
+        "FR-003",
+        "FR-004",
+        "BR-001"
+      ],
+      "schema_version": 2,
+      "source_refs": [
+        {
+          "chunk_id": "chk_0000000000000000000000000c",
+          "document_id": "doc_01KFE0000000000000000000PG",
+          "page_end": null,
+          "page_start": 4,
+          "paragraph_end": null,
+          "paragraph_start": null,
+          "quote": "A FastAPI service.",
+          "schema_version": 1,
+          "section": null
+        }
+      ],
+      "status": "supported",
+      "subject_id": "tec_01KFE000000000000000000002",
+      "subject_kind": "technology_need",
+      "subject_name": "FastAPI",
+      "substitution": "none",
+      "version_spec": null,
+      "whole_application": true
+    },
+    {
+      "alternative": "sqlite",
+      "catalog_key": null,
+      "gap": {
+        "category": "technology",
+        "description": "Database engine not specified; if accepted, SQLite is used and disclosed in the summary (Spec §13.2).",
+        "gap_id": "gap_01KFE000000000000000000003",
+        "kind": "unclear",
+        "schema_version": 1,
+        "source_refs": [
+          {
+            "chunk_id": "chk_0000000000000000000000000d",
+            "document_id": "doc_01KFE0000000000000000000PG",
+            "page_end": null,
+            "page_start": 4,
+            "paragraph_end": null,
+            "paragraph_start": null,
+            "quote": "Keep records in a relational database.",
+            "schema_version": 1,
+            "section": null
+          }
+        ]
+      },
+      "item_id": "fea_01KFE000000000000000000003",
+      "layer": "database",
+      "project_id": "prj_01KFE0000000000000000000PG",
+      "reason": "'a relational database' names no database engine; SQLite (the platform default) is offered",
+      "report_id": "fsr_01KFE0000000000000000000G1",
+      "requirement_ids": [
+        "FR-001",
+        "FR-002",
+        "FR-003",
+        "FR-004",
+        "BR-001"
+      ],
+      "schema_version": 2,
+      "source_refs": [
+        {
+          "chunk_id": "chk_0000000000000000000000000d",
+          "document_id": "doc_01KFE0000000000000000000PG",
+          "page_end": null,
+          "page_start": 4,
+          "paragraph_end": null,
+          "paragraph_start": null,
+          "quote": "Keep records in a relational database.",
+          "schema_version": 1,
+          "section": null
+        }
+      ],
+      "status": "supported_with_substitution",
+      "subject_id": "tec_01KFE000000000000000000003",
+      "subject_kind": "technology_need",
+      "subject_name": "a relational database",
+      "substitution": "offered",
+      "version_spec": null,
+      "whole_application": true
+    },
+    {
+      "alternative": null,
+      "catalog_key": "enterprise_identity_provider",
+      "gap": null,
+      "item_id": "fea_01KFE000000000000000000004",
+      "layer": "authentication",
+      "project_id": "prj_01KFE0000000000000000000PG",
+      "reason": "Enterprise identity provider is not supported: needs an external identity provider (D-04)",
+      "report_id": "fsr_01KFE0000000000000000000G1",
+      "requirement_ids": [
+        "FR-004"
+      ],
+      "schema_version": 2,
+      "source_refs": [
+        {
+          "chunk_id": "chk_0000000000000000000000000e",
+          "document_id": "doc_01KFE0000000000000000000PG",
+          "page_end": null,
+          "page_start": 4,
+          "paragraph_end": null,
+          "paragraph_start": null,
+          "quote": "Staff use Azure AD.",
+          "schema_version": 1,
+          "section": null
+        }
+      ],
+      "status": "not_supported",
+      "subject_id": "tec_01KFE000000000000000000004",
+      "subject_kind": "technology_need",
+      "subject_name": "Azure AD",
+      "substitution": "none",
+      "version_spec": null,
+      "whole_application": false
+    },
+    {
+      "alternative": null,
+      "catalog_key": "payment_gateway",
+      "gap": null,
+      "item_id": "fea_01KFE000000000000000000005",
+      "layer": null,
+      "project_id": "prj_01KFE0000000000000000000PG",
+      "reason": "Payment gateway is not supported: needs credentials and handles money; not supported",
+      "report_id": "fsr_01KFE0000000000000000000G1",
+      "requirement_ids": [
+        "FR-003"
+      ],
+      "schema_version": 2,
+      "source_refs": [
+        {
+          "chunk_id": "chk_00000000000000000000000015",
+          "document_id": "doc_01KFE0000000000000000000PG",
+          "page_end": null,
+          "page_start": 6,
+          "paragraph_end": null,
+          "paragraph_start": null,
+          "quote": "Fees are paid by Stripe.",
+          "schema_version": 1,
+          "section": null
+        }
+      ],
+      "status": "not_supported",
+      "subject_id": "itg_01KFE000000000000000000001",
+      "subject_kind": "integration",
+      "subject_name": "Stripe",
+      "substitution": "none",
+      "version_spec": null,
+      "whole_application": false
+    }
+  ],
+  "report": {
+    "analysis_task_id": "tsk_01KFE0000000000000000000G1",
+    "blocked_keys": [
+      "FR-003",
+      "FR-004"
+    ],
+    "catalog_hash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "coverage_pct": 0.0,
+    "created_at": "2026-11-26T00:00:00Z",
+    "demoted": [
+      {
+        "key": "postgresql_docker_local",
+        "reason": "not available yet: arrives in Part K",
+        "schema_version": 1
+      },
+      {
+        "key": "github_public_repo",
+        "reason": "not available yet: arrives in Part P",
+        "schema_version": 1
+      },
+      {
+        "key": "github_actions_ci",
+        "reason": "not available yet: arrives in Part P",
+        "schema_version": 1
+      },
+      {
+        "key": "github_pages",
+        "reason": "not available yet: arrives in Part P",
+        "schema_version": 1
+      }
+    ],
+    "denominator": 5,
+    "item_count": 5,
+    "needs_identified": true,
+    "numerator": 0,
+    "partial_keys": [],
+    "pending_keys": [
+      "FR-001",
+      "FR-002",
+      "BR-001"
+    ],
+    "project_id": "prj_01KFE0000000000000000000PG",
+    "recommendation": "stop_recommended",
+    "report_checksum": "0000000000000000000000000000000000000000000000000000000000000000",
+    "report_id": "fsr_01KFE0000000000000000000G1",
+    "report_path": "reports/FEASIBILITY_REPORT.md",
+    "run_id": "run_01KFE0000000000000000000PG",
+    "schema_version": 1,
+    "threshold_pct": 50,
+    "verification_ids": [
+      "tvf_01KFE0000000000000000000V1",
+      "tvf_01KFE0000000000000000000V2"
+    ]
+  }
+}

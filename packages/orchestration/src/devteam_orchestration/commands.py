@@ -12,11 +12,17 @@ through the run state machine, and leaves the work to the worker:
 * ``submit_gate_decision``: the human decision is recorded through the Approval Service (HC-13: role,
   run, spec version + checksum binding, duplicate refusal, audit) and only then a ``gate_decision`` job
   is queued with the approval **ID**; the gate re-verifies it when it resumes.
+  Part G (D-01, D-63): proceeding past the feasibility decision is refused when nothing can be built, and
+  below the coverage threshold needs ``acknowledge_low_coverage`` (recorded, and re-checked by the gate);
+  a decline names its reason, ``cancel`` or ``revise`` (revise = cancel, then a new run with the revised BRD).
+* ``accept_substitution``: records a ``substitution`` approval bound to one offered feasibility item and its
+  checksum (AC-G-04). The clarification form that offers it to the user arrives in Part I.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Literal
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session, sessionmaker
@@ -30,6 +36,7 @@ from devteam_harness.iam import Principal
 from devteam_state.machines import transition_run
 from devteam_state.models import Run, SpecVersionRow
 from devteam_state.repositories import audit, documents, runs
+from devteam_state.repositories import feasibility as feasibility_repo
 from devteam_state.repositories import orchestration as orch
 
 R = RunStatus
@@ -171,17 +178,24 @@ def submit_gate_decision(
     run_id: str,
     gate: GateName,
     decision: ApprovalDecision,
+    acknowledge_low_coverage: bool = False,
+    reason: Literal["cancel", "revise"] | None = None,
     clock: Clock = system_clock,
 ) -> Approval:
     approval_type = DECIDABLE_GATES.get(gate)
     if approval_type is None:
         raise CommandError("gate.unavailable", f"The {gate.value} gate cannot be decided in Part D.")
+    if gate is not GateName.FEASIBILITY_DECISION and (acknowledge_low_coverage or reason is not None):
+        raise CommandError("gate.bad_decision", "Only the feasibility decision takes these options.", 422)
     with sessions() as session:
         run = _run(session, project_id, run_id)
         if R(run.status) is not R.WAITING_FOR_HUMAN or run.pending_gate != gate.value:
             raise CommandError("gate.not_pending", "This gate is not waiting for a decision.")
         version_id: str | None = None
         checksum: str | None = None
+        report_id: str | None = None
+        if gate is GateName.FEASIBILITY_DECISION:
+            report_id = _check_feasibility(session, project_id, run_id, decision, acknowledge_low_coverage)
         if gate is GateName.PROJECT_APPROVAL:
             draft = draft_spec_for(session, project_id, run_id)
             if draft is None:
@@ -189,6 +203,10 @@ def submit_gate_decision(
             version_id, checksum = draft.id, draft.checksum
         elif gate is GateName.PUBLISH_APPROVAL:
             version_id, checksum = run.spec_version_id, run.spec_checksum
+    if report_id is not None and acknowledge_low_coverage and decision is ApprovalDecision.APPROVED:
+        _record(
+            sessions, principal.id, project_id, ACKNOWLEDGED, "feasibility_report", report_id, run_id, clock
+        )
     approval = approvals.record(
         principal,
         project_id=project_id,
@@ -198,6 +216,10 @@ def submit_gate_decision(
         spec_version_id=version_id,
         spec_checksum=checksum,
     )
+    if gate is GateName.FEASIBILITY_DECISION and decision is not ApprovalDecision.APPROVED:
+        details: dict[str, object] = {"reason": reason or "cancel", "report_id": report_id}
+        _record(sessions, principal.id, project_id, DECISION_REASON, "approval", approval.approval_id, run_id,
+                clock, details)  # fmt: skip
     with sessions.begin() as session:
         orch.enqueue_job(
             session,
@@ -210,8 +232,95 @@ def submit_gate_decision(
     return approval
 
 
+ACKNOWLEDGED = "feasibility.low_coverage_acknowledged"
+DECISION_REASON = "feasibility.decision_reason"
+
+
+def _check_feasibility(
+    session: Session, project_id: str, run_id: str, decision: ApprovalDecision, acknowledged: bool
+) -> str:
+    """D-63: the decision is made on this run's latest report; the gate re-checks the same rules."""
+    stored = feasibility_repo.latest_report(session, project_id, run_id)
+    if stored is None:
+        raise CommandError("feasibility.no_report", "There is no feasibility report for this run yet.")
+    report = stored.report
+    if decision is ApprovalDecision.APPROVED:
+        if not report.proceed_allowed:
+            raise CommandError(
+                "feasibility.proceed_disabled", "Nothing in scope can be built: cancel, or revise the BRD."
+            )
+        if report.needs_acknowledgement and not acknowledged:
+            raise CommandError(
+                "feasibility.acknowledgement_required",
+                "Coverage is below the threshold: confirm that you want to proceed anyway.",
+                422,
+            )
+    elif acknowledged:
+        raise CommandError("gate.bad_decision", "Acknowledging low coverage only applies to proceeding.", 422)
+    return report.report_id
+
+
+def _record(  # noqa: PLR0917 - private helper; every argument is required context
+    sessions: sessionmaker[Session],
+    principal_id: str,
+    project_id: str,
+    action: str,
+    target_type: str,
+    target_id: str,
+    run_id: str,
+    clock: Clock,
+    details: dict[str, object] | None = None,
+) -> None:
+    with sessions.begin() as session:
+        audit.append(
+            session,
+            action=action,
+            outcome="success",
+            principal_id=principal_id,
+            project_id=project_id,
+            target_type=target_type,
+            target_id=target_id,
+            details={"run_id": run_id, **(details or {})},
+            clock=clock,
+        )
+
+
+def accept_substitution(
+    sessions: sessionmaker[Session],
+    approvals: ApprovalService,
+    principal: Principal,
+    *,
+    project_id: str,
+    run_id: str,
+    item_id: str,
+    decision: ApprovalDecision,
+) -> Approval:
+    """Record a human substitution decision bound to one offered item and its checksum (AC-G-04).
+
+    Service-level in Part G; the clarification form that shows the offer arrives in Part I. Applying it is
+    the Feasibility Gate's job, which re-verifies this approval (``FeasibilityGate.apply_substitution``).
+    """
+    with sessions() as session:
+        _run(session, project_id, run_id)
+        found = feasibility_repo.item_with_checksum(session, project_id, item_id)
+    if found is None or found[2] != run_id:
+        raise CommandError("substitution.unknown_item", "No such feasibility item in this run.", 404)
+    item, checksum, _ = found
+    if item.alternative is None:
+        raise CommandError("substitution.not_offered", "No substitution was offered for this item.")
+    return approvals.record(
+        principal,
+        project_id=project_id,
+        run_id=run_id,
+        approval_type=ApprovalType.SUBSTITUTION,
+        decision=decision,
+        subject_ref=feasibility_repo.substitution_ref(item_id, checksum),
+    )
+
+
 __all__ = [
     "CommandError",
+    "accept_substitution",
     "active_run",
     "draft_spec_for",
     "request_cancel",

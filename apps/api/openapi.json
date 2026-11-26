@@ -193,6 +193,123 @@
         "title": "Body_document_upload_batch_api_projects__project_id__documents_post",
         "type": "object"
       },
+      "CatalogEntryOut": {
+        "additionalProperties": false,
+        "properties": {
+          "available_from_part": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Available From Part"
+          },
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "declared_status": {
+            "title": "Declared Status",
+            "type": "string"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "effective_status": {
+            "title": "Effective Status",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "known_limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Known Limitations",
+            "type": "array"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "substitutions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Substitutions",
+            "type": "array"
+          },
+          "templates": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Templates",
+            "type": "array"
+          },
+          "verification_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Verification Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "key",
+          "display_name",
+          "category",
+          "declared_status",
+          "effective_status",
+          "reason",
+          "templates",
+          "substitutions",
+          "known_limitations",
+          "available_from_part",
+          "verification_ids"
+        ],
+        "title": "CatalogEntryOut",
+        "type": "object"
+      },
+      "CatalogOut": {
+        "additionalProperties": false,
+        "properties": {
+          "catalog_hash": {
+            "title": "Catalog Hash",
+            "type": "string"
+          },
+          "demoted": {
+            "title": "Demoted",
+            "type": "integer"
+          },
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/CatalogEntryOut"
+            },
+            "title": "Entries",
+            "type": "array"
+          }
+        },
+        "required": [
+          "catalog_hash",
+          "entries",
+          "demoted"
+        ],
+        "title": "CatalogOut",
+        "type": "object"
+      },
       "ChunkOut": {
         "properties": {
           "id": {
@@ -322,6 +439,25 @@
           "status"
         ],
         "title": "ComponentCheck",
+        "type": "object"
+      },
+      "DemotedOut": {
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "reason"
+        ],
+        "title": "DemotedOut",
         "type": "object"
       },
       "DocumentDetail": {
@@ -528,6 +664,33 @@
         "title": "DocumentOut",
         "type": "object"
       },
+      "EffectOut": {
+        "additionalProperties": false,
+        "properties": {
+          "cause_item_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Cause Item Ids",
+            "type": "array"
+          },
+          "effect": {
+            "title": "Effect",
+            "type": "string"
+          },
+          "requirement_key": {
+            "title": "Requirement Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "requirement_key",
+          "effect",
+          "cause_item_ids"
+        ],
+        "title": "EffectOut",
+        "type": "object"
+      },
       "ErrorDetail": {
         "properties": {
           "code": {
@@ -556,6 +719,269 @@
           "detail"
         ],
         "title": "ErrorResponse",
+        "type": "object"
+      },
+      "FeasibilityItemOut": {
+        "additionalProperties": false,
+        "properties": {
+          "alternative": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alternative"
+          },
+          "catalog_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Catalog Key"
+          },
+          "gap": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GapOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "item_id": {
+            "title": "Item Id",
+            "type": "string"
+          },
+          "layer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Layer"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "requirement_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Requirement Ids",
+            "type": "array"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "subject_kind": {
+            "title": "Subject Kind",
+            "type": "string"
+          },
+          "subject_name": {
+            "title": "Subject Name",
+            "type": "string"
+          },
+          "substitution": {
+            "title": "Substitution",
+            "type": "string"
+          },
+          "version_spec": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version Spec"
+          },
+          "whole_application": {
+            "title": "Whole Application",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "item_id",
+          "subject_kind",
+          "subject_name",
+          "layer",
+          "version_spec",
+          "catalog_key",
+          "status",
+          "reason",
+          "alternative",
+          "substitution",
+          "requirement_ids",
+          "whole_application",
+          "gap",
+          "source"
+        ],
+        "title": "FeasibilityItemOut",
+        "type": "object"
+      },
+      "FeasibilityOut": {
+        "additionalProperties": false,
+        "properties": {
+          "blocked_keys": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Blocked Keys",
+            "type": "array"
+          },
+          "catalog_hash": {
+            "title": "Catalog Hash",
+            "type": "string"
+          },
+          "coverage_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Coverage Pct"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "demoted": {
+            "items": {
+              "$ref": "#/components/schemas/DemotedOut"
+            },
+            "title": "Demoted",
+            "type": "array"
+          },
+          "denominator": {
+            "title": "Denominator",
+            "type": "integer"
+          },
+          "effects": {
+            "items": {
+              "$ref": "#/components/schemas/EffectOut"
+            },
+            "title": "Effects",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/FeasibilityItemOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "needs_acknowledgement": {
+            "title": "Needs Acknowledgement",
+            "type": "boolean"
+          },
+          "needs_identified": {
+            "title": "Needs Identified",
+            "type": "boolean"
+          },
+          "numerator": {
+            "title": "Numerator",
+            "type": "integer"
+          },
+          "partial_keys": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Partial Keys",
+            "type": "array"
+          },
+          "pending_keys": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Pending Keys",
+            "type": "array"
+          },
+          "proceed_allowed": {
+            "title": "Proceed Allowed",
+            "type": "boolean"
+          },
+          "recommendation": {
+            "title": "Recommendation",
+            "type": "string"
+          },
+          "report_id": {
+            "title": "Report Id",
+            "type": "string"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "threshold_pct": {
+            "title": "Threshold Pct",
+            "type": "integer"
+          },
+          "verification_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Verification Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "report_id",
+          "run_id",
+          "created_at",
+          "catalog_hash",
+          "verification_ids",
+          "numerator",
+          "denominator",
+          "coverage_pct",
+          "threshold_pct",
+          "recommendation",
+          "proceed_allowed",
+          "needs_acknowledgement",
+          "needs_identified",
+          "blocked_keys",
+          "pending_keys",
+          "partial_keys",
+          "demoted",
+          "items",
+          "effects"
+        ],
+        "title": "FeasibilityOut",
         "type": "object"
       },
       "FileRef": {
@@ -666,9 +1092,39 @@
         "title": "FileResult",
         "type": "object"
       },
-      "GateDecisionIn": {
+      "GapOut": {
         "additionalProperties": false,
         "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "category",
+          "kind",
+          "description"
+        ],
+        "title": "GapOut",
+        "type": "object"
+      },
+      "GateDecisionIn": {
+        "additionalProperties": false,
+        "description": "v2 (Part G, D-01, D-63): the new fields are optional and apply to the feasibility decision only.",
+        "properties": {
+          "acknowledge_low_coverage": {
+            "default": false,
+            "title": "Acknowledge Low Coverage",
+            "type": "boolean"
+          },
           "decision": {
             "enum": [
               "approved",
@@ -676,6 +1132,21 @@
             ],
             "title": "Decision",
             "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "enum": [
+                  "cancel",
+                  "revise"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
           }
         },
         "required": [
@@ -4353,6 +4824,184 @@
         ]
       }
     },
+    "/api/projects/{project_id}/runs/{run_id}/feasibility": {
+      "get": {
+        "operationId": "run_feasibility_api_projects__project_id__runs__run_id__feasibility_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeasibilityOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Origin or role not allowed"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No feasibility report"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Rate limit exceeded"
+          }
+        },
+        "summary": "Run.Feasibility",
+        "tags": [
+          "feasibility"
+        ]
+      }
+    },
+    "/api/projects/{project_id}/runs/{run_id}/feasibility/report.md": {
+      "get": {
+        "operationId": "run_feasibility_report_api_projects__project_id__runs__run_id__feasibility_report_md_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/markdown": {}
+            },
+            "description": "FEASIBILITY_REPORT.md"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Origin or role not allowed"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No feasibility report"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Rate limit exceeded"
+          }
+        },
+        "summary": "Run.Feasibility Report",
+        "tags": [
+          "feasibility"
+        ]
+      }
+    },
     "/api/projects/{project_id}/runs/{run_id}/gate": {
       "get": {
         "operationId": "run_gate_api_projects__project_id__runs__run_id__gate_get",
@@ -5672,6 +6321,58 @@
         "summary": "Sign in with the local install token",
         "tags": [
           "session"
+        ]
+      }
+    },
+    "/api/settings/catalog": {
+      "get": {
+        "description": "Declared and effective status of every catalog entry (computed now; read-only, never edited here).",
+        "operationId": "settings_catalog_api_settings_catalog_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Origin or role not allowed"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Rate limit exceeded"
+          }
+        },
+        "summary": "Settings.Catalog",
+        "tags": [
+          "settings"
         ]
       }
     },

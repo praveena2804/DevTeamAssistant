@@ -2,7 +2,7 @@
 
 Two kinds:
 
-* **Stand-ins** for services built in later parts (feasibility, integration/build, test runner,
+* **Stand-ins** for services built in later parts (integration/build, test runner,
   completion gates, packager, GitHub deployer, change intake/impact). A stand-in does nothing and
   says so: its ``ServiceOutcome`` can only be "not run", "not evaluated", "not built" or "not
   published", and names the part that delivers the real service (D-38). It never writes a test
@@ -38,11 +38,6 @@ SPEC_FREEZE_PRINCIPAL = f"service:{ServiceName.SPEC_FREEZE.value}"
 
 STAND_INS: Mapping[NodeName, tuple[ServiceOutcomeStatus, ServicePart, str]] = MappingProxyType(
     {
-        N.FEASIBILITY: (
-            S.NOT_EVALUATED,
-            "G",
-            "Feasibility not evaluated: the Capability Catalog check arrives in Part G",
-        ),
         N.INTEGRATION_BUILD: (
             S.NOT_RUN,
             "E",

@@ -1,0 +1,60 @@
+{
+  "$defs": {
+    "RequirementEffectKind": {
+      "description": "Precedence per requirement: blocked > pending_substitution > partial > buildable (PART-G-PLAN §6.4).",
+      "enum": [
+        "buildable",
+        "partial",
+        "pending_substitution",
+        "blocked"
+      ],
+      "title": "RequirementEffectKind",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "cause_item_ids": {
+      "default": [],
+      "items": {
+        "pattern": "^fea_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+        "type": "string"
+      },
+      "maxItems": 500,
+      "title": "Cause Item Ids",
+      "type": "array"
+    },
+    "effect": {
+      "$ref": "#/$defs/RequirementEffectKind"
+    },
+    "project_id": {
+      "pattern": "^prj_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Project Id",
+      "type": "string"
+    },
+    "report_id": {
+      "pattern": "^fsr_[0-7][0-9A-HJKMNP-TV-Z]{25}$",
+      "title": "Report Id",
+      "type": "string"
+    },
+    "requirement_key": {
+      "pattern": "^(FR|NFR|BR)-[0-9]{3,4}$",
+      "title": "Requirement Key",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "report_id",
+    "project_id",
+    "requirement_key",
+    "effect"
+  ],
+  "title": "RequirementEffect",
+  "type": "object"
+}
