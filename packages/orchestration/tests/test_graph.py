@@ -485,8 +485,11 @@ def test_a_full_run_with_the_real_local_model_completes_unverified(tmp_path: Pat
             ]
             [summary] = [e for e in events if e["kind"] == "run.summary"]
             assert summary["verified"] is False
-            stand_ins = [e for e in events if e["kind"] == "service.recorded"]
+            services = [e for e in events if e["kind"] == "service.recorded"]
+            stand_ins = [e for e in services if e["node"] != "feasibility"]
             assert stand_ins and all(e["stand_in"] and e["status"] != "performed" for e in stand_ins)
+            [feasibility] = [e for e in services if e["node"] == "feasibility"]  # real since Part G
+            assert feasibility["stand_in"] is False and feasibility["status"] == "performed"
             assert audit.verify_chain(session).ok
             project_status = session.execute(
                 text("SELECT status FROM projects WHERE id = :p"), {"p": env.project_id}
