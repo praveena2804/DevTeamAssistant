@@ -56,7 +56,7 @@ entries:
     display_name: Angular
     category: frontend
     status: unsupported
-    known_limitations: [no Angular starter kit, generator or verification recipe]
+    known_limitations: ["no Angular starter kit, generator or verification recipe"]
     substitutions: [react_vite, html_css_js]
     aliases: [angular, angularjs, angular.js]
     documentation_ref: capability_catalog/README.md
@@ -64,7 +64,7 @@ entries:
     display_name: Vue
     category: frontend
     status: unsupported
-    known_limitations: [no Vue starter kit, generator or verification recipe]
+    known_limitations: ["no Vue starter kit, generator or verification recipe"]
     substitutions: [react_vite, html_css_js]
     aliases: [vue, vuejs, vue.js, nuxt]
     documentation_ref: capability_catalog/README.md
@@ -74,7 +74,7 @@ entries:
     status: unsupported
     required_credentials: [Microsoft 365 / Power Platform licence]
     network_requirement: credentialed
-    known_limitations: [a proprietary, licensed low-code platform; it cannot be generated or tested locally]
+    known_limitations: ["a proprietary, licensed low-code platform; it cannot be generated or tested locally"]
     substitutions: [react_vite, html_css_js]
     aliases: [power apps, powerapps, power apps canvas, canvas app, microsoft power apps]
     documentation_ref: capability_catalog/README.md
@@ -96,7 +96,7 @@ entries:
     display_name: .NET / C#
     category: backend
     status: unsupported
-    known_limitations: [no .NET starter kit, generator or verification recipe]
+    known_limitations: ["no .NET starter kit, generator or verification recipe"]
     substitutions: [fastapi_python]
     aliases: [.net, dotnet, asp.net, asp.net core, c#, csharp, .net core]
     documentation_ref: capability_catalog/README.md
@@ -104,7 +104,7 @@ entries:
     display_name: Java / Spring
     category: backend
     status: unsupported
-    known_limitations: [no Java starter kit, generator or verification recipe]
+    known_limitations: ["no Java starter kit, generator or verification recipe"]
     substitutions: [fastapi_python]
     aliases: [java, spring, spring boot, java spring, java spring boot]
     documentation_ref: capability_catalog/README.md
@@ -114,7 +114,7 @@ entries:
     status: unsupported
     required_credentials: [Microsoft 365 / Power Platform licence]
     network_requirement: credentialed
-    known_limitations: [a proprietary, licensed workflow service; it cannot be generated or tested locally]
+    known_limitations: ["a proprietary, licensed workflow service; it cannot be generated or tested locally"]
     substitutions: [fastapi_python]
     aliases: [power automate, microsoft flow, power automate flow]
     documentation_ref: capability_catalog/README.md
@@ -225,7 +225,7 @@ entries:
     status: unsupported
     required_credentials: [Microsoft 365 / Power Platform licence]
     network_requirement: credentialed
-    known_limitations: [a proprietary, licensed platform; the platform delivers source code through GitHub instead (once available, Part P)]
+    known_limitations: ["a proprietary, licensed platform; the platform delivers source code through GitHub instead (once available, Part P)"]
     aliases: [power apps, powerapps, microsoft power apps, power platform]
     documentation_ref: capability_catalog/README.md
   - key: azure
@@ -252,7 +252,7 @@ entries:
     status: unsupported
     required_credentials: [Microsoft 365 tenant]
     network_requirement: credentialed
-    known_limitations: [a proprietary, licensed platform]
+    known_limitations: ["a proprietary, licensed platform"]
     aliases: [sharepoint, sharepoint online]
     documentation_ref: capability_catalog/README.md
   - key: paid_hosting
@@ -273,7 +273,7 @@ entries:
     templates: [html_fastapi_sqlite, react_fastapi_sqlite]
     build_recipe: pytest_api
     network_requirement: public_no_credentials
-    known_limitations: [the sandbox has no network, so calls are tested against local stubs only (Spec §3.4)]
+    known_limitations: ["the sandbox has no network, so calls are tested against local stubs only (Spec §3.4)"]
     aliases: [public api, public rest api, open api without key, public web service]
     documentation_ref: capability_catalog/README.md
   - key: sso

@@ -393,3 +393,22 @@ def test_demotions_are_audited_once_per_change_and_restorations_too(sessions: se
     assert all(e.principal_id == "service:feasibility_gate" for e in events)
     store(sessions, "react_fastapi_sqlite", V.FAILED)
     assert record() == 5  # demoted again, with the new reason
+
+
+def test_a_limitation_with_a_comma_stays_one_sentence() -> None:
+    """Regression (G-G demo): an unquoted YAML flow item split "a proprietary, licensed …" in two."""
+    entries = {e.key: e for e in load_catalog().catalog.entries}
+    assert entries[CatalogKey.POWER_APPS_CANVAS].known_limitations == (
+        "a proprietary, licensed low-code platform; it cannot be generated or tested locally",
+    )
+    assert entries[CatalogKey.ANGULAR].known_limitations == (
+        "no Angular starter kit, generator or verification recipe",
+    )
+    raw = yaml.safe_load((svc.code_root() / "capability_catalog" / "capabilities.yaml").read_text("utf-8"))
+    fragments = [
+        (e["key"], item)
+        for e in raw["entries"]
+        for item in e.get("known_limitations", [])
+        if item[:1].islower() and len(e["known_limitations"]) > 1
+    ]
+    assert fragments == []  # every limitation is one complete statement
