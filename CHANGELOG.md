@@ -29,6 +29,11 @@ One section per approved part (roadmap §8). Entries are added at gate approval;
 - Contracts: `FeasibilityItem` v2 (D-61), `TechnologyNeed` and `Integration` v2 (optional `requirement_ids`;
   model-proposed `catalog_key` validated); v1 needs and integrations are read unchanged
 
+### Fixed
+
+- Capability Catalog: limitation texts containing a comma were split in two by YAML, cutting the reason shown
+  in the feasibility report short (found during the G-G demonstration)
+
 ## Unreleased — Part F: LLM Gateway, Model Routing, Context & Memory, and RAG (awaiting G-F)
 
 ### Added (checkpoints F.1–F.2)

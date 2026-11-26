@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | **Revision 1, awaiting the owner's review** (planning only; nothing implemented) |
+| Status | **Revision 1, approved** (AP-026, 2026-11-26; D-01, D-02, D-60…D-65 (a), D-66 (b)) |
 | Date | 2026-11-26 |
 | Milestone | M2 Discovery (G, H, I). M1 complete: Parts C–F approved (Part F: AP-025) |
 | Baseline | `part/f-gateway-rag` = `b0db053` (Part F approved, pushed; **not merged into `main`**, which stays at `efa5031` / v0.5.0, by owner instruction) |
