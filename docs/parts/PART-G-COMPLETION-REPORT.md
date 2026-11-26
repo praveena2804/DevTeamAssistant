@@ -219,7 +219,7 @@ and safety-critical services; ≥ 80% elsewhere) is met.
 | `4a752c3` | fix(catalog): keep comma-containing limitations as one sentence (G-G demo finding) |
 | `24512cd` | test(graph): the real-model run now expects the real feasibility step (DV-035) |
 | Docs commit | completion report, trackers, Run 32 (this document) |
-| Push | normal push of `part/g-catalog-feasibility` only; remote verification is recorded in tracker TR-0160 |
+| Push | normal push of `part/g-catalog-feasibility` only; verified with `git ls-remote`: remote = local `4c8f0bd` (docs commit), Part F branch unchanged at `7e9e18f`, `main` unchanged at `efa5031`, no new tags (TR-0160). A follow-up commit records this |
 | Not done (by instruction) | no merge into `main` (`main` stays at `efa5031`), no tag, no release, no version change; the Part F branch is not altered; the spec `.docx` and `PROJECT_EXPLAINED.md` are not staged |
 
 **Part H has not been started.** Waiting for your G-G decision.
