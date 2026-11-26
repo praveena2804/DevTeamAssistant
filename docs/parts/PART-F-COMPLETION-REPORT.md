@@ -106,7 +106,7 @@ The full regression ran every Part A–E test, including the real-model (`llm`),
 
 ## 9. Branch and push
 
-Pushed `part/f-gateway-rag` to `origin` (normal push, no force); remote ref verified with `git ls-remote` equal to the local branch head. Not merged into `main`, no tag, no release. The exact pushed hash and the verification are recorded in the tracker (TR-0147).
+Pushed `part/f-gateway-rag` to `origin` (normal push, no force); remote ref verified with `git ls-remote` equal to the local branch head. Not merged into `main`, no tag, no release. Pushed head `d7632437c901ff56a5e089db33c938cb706b1577` (F.6) verified on 2026-11-26 (TR-0147); a follow-up commit recording this push was pushed the same way.
 
 ## 10. Commits
 
@@ -116,6 +116,6 @@ Pushed `part/f-gateway-rag` to `origin` (normal push, no force); remote ref veri
 | F.3 prompt and skill registry | `7d2ad66` |
 | F.4 evaluation and CI gate | `059295c` |
 | F.5 retrieval, ChromaDB, context, memory | `d81e856` |
-| F.6 settings/status API and UI, E2E-F, documentation, this report | the F.6 commit on `part/f-gateway-rag` (hash recorded in tracker TR-0147) |
+| F.6 settings/status API and UI, E2E-F, documentation, this report | `d763243` (`d7632437c901ff56a5e089db33c938cb706b1577`) |
 
 **Part G has not been started.** Waiting for your G-F decision.
