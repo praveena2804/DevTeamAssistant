@@ -4,6 +4,40 @@ One section per approved part (roadmap §8). Entries are added at gate approval;
 
 **Versioning:** SemVer, pre-1.0. Each approved part bumps the minor version (Part A = 0.1.0, B = 0.2.0, …, R = 0.18.0); fixes to an approved part bump the patch version. The accepted MVP is `1.0.0-mvp`. Git tags: `vX.Y.Z` plus `part-<letter>-approved` (roadmap §16.2).
 
+## Unreleased — Part F: LLM Gateway, Model Routing, Context & Memory, and RAG (awaiting G-F)
+
+### Added (checkpoints F.1–F.2)
+
+- `config/models.yaml`: approved local models (Q1), slots, fallback ladders, per-agent (D-06) and per-operation
+  (D-37) overrides, validated at start-up (MODEL_ROUTING rules 1–9); the old `ollama.models` setting is gone
+- Router (operation > agent > slot > global) with the rule recorded; recovery ladder after resource failures
+  only (reduced context, then a smaller model; never after invalid output), cancel-before-step, per-model
+  free-RAM check, circuit breaker, unload-before-switch; exhaustion → waiting for resources and a checkpoint
+  (Spec scenario #22)
+- `ModelCall` records (migration 0008, append-only, content-free) with model digest, route rule and recovery
+  step; per-role and per-service rate limits (`config/rate_limits.yaml`); response cache (D-28, off by
+  default, re-validated, project-scoped); embedding cache; `gateway.embed()` for platform services
+- `ollama.keep_alive: 0s` on `low_memory` (D-59); dev dependency `respx`
+
+### Added (checkpoint F.3)
+
+- File-backed prompt and skill registry: `prompts/<agent>/<id>.v<N>.md`, `config/prompts.yaml` (active version,
+  released hashes); the ten Part D prompts moved verbatim with unchanged hashes (D-58)
+
+### Added (checkpoint F.4)
+
+- Evaluation framework (`devteam_harness.evaluation`, `scripts/run_evals.py`), smoke dataset and scorecard for
+  the BRD Analyst prompt; CI eval gate `scripts/check_eval_gate.py` (D-56)
+
+### Added (checkpoints F.5–F.6)
+
+- Retrieval over project knowledge: local `nomic-embed-text` embeddings (D-53, benchmarked), in-process ChromaDB
+  (D-54; four server-side advisories accepted as unreachable, AP-024 / KI-045), per-project collections,
+  per-document freshness, rebuild on model or chunker change (migration 0009); `search_project_knowledge` v2;
+  Context Manager; read-only project memory
+- Worker index jobs and model inventory; API `/api/settings/*` (read-only, D-55), project search-index status
+  and rebuild, run model calls; UI **Settings** page, search-index panel, model calls on the trace page
+
 ## 0.5.0 — Part E: Secure Docker Sandbox and Starter Kits (G-E approved 2026-11-24)
 
 ### Added (checkpoint E.1)

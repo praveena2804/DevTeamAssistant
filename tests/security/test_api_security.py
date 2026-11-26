@@ -10,7 +10,8 @@ from fastapi.testclient import TestClient
 
 from devteam_api.deps import audited, authenticate
 from devteam_api.routers import audit as audit_router
-from devteam_api.routers import documents, projects, runs, sandbox, session
+from devteam_api.routers import documents, knowledge, projects, runs, sandbox, session
+from devteam_api.routers import settings as settings_router
 from devteam_core.config import Settings
 from tests.conftest import UI_ORIGIN, audit_rows, bearer, create_project, upload
 from tests.fixtures import brds
@@ -38,7 +39,7 @@ def _api_routes(client: TestClient) -> list[tuple[str, str, APIRoute]]:
     """All /api routes, taken from the router modules and cross-checked against the live OpenAPI document,
     so a route registered anywhere else cannot escape this inventory."""
     routes: list[tuple[str, str, APIRoute]] = []
-    for module in (session, projects, documents, audit_router, runs, sandbox):
+    for module in (session, projects, documents, audit_router, runs, sandbox, settings_router, knowledge):
         for route in module.router.routes:
             assert isinstance(route, APIRoute)
             routes.extend((method, route.path, route) for method in sorted(route.methods or ()))
@@ -90,6 +91,7 @@ def test_known_mutating_routes(client: TestClient) -> None:
         ("POST", "/api/projects/{project_id}/runs/{run_id}/cancel"),
         ("POST", "/api/projects/{project_id}/runs/{run_id}/gates/{gate}/decision"),
         ("POST", "/api/sandbox/templates/{template_id}/verifications"),  # Part E: queues only (DV-026)
+        ("POST", "/api/projects/{project_id}/knowledge/index"),  # Part F: queues a rebuild only (D-57)
     }
 
 

@@ -9,6 +9,7 @@ import { ProjectsPage } from "./pages/ProjectsPage";
 import { RunHistoryPage } from "./pages/RunHistoryPage";
 import { RunPage } from "./pages/RunPage";
 import { SandboxPage } from "./pages/SandboxPage";
+import { SettingsPage } from "./pages/SettingsPage";
 import { SignInPage } from "./pages/SignInPage";
 import { SystemStatusPage } from "./pages/SystemStatusPage";
 import { TracePage } from "./pages/TracePage";
@@ -33,6 +34,7 @@ export function App() {
         <Route path="projects/:projectId/runs/:runId/history" element={<RunHistoryPage />} />
         <Route path="activity" element={<ActivityPage />} />
         <Route path="sandbox" element={<SandboxPage />} />
+        <Route path="settings" element={<SettingsPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

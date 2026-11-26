@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | **Proposed. Not implemented.** Design input for the Part F plan. Nothing in this document exists in code yet unless the audit table says "Implemented (Part A)" |
+| Status | **Implemented in Part F (2026-11-25)** as described in §3–§4: `config/models.yaml`, `devteam_harness.llm_gateway.router` (precedence, start-up rules, recovery ladder), `ModelCall` records. D-06 and D-37 ruled (AP-023). The §1 audit table below is the historical 2026-11-19 snapshot; see `docs/architecture/llm-gateway.md` for the current behaviour |
 | Date | 2026-11-19 |
 | Requested by | Owner instruction "Model Routing Audit, Part B Planning, and Simple-Words Progress Tracker" (2026-11-19) |
 | Sources checked | Spec §9.1–§9.3, §10; roadmap §5.1 (HC-02…HC-05, HC-18), §9.1, §13 F, §20 (D-06, D-28); Working Plan §8 (GW-01…GW-12); `config/`, `packages/core/src/devteam_core/config/settings.py`, `scripts/benchmark_models.py`; `docs/benchmarks/2026-11-19-baseline.md`; `ollama list` |

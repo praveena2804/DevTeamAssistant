@@ -21,6 +21,10 @@ DevTeam AI is a local-first, BRD-driven software development platform.
 > - Part E (approved, v0.5.0): a secure Docker sandbox (Docker Engine inside WSL2, mutual TLS, no
 >   network, locked images) with ten fixed build and test recipes, and two starter kits checked in the sandbox.
 >   The run graph does not use the sandbox yet; project runs still use the Part D stand-ins.
+> - Part F (built on branch `part/f-gateway-rag`, awaiting approval G-F): model routing from `config/models.yaml` with a
+>   recovery ladder for out-of-memory and slow models, a content-free record of every model call, rate limits,
+>   a file-based prompt registry with a CI evaluation gate, and project-isolated document search (local
+>   `nomic-embed-text` embeddings in an in-process ChromaDB). Agents start using search in Part H.
 >
 > See `docs/IMPLEMENTATION_TRACKER.md` for the authoritative
 > status and `docs/PROJECT_PROGRESS_TRACKER.md` for a plain-English run history.
@@ -42,6 +46,8 @@ DevTeam AI is a local-first, BRD-driven software development platform.
 | `docs/runbooks/worker.md` | Starting, stopping and recovering the run worker |
 | `docs/runbooks/docker-setup.md` | Setting up the sandbox engine, certificates and images |
 | `docs/architecture/sandbox.md` | How sandbox runs work and which controls apply |
+| `docs/architecture/llm-gateway.md`, `rag.md`, `context-memory.md` | Model path, routing, records, search index, context budgets (Part F) |
+| `docs/runbooks/models-and-rag.md` | Models, search index, evaluations and prompts: day-to-day tasks |
 | `CLAUDE.md` | Engineering rules for coding agents |
 
 ## Architecture
@@ -173,7 +179,9 @@ uv run pytest tests/sandbox -m docker   # real sandbox tests; needs the WSL engi
 | API refuses to start: "no secure OS credential store is available" | The key can only live in Windows Credential Manager; there is no file fallback. Check that the `PYTHON_KEYRING_BACKEND` environment variable is not set |
 | UI says "You are not signed in" | Open the sign-in link printed by `scripts/dev.ps1` (or run `uv run python -m devteam_api.signin_link`). The key is stored in Windows Credential Manager (entry `devteam-ai`), never in a file; never share it |
 | A run waits with "waiting for resources" | Ollama is not running or memory is low. Start Ollama; the run continues by itself. See `docs/runbooks/worker.md` |
-| The worker refuses to start: "configured local models are not installed" | Install them, e.g. `ollama pull qwen2.5:3b` (models are listed in `config/defaults.yaml`); the platform never downloads models itself |
+| The worker refuses to start: "configured local models are not installed" | Install them: `ollama pull qwen2.5:3b`, `qwen2.5-coder:3b`, `qwen2.5:1.5b`, `nomic-embed-text` (models are listed in `config/models.yaml`); the platform never downloads models itself |
+| A run waits with `model.exhausted` or `rate.limited` | See `docs/runbooks/models-and-rag.md`: every recovery step ran out of memory, or the role's call rate was reached; the run continues by itself |
+| Search index job `blocked` | `rag.embedding_unavailable`: install `nomic-embed-text`; `rag.store_unavailable`: start the worker with `scripts/dev.ps1`. See the runbook |
 | A large PDF takes a long time to upload | Expected for now: reading happens during the upload (≈40 s for 300 pages on this laptop). Background reading arrives with the worker (Part D) |
 | `npm test` fails with "Vitest failed to find the current suite" | Run it from PowerShell or a path that starts with an upper-case `C:`; a lower-case drive letter loads Vitest twice |
 | API reports `degraded` | The state DB schema is behind; restart the API (it backs up, then migrates), or run `uv run alembic -c packages/state/alembic.ini upgrade head` |

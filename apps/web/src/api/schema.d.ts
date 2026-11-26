@@ -146,6 +146,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/projects/{project_id}/knowledge/index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Knowledge.Index Status */
+        get: operations["knowledge_index_status_api_projects__project_id__knowledge_index_get"];
+        put?: never;
+        /** Knowledge.Rebuild */
+        post: operations["knowledge_rebuild_api_projects__project_id__knowledge_index_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/projects/{project_id}/runs": {
         parameters: {
             query?: never;
@@ -292,6 +310,23 @@ export interface paths {
         };
         /** Run.Metrics */
         get: operations["run_metrics_api_projects__project_id__runs__run_id__metrics_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{project_id}/runs/{run_id}/model-calls": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Knowledge.Model Calls */
+        get: operations["knowledge_model_calls_api_projects__project_id__runs__run_id__model_calls_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -450,6 +485,74 @@ export interface paths {
         post: operations["session_create_api_session_post"];
         /** Session.Delete */
         delete: operations["session_delete_api_session_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/settings/evals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Settings.Evals */
+        get: operations["settings_evals_api_settings_evals_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/settings/limits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Settings.Limits */
+        get: operations["settings_limits_api_settings_limits_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/settings/models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Settings.Models */
+        get: operations["settings_models_api_settings_models_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/settings/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Settings.Profile */
+        get: operations["settings_profile_api_settings_profile_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -818,6 +921,65 @@ export interface components {
             /** Tag */
             tag: string;
         };
+        /** IndexJobOut */
+        IndexJobOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Detail */
+            detail: string | null;
+            /** Error Code */
+            error_code: string | null;
+            /** Finished At */
+            finished_at: string | null;
+            /** Job Id */
+            job_id: string;
+            /** Kind */
+            kind: string;
+            /** Status */
+            status: string;
+        };
+        /** IndexStatusOut */
+        IndexStatusOut: {
+            /** Chunker Version */
+            chunker_version: string | null;
+            /** Collection */
+            collection: string | null;
+            /** Documents Extracted */
+            documents_extracted: number;
+            /** Documents Indexed */
+            documents_indexed: number;
+            /** Embedding Digest */
+            embedding_digest: string | null;
+            /** Embedding Model */
+            embedding_model: string | null;
+            /** Index Complete */
+            index_complete: boolean;
+            latest_job: components["schemas"]["IndexJobOut"] | null;
+            /** Project Id */
+            project_id: string;
+        };
+        /** LimitsOut */
+        LimitsOut: {
+            /** Context */
+            context: {
+                [key: string]: unknown;
+            };
+            /** Llm */
+            llm: {
+                [key: string]: unknown;
+            };
+            /** Rag */
+            rag: {
+                [key: string]: unknown;
+            };
+            /** Rate Limits */
+            rate_limits: {
+                [key: string]: unknown;
+            };
+        };
         /** MetricsOut */
         MetricsOut: {
             /** Input Tokens */
@@ -839,6 +1001,85 @@ export interface components {
             /** Run Id */
             run_id: string;
         };
+        /** ModelCallOut */
+        ModelCallOut: {
+            /** Agent */
+            agent: string | null;
+            /** Attempt */
+            attempt: number;
+            /** Cache Hit */
+            cache_hit: boolean;
+            /** Call Id */
+            call_id: string;
+            /** Duration Ms */
+            duration_ms: number;
+            /** Error Code */
+            error_code: string | null;
+            /** Input Tokens */
+            input_tokens: number;
+            /** Kind */
+            kind: string;
+            /** Model Digest */
+            model_digest: string | null;
+            /** Model Tag */
+            model_tag: string;
+            /** Operation Id */
+            operation_id: string;
+            /** Outcome */
+            outcome: string;
+            /** Output Tokens */
+            output_tokens: number;
+            /** Recovery Step */
+            recovery_step: string;
+            /** Route Rule */
+            route_rule: string;
+            /** Service */
+            service: string | null;
+            /** Slot */
+            slot: string;
+            /** Task Id */
+            task_id: string | null;
+        };
+        /** ModelOut */
+        ModelOut: {
+            /** Approved */
+            approved: boolean;
+            /** Benchmark Ref */
+            benchmark_ref: string | null;
+            /** Checked At */
+            checked_at: string | null;
+            /** Digest */
+            digest: string | null;
+            /** Installed */
+            installed: boolean | null;
+            /** Kind */
+            kind: string;
+            /** Num Ctx */
+            num_ctx: number;
+            /** Peak Ram Mb */
+            peak_ram_mb: number | null;
+            /** Tag */
+            tag: string;
+            /** Timeout S */
+            timeout_s: number;
+        };
+        /** ModelsOut */
+        ModelsOut: {
+            /** Agent Overrides */
+            agent_overrides: number;
+            /** Keep Alive */
+            keep_alive: string;
+            /** Models */
+            models: components["schemas"]["ModelOut"][];
+            /** Ollama Version */
+            ollama_version: string | null;
+            /** Operation Overrides */
+            operation_overrides: number;
+            /** Response Cache */
+            response_cache: boolean;
+            /** Slots */
+            slots: components["schemas"]["SlotOut"][];
+        };
         /** NodeTiming */
         NodeTiming: {
             /** Node */
@@ -856,6 +1097,21 @@ export interface components {
             page?: number | null;
             /** Title */
             title: string;
+        };
+        /** ProfileOut */
+        ProfileOut: {
+            /** Max Model Ram Mb */
+            max_model_ram_mb: number;
+            /** Min Free Ram Mb */
+            min_free_ram_mb: number;
+            /** Profile */
+            profile: string;
+            /** Ram Margin Mb */
+            ram_margin_mb: number;
+            /** Sandbox Cpus */
+            sandbox_cpus: number;
+            /** Sandbox Memory Mb */
+            sandbox_memory_mb: number;
         };
         /** ProjectCreate */
         ProjectCreate: {
@@ -896,6 +1152,17 @@ export interface components {
             description?: string | null;
             /** Name */
             name?: string | null;
+        };
+        /** PromptStatusOut */
+        PromptStatusOut: {
+            /** Active Version */
+            active_version: number;
+            /** Eval Required */
+            eval_required: boolean;
+            /** Prompt Id */
+            prompt_id: string;
+            /** Report */
+            report: string;
         };
         /** RecipeOutcomeOut */
         RecipeOutcomeOut: {
@@ -1066,6 +1333,15 @@ export interface components {
         SessionRequest: {
             /** Token */
             token: string;
+        };
+        /** SlotOut */
+        SlotOut: {
+            /** Fallbacks */
+            fallbacks: string[];
+            /** Model */
+            model: string | null;
+            /** Slot */
+            slot: string;
         };
         /** SpanOut */
         SpanOut: {
@@ -1966,6 +2242,122 @@ export interface operations {
             };
         };
     };
+    knowledge_index_status_api_projects__project_id__knowledge_index_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IndexStatusOut"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Origin or role not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    knowledge_rebuild_api_projects__project_id__knowledge_index_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IndexJobOut"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Origin or role not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     run_list_api_projects__project_id__runs_get: {
         parameters: {
             query?: never;
@@ -2693,6 +3085,65 @@ export interface operations {
             };
         };
     };
+    knowledge_model_calls_api_projects__project_id__runs__run_id__model_calls_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModelCallOut"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Origin or role not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     run_pause_api_projects__project_id__runs__run_id__pause_post: {
         parameters: {
             query?: never;
@@ -3342,6 +3793,194 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Origin or role not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    settings_evals_api_settings_evals_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PromptStatusOut"][];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Origin or role not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    settings_limits_api_settings_limits_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LimitsOut"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Origin or role not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    settings_models_api_settings_models_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModelsOut"];
+                };
+            };
+            /** @description Not signed in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Origin or role not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    settings_profile_api_settings_profile_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileOut"];
+                };
             };
             /** @description Not signed in */
             401: {

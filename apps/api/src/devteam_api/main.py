@@ -13,7 +13,17 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from devteam_api.middleware.body_limit import UploadBodyLimitMiddleware
 from devteam_api.middleware.request_context import RequestContextMiddleware
-from devteam_api.routers import audit, documents, projects, runs, sandbox, session, system
+from devteam_api.routers import (
+    audit,
+    documents,
+    knowledge,
+    projects,
+    runs,
+    sandbox,
+    session,
+    system,
+)
+from devteam_api.routers import settings as settings_router
 from devteam_core import __version__
 from devteam_core.config import Settings, load_settings
 from devteam_core.logging import configure_logging, get_logger, secret_registry
@@ -116,4 +126,6 @@ def create_app(
     app.include_router(audit.router)
     app.include_router(runs.router)
     app.include_router(sandbox.router)
+    app.include_router(settings_router.router)  # Part F.6 (read-only, D-55)
+    app.include_router(knowledge.router)  # Part F.5/F.6 (status and queue only, D-57)
     return app

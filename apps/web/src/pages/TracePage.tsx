@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { type Span, getRunTrace } from "../api/client";
 import { useLoad } from "../api/useLoad";
 import { ErrorNotice } from "../components/ErrorNotice";
+import { ModelCallsTable } from "../components/ModelCallsTable";
 
 function tree(spans: readonly Span[]): { span: Span; depth: number }[] {
   const ids = new Set(spans.map((s) => s.span_id));
@@ -67,6 +68,7 @@ export function TracePage() {
           </tbody>
         </table>
       )}
+      <ModelCallsTable projectId={projectId} runId={runId} />
     </section>
   );
 }

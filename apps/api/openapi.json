@@ -915,6 +915,194 @@
         "title": "ImageOut",
         "type": "object"
       },
+      "IndexJobOut": {
+        "additionalProperties": false,
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "kind",
+          "status",
+          "created_at",
+          "finished_at",
+          "error_code",
+          "detail"
+        ],
+        "title": "IndexJobOut",
+        "type": "object"
+      },
+      "IndexStatusOut": {
+        "additionalProperties": false,
+        "properties": {
+          "chunker_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chunker Version"
+          },
+          "collection": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collection"
+          },
+          "documents_extracted": {
+            "title": "Documents Extracted",
+            "type": "integer"
+          },
+          "documents_indexed": {
+            "title": "Documents Indexed",
+            "type": "integer"
+          },
+          "embedding_digest": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Embedding Digest"
+          },
+          "embedding_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Embedding Model"
+          },
+          "index_complete": {
+            "title": "Index Complete",
+            "type": "boolean"
+          },
+          "latest_job": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IndexJobOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "project_id": {
+            "title": "Project Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project_id",
+          "collection",
+          "embedding_model",
+          "embedding_digest",
+          "chunker_version",
+          "documents_extracted",
+          "documents_indexed",
+          "index_complete",
+          "latest_job"
+        ],
+        "title": "IndexStatusOut",
+        "type": "object"
+      },
+      "LimitsOut": {
+        "additionalProperties": false,
+        "properties": {
+          "context": {
+            "additionalProperties": true,
+            "title": "Context",
+            "type": "object"
+          },
+          "llm": {
+            "additionalProperties": true,
+            "title": "Llm",
+            "type": "object"
+          },
+          "rag": {
+            "additionalProperties": true,
+            "title": "Rag",
+            "type": "object"
+          },
+          "rate_limits": {
+            "additionalProperties": true,
+            "title": "Rate Limits",
+            "type": "object"
+          }
+        },
+        "required": [
+          "rate_limits",
+          "rag",
+          "context",
+          "llm"
+        ],
+        "title": "LimitsOut",
+        "type": "object"
+      },
       "MetricsOut": {
         "properties": {
           "input_tokens": {
@@ -969,6 +1157,292 @@
         "title": "MetricsOut",
         "type": "object"
       },
+      "ModelCallOut": {
+        "additionalProperties": false,
+        "properties": {
+          "agent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent"
+          },
+          "attempt": {
+            "title": "Attempt",
+            "type": "integer"
+          },
+          "cache_hit": {
+            "title": "Cache Hit",
+            "type": "boolean"
+          },
+          "call_id": {
+            "title": "Call Id",
+            "type": "string"
+          },
+          "duration_ms": {
+            "title": "Duration Ms",
+            "type": "integer"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "input_tokens": {
+            "title": "Input Tokens",
+            "type": "integer"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "model_digest": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Digest"
+          },
+          "model_tag": {
+            "title": "Model Tag",
+            "type": "string"
+          },
+          "operation_id": {
+            "title": "Operation Id",
+            "type": "string"
+          },
+          "outcome": {
+            "title": "Outcome",
+            "type": "string"
+          },
+          "output_tokens": {
+            "title": "Output Tokens",
+            "type": "integer"
+          },
+          "recovery_step": {
+            "title": "Recovery Step",
+            "type": "string"
+          },
+          "route_rule": {
+            "title": "Route Rule",
+            "type": "string"
+          },
+          "service": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Service"
+          },
+          "slot": {
+            "title": "Slot",
+            "type": "string"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Id"
+          }
+        },
+        "required": [
+          "call_id",
+          "task_id",
+          "agent",
+          "service",
+          "kind",
+          "operation_id",
+          "slot",
+          "model_tag",
+          "model_digest",
+          "route_rule",
+          "recovery_step",
+          "cache_hit",
+          "input_tokens",
+          "output_tokens",
+          "duration_ms",
+          "outcome",
+          "error_code",
+          "attempt"
+        ],
+        "title": "ModelCallOut",
+        "type": "object"
+      },
+      "ModelOut": {
+        "additionalProperties": false,
+        "properties": {
+          "approved": {
+            "title": "Approved",
+            "type": "boolean"
+          },
+          "benchmark_ref": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Benchmark Ref"
+          },
+          "checked_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checked At"
+          },
+          "digest": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Digest"
+          },
+          "installed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Installed"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "num_ctx": {
+            "title": "Num Ctx",
+            "type": "integer"
+          },
+          "peak_ram_mb": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Peak Ram Mb"
+          },
+          "tag": {
+            "title": "Tag",
+            "type": "string"
+          },
+          "timeout_s": {
+            "title": "Timeout S",
+            "type": "number"
+          }
+        },
+        "required": [
+          "tag",
+          "kind",
+          "approved",
+          "benchmark_ref",
+          "peak_ram_mb",
+          "num_ctx",
+          "timeout_s",
+          "installed",
+          "digest",
+          "checked_at"
+        ],
+        "title": "ModelOut",
+        "type": "object"
+      },
+      "ModelsOut": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_overrides": {
+            "title": "Agent Overrides",
+            "type": "integer"
+          },
+          "keep_alive": {
+            "title": "Keep Alive",
+            "type": "string"
+          },
+          "models": {
+            "items": {
+              "$ref": "#/components/schemas/ModelOut"
+            },
+            "title": "Models",
+            "type": "array"
+          },
+          "ollama_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ollama Version"
+          },
+          "operation_overrides": {
+            "title": "Operation Overrides",
+            "type": "integer"
+          },
+          "response_cache": {
+            "title": "Response Cache",
+            "type": "boolean"
+          },
+          "slots": {
+            "items": {
+              "$ref": "#/components/schemas/SlotOut"
+            },
+            "title": "Slots",
+            "type": "array"
+          }
+        },
+        "required": [
+          "models",
+          "slots",
+          "agent_overrides",
+          "operation_overrides",
+          "keep_alive",
+          "response_cache",
+          "ollama_version"
+        ],
+        "title": "ModelsOut",
+        "type": "object"
+      },
       "NodeTiming": {
         "properties": {
           "node": {
@@ -1019,6 +1493,45 @@
           "title"
         ],
         "title": "OutlineItem",
+        "type": "object"
+      },
+      "ProfileOut": {
+        "additionalProperties": false,
+        "properties": {
+          "max_model_ram_mb": {
+            "title": "Max Model Ram Mb",
+            "type": "integer"
+          },
+          "min_free_ram_mb": {
+            "title": "Min Free Ram Mb",
+            "type": "integer"
+          },
+          "profile": {
+            "title": "Profile",
+            "type": "string"
+          },
+          "ram_margin_mb": {
+            "title": "Ram Margin Mb",
+            "type": "integer"
+          },
+          "sandbox_cpus": {
+            "title": "Sandbox Cpus",
+            "type": "number"
+          },
+          "sandbox_memory_mb": {
+            "title": "Sandbox Memory Mb",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "profile",
+          "max_model_ram_mb",
+          "min_free_ram_mb",
+          "ram_margin_mb",
+          "sandbox_memory_mb",
+          "sandbox_cpus"
+        ],
+        "title": "ProfileOut",
         "type": "object"
       },
       "ProjectCreate": {
@@ -1118,6 +1631,35 @@
           }
         },
         "title": "ProjectUpdate",
+        "type": "object"
+      },
+      "PromptStatusOut": {
+        "additionalProperties": false,
+        "properties": {
+          "active_version": {
+            "title": "Active Version",
+            "type": "integer"
+          },
+          "eval_required": {
+            "title": "Eval Required",
+            "type": "boolean"
+          },
+          "prompt_id": {
+            "title": "Prompt Id",
+            "type": "string"
+          },
+          "report": {
+            "title": "Report",
+            "type": "string"
+          }
+        },
+        "required": [
+          "prompt_id",
+          "active_version",
+          "eval_required",
+          "report"
+        ],
+        "title": "PromptStatusOut",
         "type": "object"
       },
       "RecipeOutcomeOut": {
@@ -1600,6 +2142,40 @@
           "token"
         ],
         "title": "SessionRequest",
+        "type": "object"
+      },
+      "SlotOut": {
+        "additionalProperties": false,
+        "properties": {
+          "fallbacks": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Fallbacks",
+            "type": "array"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "slot": {
+            "title": "Slot",
+            "type": "string"
+          }
+        },
+        "required": [
+          "slot",
+          "model",
+          "fallbacks"
+        ],
+        "title": "SlotOut",
         "type": "object"
       },
       "SpanOut": {
@@ -3055,6 +3631,148 @@
         ]
       }
     },
+    "/api/projects/{project_id}/knowledge/index": {
+      "get": {
+        "operationId": "knowledge_index_status_api_projects__project_id__knowledge_index_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndexStatusOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Origin or role not allowed"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Rate limit exceeded"
+          }
+        },
+        "summary": "Knowledge.Index Status",
+        "tags": [
+          "knowledge"
+        ]
+      },
+      "post": {
+        "operationId": "knowledge_rebuild_api_projects__project_id__knowledge_index_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndexJobOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Origin or role not allowed"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Rate limit exceeded"
+          }
+        },
+        "summary": "Knowledge.Rebuild",
+        "tags": [
+          "knowledge"
+        ]
+      }
+    },
     "/api/projects/{project_id}/runs": {
       "get": {
         "operationId": "run_list_api_projects__project_id__runs_get",
@@ -4042,6 +4760,91 @@
         ]
       }
     },
+    "/api/projects/{project_id}/runs/{run_id}/model-calls": {
+      "get": {
+        "operationId": "knowledge_model_calls_api_projects__project_id__runs__run_id__model_calls_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "project_id",
+            "required": true,
+            "schema": {
+              "title": "Project Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ModelCallOut"
+                  },
+                  "title": "Response Knowledge Model Calls Api Projects  Project Id  Runs  Run Id  Model Calls Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Origin or role not allowed"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Rate limit exceeded"
+          }
+        },
+        "summary": "Knowledge.Model Calls",
+        "tags": [
+          "knowledge"
+        ]
+      }
+    },
     "/api/projects/{project_id}/runs/{run_id}/pause": {
       "post": {
         "operationId": "run_pause_api_projects__project_id__runs__run_id__pause_post",
@@ -4869,6 +5672,214 @@
         "summary": "Sign in with the local install token",
         "tags": [
           "session"
+        ]
+      }
+    },
+    "/api/settings/evals": {
+      "get": {
+        "operationId": "settings_evals_api_settings_evals_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PromptStatusOut"
+                  },
+                  "title": "Response Settings Evals Api Settings Evals Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Origin or role not allowed"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Rate limit exceeded"
+          }
+        },
+        "summary": "Settings.Evals",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/settings/limits": {
+      "get": {
+        "operationId": "settings_limits_api_settings_limits_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LimitsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Origin or role not allowed"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Rate limit exceeded"
+          }
+        },
+        "summary": "Settings.Limits",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/settings/models": {
+      "get": {
+        "operationId": "settings_models_api_settings_models_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Origin or role not allowed"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Rate limit exceeded"
+          }
+        },
+        "summary": "Settings.Models",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/settings/profile": {
+      "get": {
+        "operationId": "settings_profile_api_settings_profile_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Origin or role not allowed"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Rate limit exceeded"
+          }
+        },
+        "summary": "Settings.Profile",
+        "tags": [
+          "settings"
         ]
       }
     },

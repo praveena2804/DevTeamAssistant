@@ -21,6 +21,7 @@ export function Layout() {
           <NavLink to="/projects">Projects</NavLink>
           <NavLink to="/activity">Activity</NavLink>
           <NavLink to="/sandbox">Sandbox</NavLink>
+          <NavLink to="/settings">Settings</NavLink>
           <NavLink to="/" end>
             System status
           </NavLink>

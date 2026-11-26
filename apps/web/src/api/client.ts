@@ -36,6 +36,13 @@ export type RunMetrics = Schemas["MetricsOut"];
 export type SandboxStatus = Schemas["SandboxStatusOut"];
 export type StarterKit = Schemas["TemplateOut"];
 export type Verification = Schemas["VerificationOut"];
+export type ModelsSettings = Schemas["ModelsOut"];
+export type ProfileSettings = Schemas["ProfileOut"];
+export type LimitsSettings = Schemas["LimitsOut"];
+export type PromptStatus = Schemas["PromptStatusOut"];
+export type IndexStatus = Schemas["IndexStatusOut"];
+export type IndexJob = Schemas["IndexJobOut"];
+export type ModelCall = Schemas["ModelCallOut"];
 
 export class ApiError extends Error {
   readonly status: number;
@@ -184,3 +191,18 @@ export const requestVerification = (templateId: string) =>
   request<Verification>(`/api/sandbox/templates/${encodeURIComponent(templateId)}/verifications`, { method: "POST" });
 export const getVerification = (verificationId: string, signal?: AbortSignal) =>
   request<Verification>(`/api/sandbox/verifications/${encodeURIComponent(verificationId)}`, opt(signal));
+
+// ---------------------------------------------------------------- settings, knowledge (Part F)
+export const getModelSettings = (signal?: AbortSignal) => request<ModelsSettings>("/api/settings/models", opt(signal));
+export const getProfileSettings = (signal?: AbortSignal) => request<ProfileSettings>("/api/settings/profile", opt(signal));
+export const getLimitSettings = (signal?: AbortSignal) => request<LimitsSettings>("/api/settings/limits", opt(signal));
+export const getEvalStatus = (signal?: AbortSignal) => request<PromptStatus[]>("/api/settings/evals", opt(signal));
+export const getIndexStatus = (projectId: string, signal?: AbortSignal) =>
+  request<IndexStatus>(`/api/projects/${encodeURIComponent(projectId)}/knowledge/index`, opt(signal));
+export const requestIndexRebuild = (projectId: string) =>
+  request<IndexJob>(`/api/projects/${encodeURIComponent(projectId)}/knowledge/index`, { method: "POST" });
+export const listModelCalls = (projectId: string, runId: string, signal?: AbortSignal) =>
+  request<ModelCall[]>(
+    `/api/projects/${encodeURIComponent(projectId)}/runs/${encodeURIComponent(runId)}/model-calls`,
+    opt(signal),
+  );

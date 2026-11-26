@@ -4,6 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import { type UploadResponse, getProject, listDocuments, uploadDocuments } from "../api/client";
 import { useLoad } from "../api/useLoad";
 import { ErrorNotice } from "../components/ErrorNotice";
+import { KnowledgePanel } from "../components/KnowledgePanel";
 import { RunsSection } from "../components/RunsSection";
 
 const ACCEPT = ".pdf,.docx,.txt,.md";
@@ -132,6 +133,8 @@ export function ProjectPage() {
             </tbody>
           </table>
         ))}
+
+      <KnowledgePanel projectId={projectId} />
 
       <RunsSection
         projectId={projectId}
