@@ -33,6 +33,10 @@ One section per approved part (roadmap §8). Entries are added at gate approval;
 
 - Capability Catalog: limitation texts containing a comma were split in two by YAML, cutting the reason shown
   in the feasibility report short (found during the G-G demonstration)
+- Web tests: `npm --prefix apps/web test` failed when started from a working directory spelled with a lower-case
+  drive letter on Windows; Vitest is now started through `apps/web/scripts/vitest.mjs` (KI-048)
+- Test reliability: audit events in tests are read in hash-chain order (KI-046); two orchestration fixtures no
+  longer depend on the host's free memory (KI-047)
 
 ## Unreleased — Part F: LLM Gateway, Model Routing, Context & Memory, and RAG (awaiting G-F)
 
