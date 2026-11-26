@@ -20,12 +20,13 @@ from devteam_orchestration.safety import CloudTracingConfiguredError
 from devteam_orchestration.steps import ResourceWait, ensure_task, run_task, task_row_status
 from devteam_state.repositories import documents
 from tests.fixtures.harness import REPO_ROOT
-from tests.fixtures.orchestration import Env, closed_port, make_env
+from tests.fixtures.orchestration import Env, assume_free_ram, closed_port, make_env
 
 
 @pytest.fixture
 def offline(tmp_path: Path) -> Iterator[Env]:
     env = make_env(tmp_path, ollama_url=f"http://127.0.0.1:{closed_port()}")
+    assume_free_ram(env)  # these tests are about an unreachable model, not about this host's memory
     yield env
     env.close()
 

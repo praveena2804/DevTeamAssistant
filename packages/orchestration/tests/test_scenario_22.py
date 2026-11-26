@@ -23,7 +23,7 @@ from sqlalchemy import select, text
 from devteam_core.contracts.statuses import RunStatus
 from devteam_orchestration.execution import advance
 from devteam_state.models import AgentTaskRow, ModelCallRow, Run
-from tests.fixtures.orchestration import Env, make_env
+from tests.fixtures.orchestration import Env, assume_free_ram, make_env
 
 BASE = "http://127.0.0.1:11434"
 TAGS = {"models": [{"name": n, "digest": d * 64} for n, d in
@@ -42,7 +42,7 @@ def env(tmp_path: Path) -> Iterator[tuple[Env, respx.MockRouter]]:
         )
         built = make_env(tmp_path, ollama_url=BASE, with_graph=True)
         assert built.rt.gateway is not None
-        built.rt.gateway._free_ram = lambda: 64_000
+        assume_free_ram(built)  # the OOM is simulated by the model server, not by this host
         try:
             yield built, mock
         finally:

@@ -57,10 +57,17 @@ def bearer(client: TestClient) -> dict[str, str]:
 
 
 def audit_rows(settings: Settings) -> list[AuditEvent]:
+    """Audit events in append order: the hash chain's ``seq`` (KI-046).
+
+    ``ts`` alone cannot order events: the Windows wall clock advances in steps of about 1-16 ms, so two events
+    appended back to back can share a timestamp, and the random part of the ID then decides. Unchained rows
+    (``seq`` NULL, written before the chain existed) sort first, by time.
+    """
     engine = create_sqlite_engine(settings.state_db_path)
     try:
         with session_factory(engine)() as session:
-            return list(session.scalars(select(AuditEvent).order_by(AuditEvent.ts, AuditEvent.id)))
+            query = select(AuditEvent).order_by(AuditEvent.seq, AuditEvent.ts, AuditEvent.id)
+            return list(session.scalars(query))
     finally:
         engine.dispose()
 

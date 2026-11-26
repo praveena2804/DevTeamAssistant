@@ -154,6 +154,18 @@ def make_env(
     return Env(settings, sessions, rt, graph, checkpointer, owner, project_id, run_id)
 
 
+def assume_free_ram(env: Env, megabytes: int = 64_000) -> None:
+    """Make the run's memory checks see ``megabytes`` free instead of the host's real RAM (KI-047).
+
+    Both probes are pinned: the gateway's per-model check and the Budget Manager's check, which the Agent
+    Executor consults before every task. Without this, a test that mocks or removes Ollama still depends on
+    how much memory the machine happens to have free.
+    """
+    assert env.rt.gateway is not None
+    env.rt.gateway._free_ram = lambda: megabytes
+    env.rt.executor._s.budgets._memory_probe = lambda: megabytes
+
+
 def frozen_spec(env: Env, in_scope: tuple[str, ...] = ("FR-001",)) -> tuple[str, str, str]:
     """A genuinely approved and frozen spec version for ``env``'s run: ``(spec_id, checksum, approval_id)``.
 

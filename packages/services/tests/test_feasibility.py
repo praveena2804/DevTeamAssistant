@@ -10,10 +10,16 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
+from pydantic import ValidationError
 
 from devteam_core.contracts.agents import BrdAnalystOutput
 from devteam_core.contracts.catalog import CatalogKey
-from devteam_core.contracts.feasibility import CoverageRecommendation, RequirementEffectKind
+from devteam_core.contracts.feasibility import (
+    CoverageRecommendation,
+    FeasibilityReport,
+    RequirementEffectKind,
+    recommend,
+)
 from devteam_core.contracts.records import (
     GapCategory,
     GapKind,
@@ -23,6 +29,7 @@ from devteam_core.contracts.statuses import FeasibilityStatus
 from devteam_services import catalog as cat
 from devteam_services.feasibility.mapping import map_subject, normalise, requested_version, version_compatible
 from devteam_services.feasibility.rules import assess_all, coverage_of_effects, effects_of, scope_of
+from tests.fixtures.contract_samples import SAMPLES
 from tests.fixtures.feasibility_engine import COUNTED, fixture, snapshot
 
 S = FeasibilityStatus
@@ -239,3 +246,47 @@ def test_unknown_linked_keys_fall_back_to_the_whole_application() -> None:
         a for a in assess_all(analysis, snapshot(), scope_of(analysis), {}) if a.subject.name == "Stripe"
     )
     assert stripe.whole_application
+
+
+# ------------------------------------------------------------------- DV-034 (accepted by the owner, AP-027)
+
+
+@pytest.mark.parametrize(
+    ("numerator", "denominator", "pending", "expected"),
+    [
+        (0, 5, 0, R.NOTHING_TO_BUILD),  # 0% and nothing waits for a substitution: proceeding is disabled
+        (0, 5, 1, R.STOP_RECOMMENDED),  # 0% but an offered substitution can still make it buildable
+        (0, 5, 5, R.STOP_RECOMMENDED),
+        (0, 0, 0, R.NOT_APPLICABLE),  # no counted requirement: nothing to measure
+        (2, 5, 0, R.STOP_RECOMMENDED),  # 40% < 50%: needs the acknowledgement
+        (3, 5, 0, R.PROCEED),
+        (5, 5, 0, R.PROCEED),
+    ],
+)
+def test_dv_034_proceeding_is_disabled_only_at_0_percent_with_no_pending_substitution(
+    numerator: int, denominator: int, pending: int, expected: CoverageRecommendation
+) -> None:
+    assert recommend(numerator, denominator, 50, pending) is expected
+
+
+def test_dv_034_a_report_cannot_claim_a_different_recommendation() -> None:
+    """The contract recomputes the rule, so a stored or forged report cannot re-enable proceeding."""
+    nothing = SAMPLES["FeasibilityReport"]().model_dump() | {
+        "numerator": 0,
+        "coverage_pct": 0.0,
+        "pending_keys": (),
+        "recommendation": R.NOTHING_TO_BUILD,
+    }
+    report = FeasibilityReport.model_validate(nothing)
+    assert not report.proceed_allowed  # control: the honest report disables proceeding
+    for forged in (R.STOP_RECOMMENDED, R.PROCEED):
+        with pytest.raises(ValidationError, match="does not follow"):
+            FeasibilityReport.model_validate(nothing | {"recommendation": forged})
+    pending = FeasibilityReport.model_validate(
+        nothing | {"pending_keys": ("FR-001",), "recommendation": R.STOP_RECOMMENDED}
+    )
+    assert pending.proceed_allowed and pending.needs_acknowledgement  # 0% with a pending offer
+    with pytest.raises(ValidationError, match="does not follow"):  # a pending NFR does not count (D-02)
+        FeasibilityReport.model_validate(
+            nothing | {"pending_keys": ("NFR-001",), "recommendation": R.STOP_RECOMMENDED}
+        )
